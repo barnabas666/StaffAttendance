@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[Aliases]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Alias] NVARCHAR(10) NOT NULL, 
+    [PIN] NVARCHAR(10) NOT NULL
+)
