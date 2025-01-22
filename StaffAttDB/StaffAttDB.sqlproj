@@ -60,6 +60,7 @@
     <Folder Include="dbo\Tables" />
     <Folder Include="Scripts" />
     <Folder Include="Publish Profiles" />
+    <Folder Include="dbo\Stored Procedures" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Departments.sql" />
@@ -69,6 +70,10 @@
     <Build Include="dbo\Tables\PhoneNumbers.sql" />
     <Build Include="dbo\Tables\StaffPhoneNumbers.sql" />
     <Build Include="dbo\Tables\CheckIns.sql" />
+    <Build Include="dbo\Stored Procedures\spDepartments_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffs_Insert.sql" />
+    <Build Include="dbo\Stored Procedures\spAliases_Insert.sql" />
+    <Build Include="dbo\Stored Procedures\spAddresses_Insert.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />

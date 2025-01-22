@@ -24,18 +24,36 @@ public class SqlDataAccess : ISqlDataAccess
 
         using (IDbConnection connection = new SqlConnection(connectionString))
         {
-            var rows = await connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            var rows = await connection.QueryAsync<T>(storedProcedure,
+                                                      parameters,
+                                                      commandType: CommandType.StoredProcedure);
             return rows.ToList();
         }
     }
 
+    // returns number of inserted/affected rows
     public async Task<int> SaveData<T>(string storedProcedure, T parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
 
         using (IDbConnection connection = new SqlConnection(connectionString))
         {
-            return await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            return await connection.ExecuteAsync(storedProcedure,
+                                                 parameters,
+                                                 commandType: CommandType.StoredProcedure);
+        }
+    }
+
+    // returns Id of last inserted object, query/SP should end with: SELECT SCOPE_IDENTITY();
+    public async Task<int> SaveDataGetId<T>(string storedProcedure, T parameters, string connectionStringName)
+    {
+        string connectionString = _config.GetConnectionString(connectionStringName);
+
+        using (IDbConnection connection = new SqlConnection(connectionString))
+        {
+            return await connection.ExecuteScalarAsync<int>(storedProcedure,
+                                                            parameters,
+                                                            commandType: CommandType.StoredProcedure);
         }
     }
 }
