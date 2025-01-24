@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace StaffAttLibrary.Data;
 
 /// <summary>
-/// Class servicing Staffs - CRUD actions.
+/// Class servicing Staffs - CRUD actions. Maybe should make class for Staffs and other for CheckIns
 /// UIs (MVC, WPF) talk to this class. This class calls SqlDataAccess methods.
 /// </summary>
 public class SqlData
@@ -119,6 +119,29 @@ public class SqlData
                                    connectionStringName);
             }
         }
+    }
+
+    /// <summary>
+    /// Get all Staffs from Db by default. If optional parameter is false than get only those not approved.
+    /// </summary>
+    /// <param name="getAll">false returns only not approved Staff.</param>
+    /// <returns>Collection of StaffFullModel</returns>
+    public async Task<List<StaffFullModel>> GetAllStaff(bool getAll = true)
+    {
+        string sql = getAll ? "spStaffs_GetAll" : "spStaffs_GetAllNotApproved";
+
+        List <StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>(sql,
+                                                                                  new { },
+                                                                                  connectionStringName);
+
+        foreach (StaffFullModel staff in output)
+        {
+            staff.PhoneNumbers = await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
+                                                                               new { staffId = staff.Id },
+                                                                               connectionStringName);
+        }
+
+        return output;
     }
 
     /// <summary>

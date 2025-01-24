@@ -77,6 +77,9 @@
     <Build Include="dbo\Stored Procedures\spPhoneNumbers_GetByPhoneNumber.sql" />
     <Build Include="dbo\Stored Procedures\spPhoneNumbers_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spStaffPhoneNumbers_Insert.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffs_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spPhoneNumbers_GetByStaffId.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffs_GetAllNotApproved.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />
