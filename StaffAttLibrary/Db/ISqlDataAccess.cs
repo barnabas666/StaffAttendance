@@ -1,6 +1,9 @@
 ﻿
 namespace StaffAttLibrary.Db;
 
+/// <summary>
+/// Interface for class servicing SQL database connection
+/// </summary>
 public interface ISqlDataAccess
 {
     Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName);

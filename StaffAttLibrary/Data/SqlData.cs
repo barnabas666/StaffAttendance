@@ -7,21 +7,55 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Data;
+
+/// <summary>
+/// Class servicing Staffs - CRUD actions.
+/// UIs (MVC, WPF) talk to this class. This class calls SqlDataAccess methods.
+/// </summary>
 public class SqlData
 {
+    /// <summary>
+    /// Servicing SQL database connection.
+    /// </summary>
     private readonly ISqlDataAccess _db;
+
+    /// <summary>
+    /// Holds default connection string name.
+    /// </summary>
     private const string connectionStringName = "SqlDb";
 
+    /// <summary>
+    /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
+    /// </summary>
+    /// <param name="db">Servicing SQL database connection.</param>
     public SqlData(ISqlDataAccess db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Get all Departments from our database.
+    /// </summary>
+    /// <returns>Collection of DepartmentModel.</returns>
     public async Task<List<DepartmentModel>> GetAllDepartments()
     {
         return await _db.LoadData<DepartmentModel, dynamic>("spDepartments_GetAll", new { }, connectionStringName);
     }
 
+    /// <summary>
+    /// Create Staff and save it to our database, needs some refactoring into more methods.
+    /// All parameters are pretty straightforward
+    /// </summary>
+    /// <param name="departmentId"></param>
+    /// <param name="street"></param>
+    /// <param name="city"></param>
+    /// <param name="zip"></param>
+    /// <param name="state"></param>
+    /// <param name="pIN"></param>
+    /// <param name="firstName"></param>
+    /// <param name="lastName"></param>
+    /// <param name="emailAddress"></param>
+    /// <param name="phoneNumbers"></param>
     public async void CreateStaff(int departmentId,
                             string street,
                             string city,
@@ -30,8 +64,10 @@ public class SqlData
                             string pIN,
                             string firstName,
                             string lastName,
-                            string emailAddress)
+                            string emailAddress,
+                            List<string> phoneNumbers)
     {
+        // Save Address into Db and returns back Id.
         int addressId = await _db.SaveDataGetId("spAddresses_Insert",
                                                 new { street, city, zip, state },
                                                 connectionStringName);
@@ -40,6 +76,7 @@ public class SqlData
         string alias = "";
         int aliasId = 0;
 
+        // Repeat until we have available Alias (SP returns last inserted Id).
         do
         {
             orderNumber++;
@@ -49,9 +86,39 @@ public class SqlData
                                               connectionStringName);
         } while (aliasId == 0);
 
+        // Save Alias into Db and returns back Id.
         int staffId = await _db.SaveDataGetId("spStaffs_Insert",
                                               new { departmentId, addressId, aliasId, firstName, lastName, emailAddress },
                                               connectionStringName);
+
+        // Add Phone Numbers into Db.
+        int phoneNumberId = 0;
+        foreach (string phoneNumber in phoneNumbers)
+        {
+            // Check if given Phone Number is already in Db (some Staff can share it because they live together).
+            List<PhoneNumberModel> phoneNumberList = await _db.LoadData<PhoneNumberModel, dynamic>(
+                "spPhoneNumbers_GetByPhoneNumber",
+                new { phoneNumber },
+                connectionStringName);
+
+            // If we found that Phone Number in Db we just store it inside relation StaffPhoneNumbers Table.
+            if (phoneNumberList.Count == 1)
+            {
+                await _db.SaveData("spStaffPhoneNumbers_Insert",
+                                   new { staffId, phoneNumberId = phoneNumberList.First().Id },
+                                   connectionStringName);
+            }
+            // If its new Phone Number we add it to PhoneNumbers Table too.
+            else
+            {
+                phoneNumberId = await _db.SaveDataGetId("spPhoneNumbers_Insert",
+                                                        new { phoneNumber },
+                                                        connectionStringName);
+                await _db.SaveData("spStaffPhoneNumbers_Insert",
+                                   new { staffId, phoneNumberId },
+                                   connectionStringName);
+            }
+        }
     }
 
     /// <summary>

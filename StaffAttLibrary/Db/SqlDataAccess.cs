@@ -9,15 +9,35 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Db;
+
+/// <summary>
+/// Class servicing SQL database connection, using Dapper.
+/// </summary>
 public class SqlDataAccess : ISqlDataAccess
 {
+    /// <summary>
+    /// IConfiguration interface is used to read Settings and Connection Strings from appsettings.json file.    /// 
+    /// </summary>
     private readonly IConfiguration _config;
 
+    /// <summary>
+    /// Constructor, IConfiguration comes from Dependency Injection from our frontend (UI).
+    /// </summary>
+    /// <param name="config">Is used to read Settings and Connection Strings from appsettings.json file.</param>
     public SqlDataAccess(IConfiguration config)
     {
         _config = config;
     }
 
+    /// <summary>
+    /// Connect to SQL database and load data without blocking UI thread.
+    /// </summary>
+    /// <typeparam name="T">Generic parameter - Model we get from Db.</typeparam>
+    /// <typeparam name="U">Generic parameter - dynamic parameters inserted into Stored Procedure.</typeparam>
+    /// <param name="storedProcedure">Stored Procedure to execute SQL query.</param>
+    /// <param name="parameters">Parameters inserted into Stored Procedure.</param>
+    /// <param name="connectionStringName">Connection String Name from appsettings.json.</param>
+    /// <returns>Collection of T representing some Model.</returns>
     public async Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
@@ -31,7 +51,14 @@ public class SqlDataAccess : ISqlDataAccess
         }
     }
 
-    // returns number of inserted/affected rows
+    /// <summary>
+    /// Connect to SQL database and save data without blocking UI thread. 
+    /// </summary>
+    /// <typeparam name="T">Generic parameter - dynamic parameters inserted into Stored Procedure.</typeparam>
+    /// <param name="storedProcedure">Stored Procedure to execute SQL query.</param>
+    /// <param name="parameters">Parameters inserted into Stored Procedure.</param>
+    /// <param name="connectionStringName">Connection String Name from appsettings.json.</param>
+    /// <returns>Returns number of inserted/affected rows</returns>
     public async Task<int> SaveData<T>(string storedProcedure, T parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
@@ -44,7 +71,14 @@ public class SqlDataAccess : ISqlDataAccess
         }
     }
 
-    // returns Id of last inserted object, query/SP should end with: SELECT SCOPE_IDENTITY();
+    /// <summary>
+    /// Connect to SQL database and save data without blocking UI thread.
+    /// </summary>
+    /// <typeparam name="T">Generic parameter - dynamic parameters inserted into Stored Procedure.</typeparam>
+    /// <param name="storedProcedure">Stored Procedure to execute SQL query.</param>
+    /// <param name="parameters">Parameters inserted into Stored Procedure.</param>
+    /// <param name="connectionStringName">Connection String Name from appsettings.json.</param>
+    /// <returns>Returns Id of last inserted object, query/SP should end with: SELECT SCOPE_IDENTITY();</returns>
     public async Task<int> SaveDataGetId<T>(string storedProcedure, T parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
