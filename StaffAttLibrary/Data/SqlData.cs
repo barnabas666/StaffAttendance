@@ -3,6 +3,7 @@ using StaffAttLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -122,6 +123,81 @@ public class SqlData
     }
 
     /// <summary>
+    /// Verify if entered credentials are correct.
+    /// </summary>
+    /// <param name="alias">Staff's Alias.</param>
+    /// <param name="pIN">Staff's PIN.</param>
+    /// <returns>Correct: Alias info. False: null</returns>
+    public async Task<AliasModel> AliasVerification(string alias, string pIN)
+    {
+        List<AliasModel> output = await _db.LoadData<AliasModel, dynamic>("spAliases_Verification",
+                                                                          new { alias, pIN },
+                                                                          connectionStringName);
+
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Check if Staff is approved to do CheckIn/CheckOut
+    /// </summary>
+    /// <param name="aliasId">Staff's Alias info.</param>
+    /// <returns>True if Staff is approved, false if not. ArgumentException for invalid aliasId.</returns>
+    /// <exception cref="ArgumentException">For invalid aliasId.</exception>
+    public async Task<bool> CheckApproveStatus(int aliasId)
+    {
+        List<StaffFullModel> model = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetByAlias",
+                                                                                 new { aliasId },
+                                                                                 connectionStringName);
+
+        if (model.FirstOrDefault() == null)
+            throw new ArgumentException("You passed in an invalid parameter", "aliasId");
+
+        return model.First().IsApproved;
+    }
+
+    /// <summary>
+    /// Get last record from CheckIn Table.
+    /// </summary>
+    /// <param name="staffId">Staff's Id.</param>
+    /// <returns>Last CheckIn (CheckOut prop can be null) info or null for invalid staffId.</returns>
+    public async Task<CheckInModel> GetLastCheckIn(int staffId)
+    {
+        List<CheckInModel> output = await _db.LoadData<CheckInModel, dynamic>("spCheckIns_GetLastRecord",
+                                                                  new { staffId },
+                                                                  connectionStringName);
+
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Perform CheckIn for given Staff with current date.
+    /// </summary>
+    /// <param name="staffId">Staff's id.</param>
+    /// <returns>CheckIn id.</returns>
+    public async Task<int> CheckInPerform(int staffId)
+    {
+        int checkInId = await _db.SaveDataGetId("spCheckIns_InsertCheckIn",
+                           new { staffId },
+                           connectionStringName);
+
+        return checkInId;
+    }
+
+    /// <summary>
+    /// Perform CheckOut for given CheckIn record with current date.
+    /// </summary>
+    /// <param name="checkInId">CheckIn's id.</param>
+    /// <returns>CheckIn id.</returns>
+    public async Task<int> CheckOutPerform(int checkInId)
+    {
+        checkInId = await _db.SaveDataGetId("spCheckIns_InsertCheckOut",
+                           new { checkInId },
+                           connectionStringName);
+
+        return checkInId;
+    }
+
+    /// <summary>
     /// Get all Staffs from Db by default. If optional parameter is false than get only those not approved.
     /// </summary>
     /// <param name="getAll">false returns only not approved Staff.</param>
@@ -130,7 +206,7 @@ public class SqlData
     {
         string sql = getAll ? "spStaffs_GetAll" : "spStaffs_GetAllNotApproved";
 
-        List <StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>(sql,
+        List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>(sql,
                                                                                   new { },
                                                                                   connectionStringName);
 
@@ -145,6 +221,54 @@ public class SqlData
     }
 
     /// <summary>
+    /// Get Staff by Email from Db.
+    /// </summary>
+    /// <param name="emailAddress">Staff's email.</param>
+    /// <returns>Staff info.</returns>
+    public async Task<StaffFullModel> GetStaffByEmail(string emailAddress)
+    {
+        List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetByEmail",
+                                                                            new { emailAddress },
+                                                                            connectionStringName);
+
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Update type of Department and Approved status by Admin.
+    /// </summary>
+    /// <param name="id">Staff's id.</param>
+    /// <param name="departmentId">Department's id.</param>
+    /// <param name="isApproved">is Approved status</param>
+    public async void UpdateStaffByAdmin(int id, int departmentId, bool isApproved)
+    {
+        await _db.SaveData("spStaffs_UpdateByAdmin",
+                           new { id, departmentId, isApproved },
+                           connectionStringName);
+    }
+
+    /// <summary>
+    /// Should move into some helper class!
+    /// Perform CheckOut if last record in CheckIns Table has CheckOut set to null,
+    /// otherwise perform CheckIn.
+    /// </summary>
+    /// <param name="staffId">Staff's Id.</param>
+    /// <exception cref="ArgumentException"></exception>
+    private async void DoCheckInOrCheckOut(int staffId)
+    {
+        CheckInModel model = await GetLastCheckIn(staffId);
+
+        if (model == null)
+            throw new ArgumentException("You passed in an invalid parameter", "staffId");
+
+        if (model.CheckOutDate == null)
+            await CheckOutPerform(model.Id);
+        else
+            await CheckInPerform(staffId);
+    }
+
+    /// <summary>
+    /// Should move into some helper class!
     /// Create Alias from First Name, Last Name and Order Number (just in case of same aliases)
     /// John Doe will have alias JDO1, Jason Doherty JDO2, Susan Storm SST1 etc. 
     /// </summary>
