@@ -13,7 +13,7 @@ namespace StaffAttLibrary.Data;
 /// Class servicing Staffs - CRUD actions. Maybe should make class for Staffs and other for CheckIns
 /// UIs (MVC, WPF) talk to this class. This class calls SqlDataAccess methods.
 /// </summary>
-public class SqlData
+public class SqlData : IDatabaseData
 {
     /// <summary>
     /// Servicing SQL database connection.
@@ -23,7 +23,7 @@ public class SqlData
     /// <summary>
     /// Holds default connection string name.
     /// </summary>
-    private const string connectionStringName = "SqlDb";
+    private const string connectionStringName = "Testing";
 
     /// <summary>
     /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
