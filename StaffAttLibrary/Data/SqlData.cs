@@ -1,6 +1,7 @@
 ﻿using StaffAttLibrary.Db;
 using StaffAttLibrary.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -228,6 +229,24 @@ public class SqlData : IDatabaseData
     public async Task<StaffFullModel> GetStaffByEmail(string emailAddress)
     {
         List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetByEmail",
+                                                                            new { emailAddress },
+                                                                            connectionStringName);
+
+        output.FirstOrDefault().PhoneNumbers = await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
+                                                                               new { staffId = output.FirstOrDefault().Id },
+                                                                               connectionStringName);
+
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Check if Staff exists by Email from Db.
+    /// </summary>
+    /// <param name="emailAddress">Staff's email.</param>
+    /// <returns>True if Staff exists.</returns>
+    public async Task<bool> CheckStaffByEmail(string emailAddress)
+    {
+        var output = await _db.LoadData<bool, dynamic>("spStaffs_CheckByEmail",
                                                                             new { emailAddress },
                                                                             connectionStringName);
 

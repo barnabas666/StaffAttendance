@@ -12,5 +12,6 @@ public interface IDatabaseData
     Task<List<StaffFullModel>> GetAllStaff(bool getAll = true);
     Task<CheckInModel> GetLastCheckIn(int staffId);
     Task<StaffFullModel> GetStaffByEmail(string emailAddress);
+    Task<bool> CheckStaffByEmail(string emailAddress);
     void UpdateStaffByAdmin(int id, int departmentId, bool isApproved);
 }
