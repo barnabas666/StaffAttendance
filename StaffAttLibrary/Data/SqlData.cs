@@ -58,7 +58,7 @@ public class SqlData : IDatabaseData
     /// <param name="lastName"></param>
     /// <param name="emailAddress"></param>
     /// <param name="phoneNumbers"></param>
-    public async void CreateStaff(int departmentId,
+    public async Task CreateStaff(int departmentId,
                             string street,
                             string city,
                             string zip,
@@ -246,7 +246,7 @@ public class SqlData : IDatabaseData
     /// <returns>True if Staff exists.</returns>
     public async Task<bool> CheckStaffByEmail(string emailAddress)
     {
-        var output = await _db.LoadData<bool, dynamic>("spStaffs_CheckByEmail",
+        List<bool> output = await _db.LoadData<bool, dynamic>("spStaffs_CheckByEmail",
                                                                             new { emailAddress },
                                                                             connectionStringName);
 
@@ -259,7 +259,7 @@ public class SqlData : IDatabaseData
     /// <param name="id">Staff's id.</param>
     /// <param name="departmentId">Department's id.</param>
     /// <param name="isApproved">is Approved status</param>
-    public async void UpdateStaffByAdmin(int id, int departmentId, bool isApproved)
+    public async Task UpdateStaffByAdmin(int id, int departmentId, bool isApproved)
     {
         await _db.SaveData("spStaffs_UpdateByAdmin",
                            new { id, departmentId, isApproved },

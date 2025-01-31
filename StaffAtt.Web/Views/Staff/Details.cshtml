@@ -4,17 +4,15 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
-
-@if (Model.FirstName.Length == 0)
+@if (Model == null)
 {
-    <h4>The requested record was not found. Use Create new staff page.</h4>
+    <h4>The requested record was not found.</h4>
 }
 
 else 
 {
     <div>
-        <h4>StaffDetailsModel</h4>
+        <h4>Your personal information.</h4>
         <hr />
         <dl class="row">
             <dt class="col-sm-2">
