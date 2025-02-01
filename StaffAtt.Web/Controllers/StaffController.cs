@@ -9,6 +9,9 @@ using System.Security.Claims;
 
 namespace StaffAtt.Web.Controllers;
 
+/// <summary>
+/// Controller for basic Staff's CRUD Actions
+/// </summary>
 [Authorize]
 public class StaffController : Controller
 {
@@ -49,9 +52,20 @@ public class StaffController : Controller
     {
         // this is validation for model we are passing as parameter
         if (ModelState.IsValid == false)
-        {            
-            return View(staff);
+        {
+            return RedirectToAction("Create");
         }
+
+        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+
+        // lines below (similar in Details Action) should be in some controller base class:
+        // https://stackoverflow.com/questions/70402830/what-is-the-best-way-to-move-your-code-out-of-the-controller-and-into-a-helper-m
+        // check if user has already created Staff account
+        bool isCreated = await _sqlData.CheckStaffByEmail(userEmail);
+
+        // if user has already created account we redirect him to Details action
+        if (isCreated)
+            return RedirectToAction("Details", new {message = "You have already created account!"});
 
         List<string> phoneNumbers = new List<string>();
 
@@ -60,9 +74,7 @@ public class StaffController : Controller
         for (int i = 0; i < cols.Length; i++)
         {
             phoneNumbers.Add(cols[i]);
-        }
-
-        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+        }        
 
         await _sqlData.CreateStaff(Convert.ToInt32(staff.DepartmentId),
                                    staff.Street,
@@ -81,8 +93,9 @@ public class StaffController : Controller
     /// <summary>
     /// Get Details Action. Display Staff's personal info. Homepage for Staff.
     /// </summary>
+    /// <param name="message">Optional parameter. Some warning message from different Action.</param>
     /// <returns>View with populated StaffDetailsModel inside.</returns>
-    public async Task<IActionResult> Details()
+    public async Task<IActionResult> Details(string message = "")
     {
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
@@ -109,6 +122,7 @@ public class StaffController : Controller
         detailsModel.Zip = fullModel.Zip;
         detailsModel.State = fullModel.State;
         detailsModel.PhoneNumbers = fullModel.PhoneNumbers;
+        detailsModel.Message = message;
 
         return View(detailsModel);
     }

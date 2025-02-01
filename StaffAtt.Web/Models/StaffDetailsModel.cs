@@ -58,4 +58,9 @@ public class StaffDetailsModel
     /// Staff's Phone Numbers.
     /// </summary>
     public List<PhoneNumberModel> PhoneNumbers { get; set; } = new List<PhoneNumberModel>();
+
+    /// <summary>
+    /// Details Action optional parameter. Some warning message from different Action, probably from Create.
+    /// </summary>
+    public string Message { get; set; }
 }

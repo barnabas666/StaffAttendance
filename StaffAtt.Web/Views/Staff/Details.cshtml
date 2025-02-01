@@ -4,11 +4,15 @@
     ViewData["Title"] = "Details";
 }
 
+@* Some warning message from different Action, probably from Create *@
+@if (string.IsNullOrEmpty(Model.Message) == false) {
+    <h4 class="text-danger">@Model.Message</h4>
+}
+
 @if (Model == null)
 {
     <h4>The requested record was not found.</h4>
 }
-
 else 
 {
     <div>
