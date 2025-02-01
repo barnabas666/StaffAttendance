@@ -221,6 +221,15 @@ public class SqlData : IDatabaseData
         return output;
     }
 
+    public async Task<List<StaffBasicModel>> GetAllBasicStaff()
+    {
+        List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasic",
+                                                                                    new { },
+                                                                                    connectionStringName);
+
+        return output;
+    }
+
     /// <summary>
     /// Get Staff by Email from Db.
     /// </summary>

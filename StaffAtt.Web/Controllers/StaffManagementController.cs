@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StaffAtt.Web.Models;
+using StaffAttLibrary.Data;
+using StaffAttLibrary.Models;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -9,8 +12,17 @@ namespace StaffAtt.Web.Controllers;
 [Authorize(Roles = "Administrator")]
 public class StaffManagementController : Controller
 {
-    public IActionResult Index()
+    private readonly IDatabaseData _sqlData;
+
+    public StaffManagementController(IDatabaseData sqlData)
     {
-        return View();
+        this._sqlData = sqlData;
+    }
+
+    public async Task<IActionResult> List()
+    {
+        List<StaffBasicModel> staffs = await _sqlData.GetAllBasicStaff();
+
+        return View(staffs);
     }
 }

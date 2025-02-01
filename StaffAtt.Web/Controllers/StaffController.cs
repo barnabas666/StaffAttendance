@@ -111,6 +111,7 @@ public class StaffController : Controller
         StaffFullModel fullModel = await _sqlData.GetStaffByEmail(userEmail);
 
         // maybe we could use AutoMapper here
+        detailsModel.Id = fullModel.Id;
         detailsModel.FirstName = fullModel.FirstName;
         detailsModel.LastName = fullModel.LastName;
         detailsModel.EmailAddress = fullModel.EmailAddress;
