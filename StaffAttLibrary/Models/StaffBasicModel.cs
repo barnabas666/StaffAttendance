@@ -42,7 +42,12 @@ public class StaffBasicModel
     public bool IsApproved { get; set; }
 
     /// <summary>
-    /// Staff's Department Description.
+    /// Department's Id.
     /// </summary>
-    public string Description { get; set; }
+    public int DepartmentId { get; set; }
+
+    /// <summary>
+    /// Staff's Department Title.
+    /// </summary>
+    public string Title { get; set; }
 }

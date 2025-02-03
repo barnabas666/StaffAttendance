@@ -13,11 +13,6 @@ namespace StaffAttLibrary.Models;
 public class StaffFullModel : StaffBasicModel
 {
     /// <summary>
-    /// Department's Id.
-    /// </summary>
-    public int DepartmentId { get; set; }
-
-    /// <summary>
     /// Addresses Id.
     /// </summary>
     public int AddressId { get; set; }
@@ -28,9 +23,9 @@ public class StaffFullModel : StaffBasicModel
     public int AliasId { get; set; }
 
     /// <summary>
-    /// Staff's Department Title.
+    /// Staff's Department Description.
     /// </summary>
-    public string Title { get; set; }
+    public string Description { get; set; }
 
     /// <summary>
     /// Staff's Address - Street.

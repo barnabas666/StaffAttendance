@@ -13,6 +13,7 @@ public interface IDatabaseData
     Task<List<StaffBasicModel>> GetAllBasicStaff();
     Task<CheckInModel> GetLastCheckIn(int staffId);
     Task<StaffFullModel> GetStaffByEmail(string emailAddress);
+    Task<StaffBasicModel> GetBasicStaffById(int id);
     Task<bool> CheckStaffByEmail(string emailAddress);
     Task UpdateStaffByAdmin(int id, int departmentId, bool isApproved);
 }

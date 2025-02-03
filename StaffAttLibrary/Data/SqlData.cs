@@ -249,6 +249,20 @@ public class SqlData : IDatabaseData
     }
 
     /// <summary>
+    /// Get Basic Staff Model by Id from Db.
+    /// </summary>
+    /// <param name="id">Staff's id.</param>
+    /// <returns>Basic Staff info.</returns>
+    public async Task<StaffBasicModel> GetBasicStaffById(int id)
+    {
+        List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicById",
+                                                                            new { id },
+                                                                            connectionStringName);
+
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
     /// Check if Staff exists by Email from Db.
     /// </summary>
     /// <param name="emailAddress">Staff's email.</param>

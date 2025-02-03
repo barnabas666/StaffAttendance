@@ -65,7 +65,7 @@ public class StaffController : Controller
 
         // if user has already created account we redirect him to Details action
         if (isCreated)
-            return RedirectToAction("Details", new {message = "You have already created account!"});
+            return RedirectToAction("Details", new { message = "You have already created account!" });
 
         List<string> phoneNumbers = new List<string>();
 
@@ -117,7 +117,7 @@ public class StaffController : Controller
         detailsModel.EmailAddress = fullModel.EmailAddress;
         detailsModel.Alias = fullModel.Alias;
         detailsModel.IsApproved = fullModel.IsApproved;
-        detailsModel.Description = fullModel.Description;
+        detailsModel.Title = fullModel.Title;
         detailsModel.Street = fullModel.Street;
         detailsModel.City = fullModel.City;
         detailsModel.Zip = fullModel.Zip;

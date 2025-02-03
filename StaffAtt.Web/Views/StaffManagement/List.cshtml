@@ -12,9 +12,9 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
+@*             <th>
                 @Html.DisplayNameFor(model => model.Id)
-            </th>
+            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.FirstName)
             </th>
@@ -31,7 +31,7 @@
                 @Html.DisplayNameFor(model => model.IsApproved)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayName("Department")
             </th>
             <th></th>
         </tr>
@@ -39,9 +39,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
+@*             <td>
                 @Html.DisplayFor(modelItem => item.Id)
-            </td>
+            </td> *@
             <td>
                 @Html.DisplayFor(modelItem => item.FirstName)
             </td>
@@ -58,10 +58,11 @@
                 @Html.DisplayFor(modelItem => item.IsApproved)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Description)
+                @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                    <!-- We redirect to Delete Page (with Button) and we set value for Id parameter on the route. -->
+                    <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-secondary">Edit</a> |
                 @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
                 @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
             </td>

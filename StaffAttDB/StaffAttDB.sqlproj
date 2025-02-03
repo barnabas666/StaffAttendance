@@ -89,6 +89,7 @@
     <Build Include="dbo\Stored Procedures\spCheckIns_InsertCheckOut.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_CheckByEmail.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetAllBasic.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffs_GetBasicById.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />
