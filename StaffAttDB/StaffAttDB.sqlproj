@@ -90,6 +90,13 @@
     <Build Include="dbo\Stored Procedures\spStaffs_CheckByEmail.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetAllBasic.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetBasicById.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffs_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\spAddresses_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spAliases_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffPhoneNumbers_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffPhoneNumbers_GetByPhoneNumber.sql" />
+    <Build Include="dbo\Stored Procedures\spPhoneNumbers_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffs_Delete.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />

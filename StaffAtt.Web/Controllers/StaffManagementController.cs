@@ -50,4 +50,31 @@ public class StaffManagementController : Controller
 
         return RedirectToAction("List");
     }
+
+    /// <summary>
+    /// Get Action call. We get StaffBasicModel by Id (passed in URL from List Page after we hit Delete button).
+    /// </summary>
+    /// <param name="id">Staff's id.</param>
+    /// <returns>View with populated StaffBasicModel to delete inside.</returns>
+    public async Task<IActionResult> Delete(int id)
+    {
+        StaffBasicModel basicModel = await _sqlData.GetBasicStaffById(id);
+
+        // return View with our Staff Info to delete.
+        return View(basicModel);
+    }
+
+    /// <summary>
+    /// Post Action call. After hit Submit button we delete Staff from our database.
+    /// </summary>
+    /// <param name="staffModel">Staff to delete info.</param>
+    /// <returns>Redirect back to List Action.</returns>
+    [HttpPost]
+    public async Task<IActionResult> Delete(StaffBasicModel staffModel)
+    {
+        await _sqlData.DeleteStaff(staffModel.Id);
+
+        // After deleting Staff we redirect back to List Action.
+        return RedirectToAction("List");
+    }
 }

@@ -4,7 +4,7 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT p.*
+	SELECT [p].[Id], [p].[PhoneNumber]
 	FROM dbo.PhoneNumbers p
 	INNER JOIN dbo.StaffPhoneNumbers sp on p.Id = sp.PhoneNumberId
 	WHERE sp.StaffId = @staffId

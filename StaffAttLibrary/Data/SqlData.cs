@@ -249,6 +249,24 @@ public class SqlData : IDatabaseData
     }
 
     /// <summary>
+    /// Get Staff by Id from Db.
+    /// </summary>
+    /// <param name="id">Staff's Id.</param>
+    /// <returns>Staff info.</returns>
+    public async Task<StaffFullModel> GetStaffById(int id)
+    {
+        List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetById",
+                                                                            new { id },
+                                                                            connectionStringName);
+
+        output.FirstOrDefault().PhoneNumbers = await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
+                                                                               new { staffId = output.FirstOrDefault().Id },
+                                                                               connectionStringName);
+
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
     /// Get Basic Staff Model by Id from Db.
     /// </summary>
     /// <param name="id">Staff's id.</param>
@@ -287,6 +305,56 @@ public class SqlData : IDatabaseData
         await _db.SaveData("spStaffs_UpdateByAdmin",
                            new { id, departmentId, isApproved },
                            connectionStringName);
+    }
+
+    public async Task DeleteStaff(int staffId)
+    {
+        // Get StaffFullModel by staffId
+        List<StaffFullModel> fullStaffModels = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetById",
+                                                                               new { id = staffId },
+                                                                               connectionStringName);
+
+        StaffFullModel fullStaffModel = fullStaffModels.FirstOrDefault();
+
+        fullStaffModel.PhoneNumbers = await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
+                                                                               new { staffId },
+                                                                               connectionStringName);
+
+        // First we delete Phone Numbers (can be shared with other Staff) because they have Foreign Key into Staffs Table.
+        foreach (PhoneNumberModel item in fullStaffModel.PhoneNumbers)
+        {
+            int phoneNumberId = item.Id;
+
+            // Get all links Staff-PhoneNumber for given PhoneNumber Id from relation StaffPhoneNumbers Table
+            List<StaffPhoneNumberModel> staffPhoneNumberList = await _db.LoadData<StaffPhoneNumberModel, dynamic>(
+                "spStaffPhoneNumbers_GetByPhoneNumber",
+                new { phoneNumberId },
+                connectionStringName);
+
+            // First we delete link Staff-PhoneNumber from relation StaffPhoneNumbers Table just for given Staff Id.
+            await _db.SaveData("spStaffPhoneNumbers_Delete",
+                               new { staffId, phoneNumberId },
+                               connectionStringName);
+
+            // If there was only one link Staff-PhoneNumber than we can delete PhoneNumber from PhoneNumbers Table too.
+            if (staffPhoneNumberList.Count == 1)
+            {
+                await _db.SaveData("spPhoneNumbers_Delete",
+                                   new { phoneNumberId },
+                                   connectionStringName);
+            }
+        }
+
+        // Than we must delete Staff because it has Foreign Keys into Addresses and Aliases Tables.
+        await _db.SaveData("spStaffs_Delete",
+                           new { staffId },
+                           connectionStringName);
+
+        // Delete Address by AddressId
+        await _db.SaveData("spAddresses_Delete", new { id = fullStaffModel.AddressId }, connectionStringName);
+
+        // Delete Alias by AliasId
+        await _db.SaveData("spAliases_Delete", new { id = fullStaffModel.AliasId }, connectionStringName);
     }
 
     /// <summary>
