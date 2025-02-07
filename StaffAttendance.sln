@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaffAttLibrary", "StaffAtt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaffAtt.Web", "StaffAtt.Web\StaffAtt.Web.csproj", "{42E5B2ED-C551-49CF-AE18-AD0B571DCCC1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaffAtt.Desktop", "StaffAtt.Desktop\StaffAtt.Desktop.csproj", "{662B853D-3B34-4FD6-8BF6-9EFD65F059DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{42E5B2ED-C551-49CF-AE18-AD0B571DCCC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42E5B2ED-C551-49CF-AE18-AD0B571DCCC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42E5B2ED-C551-49CF-AE18-AD0B571DCCC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{662B853D-3B34-4FD6-8BF6-9EFD65F059DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{662B853D-3B34-4FD6-8BF6-9EFD65F059DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{662B853D-3B34-4FD6-8BF6-9EFD65F059DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{662B853D-3B34-4FD6-8BF6-9EFD65F059DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
