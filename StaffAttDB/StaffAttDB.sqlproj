@@ -85,7 +85,6 @@
     <Build Include="dbo\Stored Procedures\spAliases_Verification.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_GetLastRecord.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_InsertCheckIn.sql" />
-    <Build Include="dbo\Stored Procedures\spStaffs_GetByAlias.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_InsertCheckOut.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_CheckByEmail.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetAllBasic.sql" />
@@ -97,6 +96,7 @@
     <Build Include="dbo\Stored Procedures\spStaffPhoneNumbers_GetByPhoneNumber.sql" />
     <Build Include="dbo\Stored Procedures\spPhoneNumbers_Delete.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffs_GetBasicByAliasId.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />

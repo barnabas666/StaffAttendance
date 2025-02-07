@@ -15,6 +15,7 @@ public interface IDatabaseData
     Task<StaffFullModel> GetStaffByEmail(string emailAddress);
     Task<StaffFullModel> GetStaffById(int id);
     Task<StaffBasicModel> GetBasicStaffById(int id);
+    Task<StaffBasicModel> GetBasicStaffByAliasId(int aliasId);
     Task<bool> CheckStaffByEmail(string emailAddress);
     Task UpdateStaffByAdmin(int id, int departmentId, bool isApproved);
     Task DeleteStaff(int staffId);

@@ -13,12 +13,14 @@ namespace StaffAtt.Desktop;
 /// </summary>
 public partial class App : Application
 {
+    public static ServiceProvider serviceProvider;
+
     public App()
     {
         ServiceCollection serviceCollection = new();
         serviceCollection.ConfigureServices();
 
-        ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+        serviceProvider = serviceCollection.BuildServiceProvider();
 
         var mainWindow = serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
@@ -39,6 +41,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
         services.AddSingleton<IDatabaseData, SqlData>();
         services.AddSingleton<MainWindow>();
+        services.AddSingleton<CheckInForm>();
     }
 }
 

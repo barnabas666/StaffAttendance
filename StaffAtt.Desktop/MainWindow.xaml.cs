@@ -1,4 +1,6 @@
-﻿using StaffAttLibrary.Data;
+﻿using Microsoft.Extensions.DependencyInjection;
+using StaffAttLibrary.Data;
+using StaffAttLibrary.Models;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,5 +24,32 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _sqlData = sqlData;
+    }
+
+    private async void LoginButton_Click(object sender, RoutedEventArgs e)
+    {
+        AliasModel aliasModel = await _sqlData.AliasVerification(aliasText.Text, pINText.Text);
+
+        if (aliasModel != null)
+        {
+            StaffBasicModel staffBasicModel = await _sqlData.GetBasicStaffByAliasId(aliasModel.Id);
+
+            if (staffBasicModel.IsApproved)
+            {       
+                CheckInForm checkInForm = App.serviceProvider.GetRequiredService<CheckInForm>();
+
+                // we populate instance of CheckInForm with data from our StaffBasicModel
+                checkInForm.PopulateStaff(staffBasicModel);
+
+                checkInForm.Show();
+
+                aliasText.Text = "";
+                pINText.Text = "";
+            }
+        }
+        else
+        {
+            MessageBox.Show("You have entered incorrect login information.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 }

@@ -5,8 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StaffAtt.Desktop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" FontSize="28" Height="300" Width="400" WindowStartupLocation="CenterScreen">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>            
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
+        <TextBlock Text="Alias"/>
+        <TextBox x:Name="aliasText" Grid.Column="1" 
+         FontSize="24" Margin="5"/>
+
+        <TextBlock Grid.Row="1" Text="PIN"/>
+        <TextBox x:Name="pINText" Grid.Row="1" Grid.Column="1"
+         FontSize="24" Margin="5"/>
+
+        <Button x:Name="loginButton" Grid.Row="2" Grid.ColumnSpan="2" Click="LoginButton_Click" >LOGIN</Button>
     </Grid>
 </Window>

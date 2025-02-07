@@ -146,7 +146,7 @@ public class SqlData : IDatabaseData
     /// <exception cref="ArgumentException">For invalid aliasId.</exception>
     public async Task<bool> CheckApproveStatus(int aliasId)
     {
-        List<StaffFullModel> model = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetByAlias",
+        List<StaffBasicModel> model = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
                                                                                  new { aliasId },
                                                                                  connectionStringName);
 
@@ -275,6 +275,20 @@ public class SqlData : IDatabaseData
     {
         List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicById",
                                                                             new { id },
+                                                                            connectionStringName);
+
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Get Basic Staff Model by AliasId from Db.
+    /// </summary>
+    /// <param name="aliasId">Alias id.</param>
+    /// <returns>Basic Staff info.</returns>
+    public async Task<StaffBasicModel> GetBasicStaffByAliasId(int aliasId)
+    {
+        List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
+                                                                            new { aliasId },
                                                                             connectionStringName);
 
         return output.FirstOrDefault();
