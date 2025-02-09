@@ -8,6 +8,7 @@ using System.IO;
 using System.Windows;
 
 namespace StaffAtt.Desktop;
+
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
@@ -40,8 +41,8 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
         services.AddSingleton<IDatabaseData, SqlData>();
-        services.AddSingleton<MainWindow>();
-        services.AddSingleton<CheckInForm>();
+        services.AddTransient<MainWindow>();
+        services.AddTransient<CheckInForm>(); // cant be AddSingleton or after attempt to reopen this Window app crash
     }
 }
 

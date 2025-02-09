@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StaffAtt.Desktop"
         mc:Ignorable="d"
-        Title="CheckInForm" Height="300" Width="400" WindowStartupLocation="CenterScreen">
+        Title="CheckInForm" FontSize="28" Height="400" Width="700" WindowStartupLocation="CenterScreen">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -38,5 +38,8 @@
 
         <Button Margin="10" Padding="20 10" Grid.Row="3" Grid.ColumnSpan="2"
                 x:Name="checkInButton" Click="CheckInButton_Click"></Button>
+
+        <Button Margin="10 30" Padding="20 10" Grid.Row="4" Grid.ColumnSpan="2"
+                x:Name="cancelButton" Click="CancelButton_Click" >Cancel</Button>
     </Grid>
 </Window>

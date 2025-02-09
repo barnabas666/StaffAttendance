@@ -15,21 +15,42 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace StaffAtt.Desktop;
+
 /// <summary>
-/// Interaction logic for CheckInForm.xaml
+/// Staff's CheckIn/Out form.
 /// </summary>
 public partial class CheckInForm : Window
 {
+    /// <summary>
+    /// Instance of class servicing Staffs - CRUD actions.
+    /// </summary>
     private readonly IDatabaseData _sqlData;
+
+    /// <summary>
+    /// Instance of class which holds Basic Staff data.
+    /// </summary>
     private StaffBasicModel _basicStaffModel = null;
+
+    /// <summary>
+    /// Instance of class which holds CheckIn data.
+    /// </summary>
     private CheckInModel _checkInModel = null;
 
+    /// <summary>
+    /// Constructor, initialize instance of this class.
+    /// </summary>
+    /// <param name="sqlData">Instance of class servicing Staffs - CRUD actions.</param>
     public CheckInForm(IDatabaseData sqlData)
     {
         InitializeComponent();
         _sqlData = sqlData;
     }
 
+    /// <summary>
+    /// Populate our form with data we get from Db - StaffBasicModel.
+    /// Just info for Staff to be sure its really his/her own CheckIn/Out.
+    /// </summary>
+    /// <param name="basicStaffModel">Holds Basic Staff data.</param>
     public async void PopulateStaff(StaffBasicModel basicStaffModel)
     {
         _basicStaffModel = basicStaffModel;
@@ -38,31 +59,61 @@ public partial class CheckInForm : Window
         emailAddressText.Text = _basicStaffModel.EmailAddress;
         departmentTitleText.Text = _basicStaffModel.Title;
 
-        _checkInModel = await _sqlData.GetLastCheckIn(_basicStaffModel.Id);
+        try
+        {
+            _checkInModel = await _sqlData.GetLastCheckIn(_basicStaffModel.Id);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
 
-        // For first CheckIn ever we setup Button value to Check-In
+        // For first CheckIn ever or if last record is CheckOut we setup Button's value for new record: Check-In
         if(_checkInModel == null || _checkInModel.CheckOutDate != null)
         {
             checkInButton.Content = "Check-In";
         }
-        // If last CheckIn has no CheckOut value than we setup Button value to Check-Out
-        else if(_checkInModel.CheckOutDate == null)
+        // If last CheckIn has no CheckOut value than we setup Button value to: Check-Out
+        else
         {
             checkInButton.Content = "Check-Out";
         }
     }
 
+    /// <summary>
+    /// Perform CheckIn/Out and close this CheckInForm Window.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void CheckInButton_Click(object sender, RoutedEventArgs e)
     {
-        if (checkInButton.Content == "Check-In")
+        try
         {
-            await _sqlData.CheckInPerform(_basicStaffModel.Id);
+            // Button's value decide if we do Check-In or Check-Out
+            if (checkInButton.Content == "Check-In")
+            {
+                await _sqlData.CheckInPerform(_basicStaffModel.Id);
+            }
+            else
+            {
+                await _sqlData.CheckOutPerform(_checkInModel.Id);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            await _sqlData.CheckOutPerform(_checkInModel.Id);
+            MessageBox.Show(ex.Message);
         }
 
+        this.Close();
+    }
+
+    /// <summary>
+    /// Close this CheckInForm Window.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void CancelButton_Click(object sender, RoutedEventArgs e)
+    {
         this.Close();
     }
 }
