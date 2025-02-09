@@ -131,7 +131,7 @@ public class SqlData : IDatabaseData
     /// <returns>Correct: Alias info. False: null</returns>
     public async Task<AliasModel> AliasVerification(string alias, string pIN)
     {
-        List<AliasModel> output = await _db.LoadData<AliasModel, dynamic>("spAliases_Verification",
+        List<AliasModel> output = await _db.LoadData<AliasModel, dynamic>("spAliases_GetByAliasAndPIN",
                                                                           new { alias, pIN },
                                                                           connectionStringName);
 
@@ -369,6 +369,27 @@ public class SqlData : IDatabaseData
 
         // Delete Alias by AliasId
         await _db.SaveData("spAliases_Delete", new { id = fullStaffModel.AliasId }, connectionStringName);
+    }
+
+    /// <summary>
+    /// Get all CheckIns from our database.
+    /// </summary>
+    /// <returns>Collection of CheckInModel.</returns>
+    public async Task<List<CheckInFullModel>> GetAllCheckIns()
+    {
+        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetAll", new { }, connectionStringName);
+    }
+
+    /// <summary>
+    /// Get CheckIns by Email from Db.
+    /// </summary>
+    /// <param name="emailAddress">Staff's EmailAddress.</param>
+    /// <returns>CheckIn info.</returns>
+    public async Task<List<CheckInFullModel>> GetCheckInsByEmail(string emailAddress)
+    {
+        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByEmail",
+                                                                            new { emailAddress },
+                                                                            connectionStringName);        
     }
 
     /// <summary>

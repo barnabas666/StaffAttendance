@@ -19,4 +19,6 @@ public interface IDatabaseData
     Task<bool> CheckStaffByEmail(string emailAddress);
     Task UpdateStaffByAdmin(int id, int departmentId, bool isApproved);
     Task DeleteStaff(int staffId);
+    Task<List<CheckInFullModel>> GetAllCheckIns();
+    Task<List<CheckInFullModel>> GetCheckInsByEmail(string emailAddress);
 }
