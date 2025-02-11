@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
@@ -380,6 +381,13 @@ public class SqlData : IDatabaseData
         return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetAll", new { }, connectionStringName);
     }
 
+    public async Task<List<CheckInFullModel>> GetAllCheckInsByDate(DateTime startDate, DateTime endDate)
+    {
+        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetAllByDate",
+                                                                            new { startDate, endDate },
+                                                                            connectionStringName);
+    }
+
     /// <summary>
     /// Get CheckIns by Email from Db.
     /// </summary>
@@ -390,6 +398,22 @@ public class SqlData : IDatabaseData
         return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByEmail",
                                                                             new { emailAddress },
                                                                             connectionStringName);        
+    }
+
+    /// <summary>
+    /// Get CheckIns by Date and Email from Db.
+    /// </summary>
+    /// <param name="emailAddress">Staff's EmailAddress.</param>
+    /// <param name="startDate">Start Date for CheckIns range.</param>
+    /// <param name="endDate">End Date for CheckIns range.</param>
+    /// <returns>CheckIn info.</returns>
+    public async Task<List<CheckInFullModel>> GetCheckInsByDateAndEmail(string emailAddress,
+                                                                        DateTime startDate,
+                                                                        DateTime endDate)
+    {
+        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndEmail",
+                                                                            new { emailAddress, startDate, endDate },
+                                                                            connectionStringName);
     }
 
     /// <summary>

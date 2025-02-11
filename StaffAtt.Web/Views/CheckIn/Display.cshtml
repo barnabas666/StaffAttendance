@@ -1,10 +1,10 @@
 ﻿@model StaffAtt.Web.Models.CheckInDateDisplayModel
 
 @{
-    ViewData["Title"] = "List";
+    ViewData["Title"] = "Display";
 }
 
-<h4>CheckIns for dates in range: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</h4>
+<h4>Your CheckIns for dates in range: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</h4>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -12,7 +12,7 @@
 
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="List">
+        <form asp-action="Display">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="StartDate" class="control-label"></label>
@@ -41,18 +41,11 @@
                 @Html.DisplayName("Last Name")
             </th>
             <th>
-                @Html.DisplayName("Email")
-            </th>
-            <th>
-                @Html.DisplayName("Department")
-            </th>
-            <th>
                 @Html.DisplayName("Check-In")
             </th>
             <th>
                 @Html.DisplayName("Check-Out")
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -64,12 +57,6 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.LastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmailAddress)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CheckInDate)

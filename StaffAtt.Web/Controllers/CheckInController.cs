@@ -28,17 +28,64 @@ public class CheckInController : Controller
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> List()
     {
-        List<CheckInFullModel> checkIns = await _sqlData.GetAllCheckIns();
+        CheckInDateDisplayModel dateDisplayModel = new CheckInDateDisplayModel();
 
-        return View(checkIns);
+        List<CheckInFullModel> checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
+                                                                              dateDisplayModel.EndDate);
+
+        dateDisplayModel.CheckIns = checkIns;
+
+        return View(dateDisplayModel);
     }
 
-    public async Task<IActionResult> Details()
+    [Authorize(Roles = "Administrator")]
+    [HttpPost]
+    public async Task<IActionResult> List(CheckInDateDisplayModel dateDisplayModel)
     {
+        if (ModelState.IsValid)
+        {
+            List<CheckInFullModel> checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
+                                                                                  dateDisplayModel.EndDate);
+
+            dateDisplayModel.CheckIns = checkIns;
+
+            return View(dateDisplayModel);
+        }
+
+        return RedirectToAction("List");
+    }
+
+    public async Task<IActionResult> Display()
+    {
+        CheckInDateDisplayModel dateDisplayModel = new CheckInDateDisplayModel();
+
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByEmail(userEmail);
+        List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
+                                                                                   dateDisplayModel.StartDate,
+                                                                                   dateDisplayModel.EndDate);
 
-        return View(checkIns);
+        dateDisplayModel.CheckIns = checkIns;
+
+        return View(dateDisplayModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Display(CheckInDateDisplayModel dateDisplayModel)
+    {
+        if (ModelState.IsValid)
+        {
+            string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+
+            List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
+                                                                                       dateDisplayModel.StartDate,
+                                                                                       dateDisplayModel.EndDate);
+
+            dateDisplayModel.CheckIns = checkIns;
+
+            return View(dateDisplayModel);
+        }
+
+        return RedirectToAction("Display");
     }
 }

@@ -20,5 +20,7 @@ public interface IDatabaseData
     Task UpdateStaffByAdmin(int id, int departmentId, bool isApproved);
     Task DeleteStaff(int staffId);
     Task<List<CheckInFullModel>> GetAllCheckIns();
+    Task<List<CheckInFullModel>> GetAllCheckInsByDate(DateTime startDate, DateTime endDate);
     Task<List<CheckInFullModel>> GetCheckInsByEmail(string emailAddress);
+    Task<List<CheckInFullModel>> GetCheckInsByDateAndEmail(string emailAddress, DateTime startDate, DateTime endDate);
 }
