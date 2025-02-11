@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
@@ -30,11 +31,18 @@ public class CheckInController : Controller
     {
         CheckInDateDisplayModel dateDisplayModel = new CheckInDateDisplayModel();
 
+        List<StaffBasicModel> staffList = await _sqlData.GetAllBasicStaff();
+        staffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff"});
+
         List<CheckInFullModel> checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
                                                                               dateDisplayModel.EndDate);
 
+        dateDisplayModel.StaffList = staffList;
         dateDisplayModel.CheckIns = checkIns;
 
+        // Source is Users, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user, both expect string.
+        dateDisplayModel.StaffDropDownData = new SelectList(dateDisplayModel.StaffList, nameof(StaffBasicModel.Id), nameof(StaffBasicModel.FirstName));
+        
         return View(dateDisplayModel);
     }
 
@@ -44,10 +52,32 @@ public class CheckInController : Controller
     {
         if (ModelState.IsValid)
         {
-            List<CheckInFullModel> checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
-                                                                                  dateDisplayModel.EndDate);
+            List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
+
+            if (dateDisplayModel.SelectedId == "0")
+            {
+                checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
+                                                               dateDisplayModel.EndDate);
+            }
+            else
+            {
+                checkIns = await _sqlData.GetCheckInsByDateAndId(Convert.ToInt32(dateDisplayModel.SelectedId),
+                                                 dateDisplayModel.StartDate,
+                                                 dateDisplayModel.EndDate);
+            }
+
 
             dateDisplayModel.CheckIns = checkIns;
+
+
+            List<StaffBasicModel> staffList = await _sqlData.GetAllBasicStaff();
+            staffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff" });
+
+            dateDisplayModel.StaffList = staffList;
+
+            // Source is Users, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user, both expect string.
+            dateDisplayModel.StaffDropDownData = new SelectList(dateDisplayModel.StaffList, nameof(StaffBasicModel.Id), nameof(StaffBasicModel.FirstName));
+
 
             return View(dateDisplayModel);
         }

@@ -101,6 +101,7 @@
     <Build Include="dbo\Stored Procedures\spCheckIns_GetByEmail.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_GetAllByDate.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_GetByDateAndEmail.sql" />
+    <Build Include="dbo\Stored Procedures\spCheckIns_GetByDateAndId.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />

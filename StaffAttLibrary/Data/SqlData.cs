@@ -417,6 +417,22 @@ public class SqlData : IDatabaseData
     }
 
     /// <summary>
+    /// Get CheckIns by Date and Id from Db.
+    /// </summary>
+    /// <param name="id">Staff's Id.</param>
+    /// <param name="startDate">Start Date for CheckIns range.</param>
+    /// <param name="endDate">End Date for CheckIns range.</param>
+    /// <returns>CheckIn info.</returns>
+    public async Task<List<CheckInFullModel>> GetCheckInsByDateAndId(int id,
+                                                                        DateTime startDate,
+                                                                        DateTime endDate)
+    {
+        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndId",
+                                                                            new { id, startDate, endDate },
+                                                                            connectionStringName);
+    }
+
+    /// <summary>
     /// Should move into some helper class!
     /// Perform CheckOut if last record in CheckIns Table has CheckOut set to null,
     /// otherwise perform CheckIn.

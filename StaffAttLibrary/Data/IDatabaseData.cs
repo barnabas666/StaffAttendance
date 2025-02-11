@@ -23,4 +23,5 @@ public interface IDatabaseData
     Task<List<CheckInFullModel>> GetAllCheckInsByDate(DateTime startDate, DateTime endDate);
     Task<List<CheckInFullModel>> GetCheckInsByEmail(string emailAddress);
     Task<List<CheckInFullModel>> GetCheckInsByDateAndEmail(string emailAddress, DateTime startDate, DateTime endDate);
+    Task<List<CheckInFullModel>> GetCheckInsByDateAndId(int id, DateTime startDate, DateTime endDate);
 }
