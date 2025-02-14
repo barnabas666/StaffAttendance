@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StaffAtt.Web.Models;
 
-public class CheckInDateDisplayModel
+public class CheckInDateDisplayAdminModel
 {
     public List<CheckInFullModel> CheckIns {  get; set; } = new List<CheckInFullModel>();
 

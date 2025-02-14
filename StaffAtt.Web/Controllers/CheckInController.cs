@@ -29,7 +29,7 @@ public class CheckInController : Controller
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> List()
     {
-        CheckInDateDisplayModel dateDisplayModel = new CheckInDateDisplayModel();
+        CheckInDateDisplayAdminModel dateDisplayModel = new CheckInDateDisplayAdminModel();
 
         List<StaffBasicModel> staffList = await _sqlData.GetAllBasicStaff();
         staffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff"});
@@ -48,7 +48,7 @@ public class CheckInController : Controller
 
     [Authorize(Roles = "Administrator")]
     [HttpPost]
-    public async Task<IActionResult> List(CheckInDateDisplayModel dateDisplayModel)
+    public async Task<IActionResult> List(CheckInDateDisplayAdminModel dateDisplayModel)
     {
         if (ModelState.IsValid)
         {
@@ -87,7 +87,7 @@ public class CheckInController : Controller
 
     public async Task<IActionResult> Display()
     {
-        CheckInDateDisplayModel dateDisplayModel = new CheckInDateDisplayModel();
+        CheckInDateDisplayStaffModel dateDisplayModel = new CheckInDateDisplayStaffModel();
 
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
@@ -101,7 +101,7 @@ public class CheckInController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Display(CheckInDateDisplayModel dateDisplayModel)
+    public async Task<IActionResult> Display(CheckInDateDisplayStaffModel dateDisplayModel)
     {
         if (ModelState.IsValid)
         {
