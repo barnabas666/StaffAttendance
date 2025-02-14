@@ -27,6 +27,11 @@ public class StaffBasicModel
     public string LastName { get; set; }
 
     /// <summary>
+    /// Staff's Full Name.
+    /// </summary>
+    public string FullName { get { return FirstName + " " + LastName; } }
+
+    /// <summary>
     /// Staff's Email Address.
     /// </summary>
     public string EmailAddress { get; set; }

@@ -26,96 +26,108 @@ public class CheckInController : Controller
         return View();
     }
 
+    /// <summary>
+    /// Display list of all CheckIns by Date and Staff for Admin.
+    /// First populate ViewModel with data from Db and send to View.
+    /// </summary>
+    /// <returns>ViewModel with populated CheckInDateDisplayAdminModel.</returns>
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> List()
     {
         CheckInDateDisplayAdminModel dateDisplayModel = new CheckInDateDisplayAdminModel();
 
-        List<StaffBasicModel> staffList = await _sqlData.GetAllBasicStaff();
-        staffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff"});
+        dateDisplayModel.CheckIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
+                                                                      dateDisplayModel.EndDate);
 
-        List<CheckInFullModel> checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
-                                                                              dateDisplayModel.EndDate);
+        dateDisplayModel.StaffList = await _sqlData.GetAllBasicStaff();
+        // Creating default item = All Staff for DropDown.
+        dateDisplayModel.StaffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff" });
 
-        dateDisplayModel.StaffList = staffList;
-        dateDisplayModel.CheckIns = checkIns;
-
-        // Source is Users, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user, both expect string.
-        dateDisplayModel.StaffDropDownData = new SelectList(dateDisplayModel.StaffList, nameof(StaffBasicModel.Id), nameof(StaffBasicModel.FirstName));
+        // Source is StaffList, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user.
+        dateDisplayModel.StaffDropDownData = new SelectList(dateDisplayModel.StaffList,
+                                                            nameof(StaffBasicModel.Id),
+                                                            nameof(StaffBasicModel.FullName));
         
         return View(dateDisplayModel);
     }
 
+    /// <summary>
+    /// HttpPost Action for displaying of list of all CheckIns by Date and Staff for Admin.
+    /// After hit Submit button or changing of Staff in DropDown, we get data from Db,
+    /// repopulate ViewModel and send back to View.
+    /// </summary>
+    /// <param name="dateDisplayModel">ViewModel</param>
+    /// <returns>ViewModel with repopulated CheckInDateDisplayAdminModel.</returns>
     [Authorize(Roles = "Administrator")]
     [HttpPost]
     public async Task<IActionResult> List(CheckInDateDisplayAdminModel dateDisplayModel)
     {
-        if (ModelState.IsValid)
+        if (ModelState.IsValid == false)        
+            return RedirectToAction("List");
+        
+        List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
+
+        if (dateDisplayModel.SelectedId == "0")
         {
-            List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
-
-            if (dateDisplayModel.SelectedId == "0")
-            {
-                checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
-                                                               dateDisplayModel.EndDate);
-            }
-            else
-            {
-                checkIns = await _sqlData.GetCheckInsByDateAndId(Convert.ToInt32(dateDisplayModel.SelectedId),
-                                                 dateDisplayModel.StartDate,
-                                                 dateDisplayModel.EndDate);
-            }
-
-
-            dateDisplayModel.CheckIns = checkIns;
-
-
-            List<StaffBasicModel> staffList = await _sqlData.GetAllBasicStaff();
-            staffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff" });
-
-            dateDisplayModel.StaffList = staffList;
-
-            // Source is Users, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user, both expect string.
-            dateDisplayModel.StaffDropDownData = new SelectList(dateDisplayModel.StaffList, nameof(StaffBasicModel.Id), nameof(StaffBasicModel.FirstName));
-
-
-            return View(dateDisplayModel);
+            dateDisplayModel.CheckIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
+                                                           dateDisplayModel.EndDate);
         }
+        else
+        {
+            dateDisplayModel.CheckIns = await _sqlData.GetCheckInsByDateAndId(Convert.ToInt32(dateDisplayModel.SelectedId),
+                                                                             dateDisplayModel.StartDate,
+                                                                             dateDisplayModel.EndDate);
+        }        
 
-        return RedirectToAction("List");
+        dateDisplayModel.StaffList = await _sqlData.GetAllBasicStaff();
+        // Creating default item = All Staff for DropDown.
+        dateDisplayModel.StaffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff" });
+
+        // Source is StaffList, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user.
+        dateDisplayModel.StaffDropDownData = new SelectList(dateDisplayModel.StaffList,
+                                                            nameof(StaffBasicModel.Id),
+                                                            nameof(StaffBasicModel.FullName));
+
+        return View(dateDisplayModel);
+
     }
 
+    /// <summary>
+    /// Display list of all CheckIns by Date and Staff for given Staff.
+    /// First populate ViewModel with data from Db for given Staff and send to View.
+    /// </summary>
+    /// <returns>ViewModel with populated CheckInDateDisplayStaffModel.</returns>
     public async Task<IActionResult> Display()
     {
         CheckInDateDisplayStaffModel dateDisplayModel = new CheckInDateDisplayStaffModel();
 
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
-                                                                                   dateDisplayModel.StartDate,
-                                                                                   dateDisplayModel.EndDate);
-
-        dateDisplayModel.CheckIns = checkIns;
+        dateDisplayModel.CheckIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
+                                                                             dateDisplayModel.StartDate,
+                                                                             dateDisplayModel.EndDate);
 
         return View(dateDisplayModel);
     }
 
+    /// <summary>
+    /// HttpPost Action for displaying of list of all CheckIns by Date and Staff for given Staff.
+    /// After hit Submit button we get data from Db, repopulate ViewModel and send back to View.
+    /// </summary>
+    /// <param name="dateDisplayModel">ViewModel</param>
+    /// <returns>ViewModel with repopulated CheckInDateDisplayStaffModel.</returns>
     [HttpPost]
     public async Task<IActionResult> Display(CheckInDateDisplayStaffModel dateDisplayModel)
     {
-        if (ModelState.IsValid)
-        {
-            string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+        if (ModelState.IsValid == false)        
+            return RedirectToAction("Display");
+                
+        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-            List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
-                                                                                       dateDisplayModel.StartDate,
-                                                                                       dateDisplayModel.EndDate);
+        dateDisplayModel.CheckIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
+                                                                             dateDisplayModel.StartDate,
+                                                                             dateDisplayModel.EndDate);
 
-            dateDisplayModel.CheckIns = checkIns;
-
-            return View(dateDisplayModel);
-        }
-
-        return RedirectToAction("Display");
+        return View(dateDisplayModel);
     }
 }

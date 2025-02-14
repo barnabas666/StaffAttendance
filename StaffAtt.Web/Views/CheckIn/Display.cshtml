@@ -4,7 +4,14 @@
     ViewData["Title"] = "Display";
 }
 
-<h4>Your CheckIns for dates in range: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</h4>
+@if (Model.StartDate > Model.EndDate)
+{
+    <h4 class="text-danger">The end date cannot be earlier than the start date!</h4>
+}
+else
+{
+    <h4>Your CheckIns for dates in range: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</h4>
+}
 
 <p>
     <a asp-action="Create">Create New</a>

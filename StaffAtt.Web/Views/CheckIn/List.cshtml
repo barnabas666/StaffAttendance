@@ -4,7 +4,14 @@
     ViewData["Title"] = "List";
 }
 
-<h4>CheckIns for dates in range: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</h4>
+@if (Model.StartDate > Model.EndDate)
+{
+    <h4 class="text-danger">The end date cannot be earlier than the start date!</h4>
+}
+else
+{
+    <h4>CheckIns for dates in range: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</h4>
+}
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -12,7 +19,7 @@
 
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="List">
+        <form asp-action="List">            
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <!-- Selection from DropDown List populated by SelectList StaffDropDownData.
             Value is Id of Staff and we bind it to SelectedId property.-->
