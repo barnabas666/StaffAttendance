@@ -18,11 +18,15 @@ public class StaffController : Controller
 {
     private readonly IDatabaseData _sqlData;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
 
-    public StaffController(IDatabaseData sqlData, UserManager<IdentityUser> userManager)
+    public StaffController(IDatabaseData sqlData,
+                           UserManager<IdentityUser> userManager,
+                           SignInManager<IdentityUser> signInManager)
     {
         _sqlData = sqlData;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     /// <summary>
@@ -88,13 +92,13 @@ public class StaffController : Controller
                                    staff.State,
                                    staff.PIN.ToString(),
                                    staff.FirstName,
-                                   staff.LastName, 
-                                   userEmail, 
+                                   staff.LastName,
+                                   userEmail,
                                    phoneNumbers);
 
         var newUser = await _userManager.FindByEmailAsync(userEmail);
-
         await _userManager.AddToRoleAsync(newUser, "Member");
+        await _signInManager.SignInAsync(newUser, false);
 
         return RedirectToAction("Details");
     }
