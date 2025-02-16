@@ -222,6 +222,10 @@ public class SqlData : IDatabaseData
         return output;
     }
 
+    /// <summary>
+    /// Get all Basic Staff Info from Db.
+    /// </summary>
+    /// <returns>Collection of Basic Staff Info.</returns>
     public async Task<List<StaffBasicModel>> GetAllBasicStaff()
     {
         List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasic",
@@ -322,6 +326,11 @@ public class SqlData : IDatabaseData
                            connectionStringName);
     }
 
+    /// <summary>
+    /// Delete Staff from Db. Delete all related Phone Numbers, Addresses and Aliases.
+    /// </summary>
+    /// <param name="staffId">Staff Id.</param>
+    /// <returns></returns>
     public async Task DeleteStaff(int staffId)
     {
         // Get StaffFullModel by staffId

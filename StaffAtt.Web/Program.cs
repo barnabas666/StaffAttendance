@@ -14,9 +14,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
 builder.Services.AddTransient<IDatabaseData, SqlData>();
+builder.Services.AddTransient<UserManager<IdentityUser>>();
 
-
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
@@ -46,5 +46,39 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Staff}/{action=Details}/{id?}");
 app.MapRazorPages();
+
+// scope is used to access Services which we configured above.
+// Seed the Identity Db with roles and accounts
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    // Add roles if they don't exist
+    var roles = new[] { "Administrator", "Member" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    string email = "admin@admin.com";
+    string password = "Pwd.1111";
+
+    // Create admin user if it doesn't exist and assign it to the Administrator role
+    if (await userManager.FindByEmailAsync(email) == null)
+    {
+        var adminUser = new IdentityUser
+        {
+            UserName = email,
+            Email = email
+        };
+        await userManager.CreateAsync(adminUser, password);
+        await userManager.AddToRoleAsync(adminUser, "Administrator");
+    }
+}
 
 app.Run();

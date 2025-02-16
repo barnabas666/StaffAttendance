@@ -40,7 +40,7 @@ public class CheckInController : Controller
                                                                       dateDisplayModel.EndDate);
 
         dateDisplayModel.StaffList = await _sqlData.GetAllBasicStaff();
-        // Creating default item = All Staff for DropDown.
+        // Creating default item = All Staff for DropDown. FullName prop is just getter so we setup here FirstName.
         dateDisplayModel.StaffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff" });
 
         // Source is StaffList, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user.
@@ -80,7 +80,7 @@ public class CheckInController : Controller
         }        
 
         dateDisplayModel.StaffList = await _sqlData.GetAllBasicStaff();
-        // Creating default item = All Staff for DropDown.
+        // Creating default item = All Staff for DropDown. FullName prop is just getter so we setup here FirstName.
         dateDisplayModel.StaffList.Insert(0, new StaffBasicModel() { Id = 0, FirstName = "All Staff" });
 
         // Source is StaffList, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user.
@@ -89,7 +89,6 @@ public class CheckInController : Controller
                                                             nameof(StaffBasicModel.FullName));
 
         return View(dateDisplayModel);
-
     }
 
     /// <summary>

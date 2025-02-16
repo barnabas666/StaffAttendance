@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using StaffAtt.Web.Models;
@@ -16,15 +17,18 @@ namespace StaffAtt.Web.Controllers;
 public class StaffController : Controller
 {
     private readonly IDatabaseData _sqlData;
+    private readonly UserManager<IdentityUser> _userManager;
 
-    public StaffController(IDatabaseData sqlData)
+    public StaffController(IDatabaseData sqlData, UserManager<IdentityUser> userManager)
     {
         _sqlData = sqlData;
+        _userManager = userManager;
     }
 
     /// <summary>
-    /// This is Get Create Action. We call this after new Staff register his email. We send StaffCreateModel populated 
-    /// with collection of SelectList DepartmentItems (Departments info) to View which modifies StaffCreateModel properties and send back.
+    /// This is Get Create Action. We call this after new Staff register his email. We send 
+    /// StaffCreateModel populated with collection of SelectList DepartmentItems (Departments info)
+    /// to View which modifies StaffCreateModel properties and send back.
     /// </summary>
     /// <returns>View with populated StaffCreateModel inside.</returns>
     public async Task<IActionResult> Create()
@@ -44,6 +48,7 @@ public class StaffController : Controller
     /// <summary>
     /// This is Post Create Action. We use form to create new Staff and save it to database.
     /// We get Phone Numbers from PhoneNumbersText string property and Email from currently logged User info.
+    /// Than we assign new Staff to Member Role.
     /// </summary>
     /// <param name="staff">Staff information.</param>
     /// <returns>Redirect to Details Action.</returns>
@@ -74,7 +79,7 @@ public class StaffController : Controller
         for (int i = 0; i < cols.Length; i++)
         {
             phoneNumbers.Add(cols[i]);
-        }        
+        }
 
         await _sqlData.CreateStaff(Convert.ToInt32(staff.DepartmentId),
                                    staff.Street,
@@ -86,6 +91,10 @@ public class StaffController : Controller
                                    staff.LastName, 
                                    userEmail, 
                                    phoneNumbers);
+
+        var newUser = await _userManager.FindByEmailAsync(userEmail);
+
+        await _userManager.AddToRoleAsync(newUser, "Member");
 
         return RedirectToAction("Details");
     }
@@ -103,6 +112,8 @@ public class StaffController : Controller
         bool isCreated = await _sqlData.CheckStaffByEmail(userEmail);
 
         // if user has no account yet we redirect him to Create Staff action
+        // we should assign him Registered Role here and than Create can be visible only for Registered Role
+        // we will need to add RoleManager to our Controller using DI
         if (isCreated == false)
             return RedirectToAction("Create");
 
