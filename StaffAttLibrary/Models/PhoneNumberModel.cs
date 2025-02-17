@@ -20,4 +20,18 @@ public class PhoneNumberModel
     /// PhoneNumber's value.
     /// </summary>
     public string PhoneNumber { get; set; }
+
+    public override bool Equals(object obj)
+    {
+        // If the passed object is null or is not a PhoneNumberModel object, return false.
+        if (obj == null || ((obj is PhoneNumberModel) == false))
+            return false;
+
+        return (PhoneNumber == ((PhoneNumberModel)obj).PhoneNumber);
+    }
+
+    public override int GetHashCode()
+    {        
+        return PhoneNumber.GetHashCode();
+    }
 }

@@ -34,7 +34,7 @@ public class StaffController : Controller
     /// StaffCreateModel populated with collection of SelectList DepartmentItems (Departments info)
     /// to View which modifies StaffCreateModel properties and send back.
     /// </summary>
-    /// <returns>View with populated StaffCreateModel inside.</returns>
+    /// <returns>View with populated StaffCreateModel.</returns>
     public async Task<IActionResult> Create()
     {
         // We get all Departments from our database.
@@ -61,9 +61,7 @@ public class StaffController : Controller
     {
         // this is validation for model we are passing as parameter
         if (ModelState.IsValid == false)
-        {
             return RedirectToAction("Create");
-        }
 
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
@@ -76,13 +74,11 @@ public class StaffController : Controller
         if (isCreated)
             return RedirectToAction("Details", new { message = "You have already created account!" });
 
-        List<string> phoneNumbers = new List<string>();
-
+        List<PhoneNumberModel> phoneNumbers = new List<PhoneNumberModel>();
         string[] cols = staff.PhoneNumbersText.Split(',');
-
         for (int i = 0; i < cols.Length; i++)
         {
-            phoneNumbers.Add(cols[i]);
+            phoneNumbers.Add(new PhoneNumberModel { PhoneNumber = cols[i].Trim() });
         }
 
         await _sqlData.CreateStaff(Convert.ToInt32(staff.DepartmentId),
@@ -96,7 +92,7 @@ public class StaffController : Controller
                                    userEmail,
                                    phoneNumbers);
 
-        var newUser = await _userManager.FindByEmailAsync(userEmail);
+        IdentityUser newUser = await _userManager.FindByEmailAsync(userEmail);
         await _userManager.AddToRoleAsync(newUser, "Member");
         await _signInManager.SignInAsync(newUser, false);
 
@@ -116,8 +112,6 @@ public class StaffController : Controller
         bool isCreated = await _sqlData.CheckStaffByEmail(userEmail);
 
         // if user has no account yet we redirect him to Create Staff action
-        // we should assign him Registered Role here and than Create can be visible only for Registered Role
-        // we will need to add RoleManager to our Controller using DI
         if (isCreated == false)
             return RedirectToAction("Create");
 
@@ -141,5 +135,67 @@ public class StaffController : Controller
         detailsModel.Message = message;
 
         return View(detailsModel);
+    }
+
+    /// <summary>
+    /// Get Update Action. We get Staff's personal info and populate StaffUpdateModel with it.
+    /// </summary>
+    /// <returns>View with populated StaffUpdateModel.</returns>
+    public async Task<IActionResult> Update()
+    {
+        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+
+        StaffUpdateModel updateModel = new StaffUpdateModel();
+        StaffFullModel fullModel = await _sqlData.GetStaffByEmail(userEmail);
+
+        foreach (PhoneNumberModel phoneNumber in fullModel.PhoneNumbers)
+        {
+            updateModel.PhoneNumbersText += phoneNumber.PhoneNumber + ",";
+        }
+        updateModel.PhoneNumbersText = updateModel.PhoneNumbersText.TrimEnd(',');
+
+        // maybe we could use AutoMapper here
+        updateModel.FirstName = fullModel.FirstName;
+        updateModel.LastName = fullModel.LastName;
+        updateModel.EmailAddress = fullModel.EmailAddress;
+        updateModel.Street = fullModel.Street;
+        updateModel.City = fullModel.City;
+        updateModel.Zip = fullModel.Zip;
+        updateModel.State = fullModel.State;
+
+        return View(updateModel);
+    }
+
+    /// <summary>
+    /// Post Update Action. We update Staff's personal info.
+    /// </summary>
+    /// <param name="updateModel">Staff Updated Information.</param>
+    /// <returns>Redirect to Details Action.</returns>
+    [HttpPost]
+    public async Task<IActionResult> Update(StaffUpdateModel updateModel)
+    {
+        if (ModelState.IsValid == false)
+            return RedirectToAction("Update");
+
+        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+
+        List<PhoneNumberModel> phoneNumbers = new List<PhoneNumberModel>();
+        string[] cols = updateModel.PhoneNumbersText.Split(',');
+        for (int i = 0; i < cols.Length; i++)
+        {
+            phoneNumbers.Add(new PhoneNumberModel { PhoneNumber = cols[i].Trim() });
+        }
+
+        await _sqlData.UpdateStaff(updateModel.Street,
+                                   updateModel.City,
+                                   updateModel.Zip,
+                                   updateModel.State,
+                                   updateModel.PIN.ToString(),
+                                   updateModel.FirstName,
+                                   updateModel.LastName,
+                                   userEmail,
+                                   phoneNumbers);
+
+        return RedirectToAction("Details");
     }
 }

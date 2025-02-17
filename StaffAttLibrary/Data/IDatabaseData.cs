@@ -7,7 +7,25 @@ public interface IDatabaseData
     Task<bool> CheckApproveStatus(int aliasId);
     Task<int> CheckInPerform(int staffId);
     Task<int> CheckOutPerform(int checkInId);
-    Task CreateStaff(int departmentId, string street, string city, string zip, string state, string pIN, string firstName, string lastName, string emailAddress, List<string> phoneNumbers);
+    Task CreateStaff(int departmentId,
+                     string street,
+                     string city,
+                     string zip,
+                     string state,
+                     string pIN,
+                     string firstName,
+                     string lastName,
+                     string emailAddress,
+                     List<PhoneNumberModel> phoneNumbers);
+    Task UpdateStaff(string street,
+                     string city,
+                     string zip,
+                     string state,
+                     string pIN,
+                     string firstName,
+                     string lastName,
+                     string emailAddress,
+                     List<PhoneNumberModel> phoneNumbers);
     Task<List<DepartmentModel>> GetAllDepartments();
     Task<List<StaffFullModel>> GetAllStaff(bool getAll = true);
     Task<List<StaffBasicModel>> GetAllBasicStaff();

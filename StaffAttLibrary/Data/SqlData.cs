@@ -60,15 +60,15 @@ public class SqlData : IDatabaseData
     /// <param name="emailAddress"></param>
     /// <param name="phoneNumbers"></param>
     public async Task CreateStaff(int departmentId,
-                            string street,
-                            string city,
-                            string zip,
-                            string state,
-                            string pIN,
-                            string firstName,
-                            string lastName,
-                            string emailAddress,
-                            List<string> phoneNumbers)
+                                 string street,
+                                 string city,
+                                 string zip,
+                                 string state,
+                                 string pIN,
+                                 string firstName,
+                                 string lastName,
+                                 string emailAddress,
+                                 List<PhoneNumberModel> phoneNumbers)
     {
         // Save Address into Db and returns back Id.
         int addressId = await _db.SaveDataGetId("spAddresses_Insert",
@@ -95,13 +95,18 @@ public class SqlData : IDatabaseData
                                               connectionStringName);
 
         // Add Phone Numbers into Db.
+        await CreatePhoneNumbers(staffId, phoneNumbers);
+    }
+
+    private async Task CreatePhoneNumbers(int staffId, List<PhoneNumberModel> phoneNumbers)
+    {
         int phoneNumberId = 0;
-        foreach (string phoneNumber in phoneNumbers)
+        foreach (PhoneNumberModel phoneNumber in phoneNumbers)
         {
             // Check if given Phone Number is already in Db (some Staff can share it because they live together).
             List<PhoneNumberModel> phoneNumberList = await _db.LoadData<PhoneNumberModel, dynamic>(
                 "spPhoneNumbers_GetByPhoneNumber",
-                new { phoneNumber },
+                new { phoneNumber = phoneNumber.PhoneNumber },
                 connectionStringName);
 
             // If we found that Phone Number in Db we just store it inside relation StaffPhoneNumbers Table.
@@ -115,12 +120,49 @@ public class SqlData : IDatabaseData
             else
             {
                 phoneNumberId = await _db.SaveDataGetId("spPhoneNumbers_Insert",
-                                                        new { phoneNumber },
+                                                        new { phoneNumber = phoneNumber.PhoneNumber },
                                                         connectionStringName);
                 await _db.SaveData("spStaffPhoneNumbers_Insert",
                                    new { staffId, phoneNumberId },
                                    connectionStringName);
             }
+        }
+    }
+
+    public async Task UpdateStaff(string street,
+                                 string city,
+                                 string zip,
+                                 string state,
+                                 string pIN,
+                                 string firstName,
+                                 string lastName,
+                                 string emailAddress,
+                                 List<PhoneNumberModel> phoneNumbers)
+    {
+        StaffFullModel staff = await GetStaffByEmail(emailAddress);
+
+        // Update Address
+        await _db.SaveData("spAddresses_Update",
+                           new { id = staff.AddressId, street, city, zip, state },
+                           connectionStringName);
+
+        // Update Alias
+        await _db.SaveData("spAliases_Update",
+                           new { id = staff.AliasId, pIN },
+                           connectionStringName);
+
+        // Update Staff, set isApproved to false because Admin must approve it again.
+        await _db.SaveData("spStaffs_Update",
+                           new { id = staff.Id, firstName, lastName, isApproved = false },
+                           connectionStringName);
+
+        // Check if Updated Phone Numbers and Phone Numbers from Db are the same
+        bool isSamePhoneNumber = staff.PhoneNumbers.All(phoneNumbers.Contains) && staff.PhoneNumbers.Count == phoneNumbers.Count;
+        if (isSamePhoneNumber == false)
+        {
+            // Update Phone Numbers, we simply delete old and insert new ones.
+            await DeletePhoneNumbers(staff.Id, staff.PhoneNumbers);
+            await CreatePhoneNumbers(staff.Id, phoneNumbers);
         }
     }
 
@@ -345,7 +387,23 @@ public class SqlData : IDatabaseData
                                                                                connectionStringName);
 
         // First we delete Phone Numbers (can be shared with other Staff) because they have Foreign Key into Staffs Table.
-        foreach (PhoneNumberModel item in fullStaffModel.PhoneNumbers)
+        await DeletePhoneNumbers(staffId, fullStaffModel.PhoneNumbers);
+
+        // Than we must delete Staff because it has Foreign Keys into Addresses and Aliases Tables.
+        await _db.SaveData("spStaffs_Delete",
+                           new { staffId },
+                           connectionStringName);
+
+        // Delete Address by AddressId
+        await _db.SaveData("spAddresses_Delete", new { id = fullStaffModel.AddressId }, connectionStringName);
+
+        // Delete Alias by AliasId
+        await _db.SaveData("spAliases_Delete", new { id = fullStaffModel.AliasId }, connectionStringName);
+    }
+
+    private async Task DeletePhoneNumbers(int staffId, List<PhoneNumberModel> phoneNumbers)
+    {
+        foreach (PhoneNumberModel item in phoneNumbers)
         {
             int phoneNumberId = item.Id;
 
@@ -368,17 +426,6 @@ public class SqlData : IDatabaseData
                                    connectionStringName);
             }
         }
-
-        // Than we must delete Staff because it has Foreign Keys into Addresses and Aliases Tables.
-        await _db.SaveData("spStaffs_Delete",
-                           new { staffId },
-                           connectionStringName);
-
-        // Delete Address by AddressId
-        await _db.SaveData("spAddresses_Delete", new { id = fullStaffModel.AddressId }, connectionStringName);
-
-        // Delete Alias by AliasId
-        await _db.SaveData("spAliases_Delete", new { id = fullStaffModel.AliasId }, connectionStringName);
     }
 
     /// <summary>
