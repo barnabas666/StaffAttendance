@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using StaffAtt.Web.Models;
@@ -15,10 +16,12 @@ namespace StaffAtt.Web.Controllers;
 public class CheckInController : Controller
 {
     private readonly IDatabaseData _sqlData;
+    private readonly IMapper _mapper;
 
-    public CheckInController(IDatabaseData sqlData)
+    public CheckInController(IDatabaseData sqlData, IMapper mapper)
     {
         _sqlData = sqlData;
+        _mapper = mapper;
     }
 
     public IActionResult Index()
@@ -37,37 +40,11 @@ public class CheckInController : Controller
         CheckInDisplayAdminViewModel dateDisplayModel = new CheckInDisplayAdminViewModel();
 
         List<CheckInFullModel> checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
-                                                                      dateDisplayModel.EndDate);
-
-        foreach (CheckInFullModel item in checkIns)
-        {
-            CheckInFullViewModel viewModel = new CheckInFullViewModel();
-            viewModel.Id = item.Id;            
-            viewModel.FirstName = item.FirstName;
-            viewModel.LastName = item.LastName;
-            viewModel.EmailAddress = item.EmailAddress;
-            viewModel.Title = item.Title;
-            viewModel.CheckInDate = item.CheckInDate;
-            viewModel.CheckOutDate = item.CheckOutDate;
-
-            dateDisplayModel.CheckIns.Add(viewModel);
-        }
+                                                                              dateDisplayModel.EndDate);
+        dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
 
         List<StaffBasicModel> basicStaff = await _sqlData.GetAllBasicStaff();
-
-        foreach (StaffBasicModel item in basicStaff)
-        {
-            StaffBasicViewModel viewModel = new StaffBasicViewModel();
-            viewModel.Id = item.Id;
-            viewModel.FirstName = item.FirstName;
-            viewModel.LastName = item.LastName;
-            viewModel.EmailAddress = item.EmailAddress;
-            viewModel.Alias = item.Alias;
-            viewModel.IsApproved = item.IsApproved;
-            viewModel.Title = item.Title;
-
-            dateDisplayModel.StaffList.Add(viewModel);
-        }
+        dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
 
         // Creating default item = All Staff for DropDown. FullName prop is just getter so we setup here FirstName.
         dateDisplayModel.StaffList.Insert(0, new StaffBasicViewModel()
@@ -104,58 +81,19 @@ public class CheckInController : Controller
         if (dateDisplayModel.SelectedId == "0")
         {
             checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
-                                                                          dateDisplayModel.EndDate);
-
-            foreach (CheckInFullModel item in checkIns)
-            {
-                CheckInFullViewModel viewModel = new CheckInFullViewModel();
-                viewModel.Id = item.Id;
-                viewModel.FirstName = item.FirstName;
-                viewModel.LastName = item.LastName;
-                viewModel.EmailAddress = item.EmailAddress;
-                viewModel.Title = item.Title;
-                viewModel.CheckInDate = item.CheckInDate;
-                viewModel.CheckOutDate = item.CheckOutDate;
-
-                dateDisplayModel.CheckIns.Add(viewModel);
-            }
+                                                           dateDisplayModel.EndDate);
+            dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
         }
         else
         {
             checkIns = await _sqlData.GetCheckInsByDateAndId(Convert.ToInt32(dateDisplayModel.SelectedId),
                                                                              dateDisplayModel.StartDate,
                                                                              dateDisplayModel.EndDate);
-
-            foreach (CheckInFullModel item in checkIns)
-            {
-                CheckInFullViewModel viewModel = new CheckInFullViewModel();
-                viewModel.Id = item.Id;
-                viewModel.FirstName = item.FirstName;
-                viewModel.LastName = item.LastName;
-                viewModel.EmailAddress = item.EmailAddress;
-                viewModel.Title = item.Title;
-                viewModel.CheckInDate = item.CheckInDate;
-                viewModel.CheckOutDate = item.CheckOutDate;
-
-                dateDisplayModel.CheckIns.Add(viewModel);
-            }
+            dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
         }
 
         List<StaffBasicModel> basicStaff = await _sqlData.GetAllBasicStaff();
-
-        foreach (StaffBasicModel item in basicStaff)
-        {
-            StaffBasicViewModel viewModel = new StaffBasicViewModel();
-            viewModel.Id = item.Id;
-            viewModel.FirstName = item.FirstName;
-            viewModel.LastName = item.LastName;
-            viewModel.EmailAddress = item.EmailAddress;
-            viewModel.Alias = item.Alias;
-            viewModel.IsApproved = item.IsApproved;
-            viewModel.Title = item.Title;
-
-            dateDisplayModel.StaffList.Add(viewModel);
-        }
+        dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
 
         // Creating default item = All Staff for DropDown. FullName prop is just getter so we setup here FirstName.
         dateDisplayModel.StaffList.Insert(0, new StaffBasicViewModel()
@@ -185,22 +123,9 @@ public class CheckInController : Controller
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
         List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
-                                                                             dateDisplayModel.StartDate,
-                                                                             dateDisplayModel.EndDate);
-
-        foreach (CheckInFullModel item in checkIns)
-        {
-            CheckInFullViewModel viewModel = new CheckInFullViewModel();
-            viewModel.Id = item.Id;
-            viewModel.FirstName = item.FirstName;
-            viewModel.LastName = item.LastName;
-            viewModel.EmailAddress = item.EmailAddress;
-            viewModel.Title = item.Title;
-            viewModel.CheckInDate = item.CheckInDate;
-            viewModel.CheckOutDate = item.CheckOutDate;
-
-            dateDisplayModel.CheckIns.Add(viewModel);
-        }
+                                                                                   dateDisplayModel.StartDate,
+                                                                                   dateDisplayModel.EndDate);
+        dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
 
         return View(dateDisplayModel);
     }
@@ -222,20 +147,7 @@ public class CheckInController : Controller
         List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
                                                                              dateDisplayModel.StartDate,
                                                                              dateDisplayModel.EndDate);
-
-        foreach (CheckInFullModel item in checkIns)
-        {
-            CheckInFullViewModel viewModel = new CheckInFullViewModel();
-            viewModel.Id = item.Id;
-            viewModel.FirstName = item.FirstName;
-            viewModel.LastName = item.LastName;
-            viewModel.EmailAddress = item.EmailAddress;
-            viewModel.Title = item.Title;
-            viewModel.CheckInDate = item.CheckInDate;
-            viewModel.CheckOutDate = item.CheckOutDate;
-
-            dateDisplayModel.CheckIns.Add(viewModel);
-        }
+        dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns); 
 
         return View(dateDisplayModel);
     }

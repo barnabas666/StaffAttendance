@@ -257,6 +257,11 @@ public class SqlData : IDatabaseData
 
         foreach (StaffFullModel staff in output)
         {
+            var outputAddress = await _db.LoadData<AddressModel, dynamic>("spAddresses_GetById",
+                                                                               new { id = staff.AddressId },
+                                                                               connectionStringName);
+            staff.Address = outputAddress.FirstOrDefault();
+
             staff.PhoneNumbers = await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
                                                                                new { staffId = staff.Id },
                                                                                connectionStringName);
@@ -285,9 +290,14 @@ public class SqlData : IDatabaseData
     /// <returns>Staff info.</returns>
     public async Task<StaffFullModel> GetStaffByEmail(string emailAddress)
     {
-        List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetByEmail",
+        List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetBasicByEmail",
                                                                             new { emailAddress },
                                                                             connectionStringName);
+
+         var outputAddress = await _db.LoadData<AddressModel, dynamic>("spAddresses_GetByEmail",
+                                                                               new { emailAddress },
+                                                                               connectionStringName);
+        output.FirstOrDefault().Address = outputAddress.FirstOrDefault();
 
         output.FirstOrDefault().PhoneNumbers = await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
                                                                                new { staffId = output.FirstOrDefault().Id },
@@ -306,6 +316,11 @@ public class SqlData : IDatabaseData
         List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetById",
                                                                             new { id },
                                                                             connectionStringName);
+
+        var outputAddress = await _db.LoadData<AddressModel, dynamic>("spAddresses_GetById",
+                                                                      new { id },
+                                                                      connectionStringName);
+        output.FirstOrDefault().Address = outputAddress.FirstOrDefault();
 
         output.FirstOrDefault().PhoneNumbers = await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
                                                                                new { staffId = output.FirstOrDefault().Id },

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,47 +16,28 @@ namespace StaffAtt.Web.Controllers;
 public class StaffManagementController : Controller
 {
     private readonly IDatabaseData _sqlData;
+    private readonly IMapper _mapper;
 
-    public StaffManagementController(IDatabaseData sqlData)
+    public StaffManagementController(IDatabaseData sqlData, IMapper mapper)
     {
         this._sqlData = sqlData;
+        _mapper = mapper;
     }
 
     public async Task<IActionResult> List()
     {
-        List<StaffManagementListViewModel> staffsList = new List<StaffManagementListViewModel>();
         List<StaffBasicModel> staffs = await _sqlData.GetAllBasicStaff();
 
-        foreach (StaffBasicModel staff in staffs)
-        {
-            StaffManagementListViewModel viewModel = new StaffManagementListViewModel();
-            viewModel.BasicInfo.Id = staff.Id;
-            viewModel.BasicInfo.FirstName = staff.FirstName;
-            viewModel.BasicInfo.LastName = staff.LastName;
-            viewModel.BasicInfo.EmailAddress = staff.EmailAddress;
-            viewModel.BasicInfo.Alias = staff.Alias;
-            viewModel.BasicInfo.Title = staff.Title;
-            viewModel.BasicInfo.IsApproved = staff.IsApproved;
-
-            staffsList.Add(viewModel);
-        }
+        List<StaffManagementListViewModel> staffsList = _mapper.Map<List<StaffManagementListViewModel>>(staffs);
 
         return View(staffsList);
     }
 
     public async Task<IActionResult> Update(int id)
     {
-        StaffManagementUpdateViewModel updateModel = new StaffManagementUpdateViewModel();
         StaffBasicModel basicModel = await _sqlData.GetBasicStaffById(id);
 
-        updateModel.BasicInfo.Id = basicModel.Id;
-        updateModel.BasicInfo.FirstName = basicModel.FirstName;
-        updateModel.BasicInfo.LastName = basicModel.LastName;
-        updateModel.BasicInfo.EmailAddress = basicModel.EmailAddress;
-        updateModel.BasicInfo.Alias = basicModel.Alias;
-        updateModel.BasicInfo.IsApproved = basicModel.IsApproved;
-        updateModel.BasicInfo.DepartmentId = basicModel.DepartmentId;
-        updateModel.BasicInfo.Title = basicModel.Title;
+        StaffManagementUpdateViewModel updateModel = _mapper.Map<StaffManagementUpdateViewModel>(basicModel);
 
         // We get all Departments from our database.
         List<DepartmentModel> departments = await _sqlData.GetAllDepartments();
@@ -86,15 +68,9 @@ public class StaffManagementController : Controller
     /// <returns>View with populated StaffBasicModel to delete inside.</returns>
     public async Task<IActionResult> Delete(int id)
     {
-        StaffManagementDeleteViewModel deleteModel = new StaffManagementDeleteViewModel();
         StaffBasicModel basicModel = await _sqlData.GetBasicStaffById(id);
 
-        deleteModel.BasicInfo.Id = basicModel.Id;
-        deleteModel.BasicInfo.FirstName = basicModel.FirstName;
-        deleteModel.BasicInfo.LastName = basicModel.LastName;
-        deleteModel.BasicInfo.EmailAddress = basicModel.EmailAddress;
-        deleteModel.BasicInfo.Alias = basicModel.Alias;
-        deleteModel.BasicInfo.Title = basicModel.Title;
+        StaffManagementDeleteViewModel deleteModel = _mapper.Map<StaffManagementDeleteViewModel>(basicModel);
 
         // return View with our Staff Info to delete.
         return View(deleteModel);

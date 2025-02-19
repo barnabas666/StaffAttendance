@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,14 +19,17 @@ public class StaffController : Controller
     private readonly IDatabaseData _sqlData;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IMapper _mapper;
 
     public StaffController(IDatabaseData sqlData,
                            UserManager<IdentityUser> userManager,
-                           SignInManager<IdentityUser> signInManager)
+                           SignInManager<IdentityUser> signInManager,
+                           IMapper mapper)
     {
         _sqlData = sqlData;
         _userManager = userManager;
         _signInManager = signInManager;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -119,23 +123,9 @@ public class StaffController : Controller
         if (isCreated == false)
             return RedirectToAction("Create");
 
-        StaffDetailsViewModel detailsModel = new StaffDetailsViewModel();
-
         StaffFullModel fullModel = await _sqlData.GetStaffByEmail(userEmail);
 
-        // maybe we could use AutoMapper here
-        detailsModel.BasicInfo.Id = fullModel.Id;
-        detailsModel.BasicInfo.FirstName = fullModel.FirstName;
-        detailsModel.BasicInfo.LastName = fullModel.LastName;
-        detailsModel.BasicInfo.EmailAddress = fullModel.EmailAddress;
-        detailsModel.BasicInfo.Alias = fullModel.Alias;
-        detailsModel.BasicInfo.IsApproved = fullModel.IsApproved;
-        detailsModel.BasicInfo.Title = fullModel.Title;
-        detailsModel.Street = fullModel.Address.Street;
-        detailsModel.City = fullModel.Address.City;
-        detailsModel.Zip = fullModel.Address.Zip;
-        detailsModel.State = fullModel.Address.State;
-        detailsModel.PhoneNumbers = fullModel.PhoneNumbers;
+        StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(fullModel);
         detailsModel.Message = message;
 
         return View(detailsModel);
@@ -149,23 +139,15 @@ public class StaffController : Controller
     {
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        StaffUpdateViewModel updateModel = new StaffUpdateViewModel();
         StaffFullModel fullModel = await _sqlData.GetStaffByEmail(userEmail);
+
+        StaffUpdateViewModel updateModel = _mapper.Map<StaffUpdateViewModel>(fullModel);
 
         foreach (PhoneNumberModel phoneNumber in fullModel.PhoneNumbers)
         {
             updateModel.PhoneNumbersText += phoneNumber.PhoneNumber + ",";
         }
         updateModel.PhoneNumbersText = updateModel.PhoneNumbersText.TrimEnd(',');
-
-        // maybe we could use AutoMapper here
-        updateModel.FirstName = fullModel.FirstName;
-        updateModel.LastName = fullModel.LastName;
-        updateModel.EmailAddress = fullModel.EmailAddress;
-        updateModel.Street = fullModel.Address.Street;
-        updateModel.City = fullModel.Address.City;
-        updateModel.Zip = fullModel.Address.Zip;
-        updateModel.State = fullModel.Address.State;
 
         return View(updateModel);
     }

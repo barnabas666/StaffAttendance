@@ -81,7 +81,7 @@
     <Build Include="dbo\Stored Procedures\spPhoneNumbers_GetByStaffId.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetAllNotApproved.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_UpdateByAdmin.sql" />
-    <Build Include="dbo\Stored Procedures\spStaffs_GetByEmail.sql" />
+    <Build Include="dbo\Stored Procedures\spStaffs_GetBasicByEmail.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_GetLastRecord.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_InsertCheckIn.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_InsertCheckOut.sql" />
@@ -105,6 +105,8 @@
     <Build Include="dbo\Stored Procedures\spAddresses_Update.sql" />
     <Build Include="dbo\Stored Procedures\spAliases_Update.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spAddresses_GetByEmail.sql" />
+    <Build Include="dbo\Stored Procedures\spAddresses_GetById.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />
