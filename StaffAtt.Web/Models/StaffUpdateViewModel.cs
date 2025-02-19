@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using StaffAttLibrary.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace StaffAtt.Web.Models;
 
 /// <summary>
-/// Model needed to send to View (Create Action), populate it there and send model back.
+/// Model needed to send to View (Update Action), populate it there and send model back.
 /// </summary>
-public class StaffCreateModel
+public class StaffUpdateViewModel
 {
     /// <summary>
     /// Staff's First Name.
@@ -31,18 +30,6 @@ public class StaffCreateModel
     [Required(ErrorMessage = "Please enter a PIN.")]
     [Range(1000, 9999, ErrorMessage = "PIN must contain exactly 4 digits.")]
     public int PIN { get; set; }
-
-    /// <summary>
-    /// Department data for our DropDown control - Get action
-    /// </summary>
-    [Display(Name = "Your Department: ")]    
-    public SelectList? DepartmentItems { get; set; }
-
-    /// <summary>
-    /// Staff's Department Id.
-    /// </summary>
-    [Required]
-    public string DepartmentId { get; set; }
 
     /// <summary>
     /// Staff's Address - Street.
@@ -72,6 +59,11 @@ public class StaffCreateModel
     [Required(ErrorMessage = "Please enter an Address - State.")]
     [StringLength(50, MinimumLength = 2, ErrorMessage = "State must be between 2 and 50 chars.")]
     public string State { get; set; }
+
+    /// <summary>
+    /// Staff's Email. Hidden field.
+    /// </summary>
+    public string EmailAddress { get; set; }
 
     /// <summary>
     /// Staff's Phone Numbers.

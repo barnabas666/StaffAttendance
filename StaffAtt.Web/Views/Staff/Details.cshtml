@@ -1,4 +1,4 @@
-﻿@model StaffAtt.Web.Models.StaffDetailsModel
+﻿@model StaffAtt.Web.Models.StaffDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -7,6 +7,11 @@
 @* Some warning message from different Action, probably from Create *@
 @if (string.IsNullOrEmpty(Model.Message) == false) {
     <h4 class="text-danger">@Model.Message</h4>
+}
+
+@if (Model.BasicInfo.IsApproved == false)
+{
+    <h4 class="text-danger">You are not approved to Check-in.</h4>
 }
 
 @if (Model == null)
@@ -20,40 +25,40 @@ else
         <hr />
         <dl class="row">
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.BasicInfo.FirstName)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.FirstName)
+                @Html.DisplayFor(model => model.BasicInfo.FirstName)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.BasicInfo.LastName)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.LastName)
+                @Html.DisplayFor(model => model.BasicInfo.LastName)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.EmailAddress)
+                @Html.DisplayNameFor(model => model.BasicInfo.EmailAddress)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.EmailAddress)
+                @Html.DisplayFor(model => model.BasicInfo.EmailAddress)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Alias)
+                @Html.DisplayNameFor(model => model.BasicInfo.Alias)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Alias)
+                @Html.DisplayFor(model => model.BasicInfo.Alias)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.IsApproved)
+                @Html.DisplayNameFor(model => model.BasicInfo.IsApproved)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.IsApproved)
+                @Html.DisplayFor(model => model.BasicInfo.IsApproved)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Title)
+                @Html.DisplayNameFor(model => model.BasicInfo.Title)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Title)
+                @Html.DisplayFor(model => model.BasicInfo.Title)
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Street)

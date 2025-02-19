@@ -1,7 +1,7 @@
-﻿@model IEnumerable<StaffAttLibrary.Models.StaffBasicModel>
+﻿@model IEnumerable<StaffAtt.Web.Models.StaffManagementListViewModel>
 
 @{
-    ViewData["Title"] = "List";
+    ViewData["Title"] = "List of all staff";
 }
 
 <h1>List</h1>
@@ -13,22 +13,19 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.BasicInfo.FullName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.BasicInfo.EmailAddress)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EmailAddress)
+                @Html.DisplayNameFor(model => model.BasicInfo.Alias)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Alias)
+                @Html.DisplayNameFor(model => model.BasicInfo.IsApproved)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsApproved)
-            </th>
-            <th>
-                @Html.DisplayName("Department")
+                @Html.DisplayNameFor(model => model.BasicInfo.Title)
             </th>
             <th></th>
         </tr>
@@ -37,29 +34,26 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
+                    @Html.DisplayFor(modelItem => item.BasicInfo.FullName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.LastName)
+                    @Html.DisplayFor(modelItem => item.BasicInfo.EmailAddress)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EmailAddress)
+                    @Html.DisplayFor(modelItem => item.BasicInfo.Alias)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Alias)
+                    @Html.DisplayFor(modelItem => item.BasicInfo.IsApproved)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsApproved)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
+                    @Html.DisplayFor(modelItem => item.BasicInfo.Title)
             </td>
             <td>
                     <!-- We redirect to Update Page (with Button) and we set value for Id parameter on the route. -->
-                    <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-secondary">Edit</a> |
+                    <a asp-action="Update" asp-route-id="@item.BasicInfo.Id" class="btn btn-secondary">Edit</a> |
                 @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |                
                     <!-- We redirect to Delete Page (with Button) and we set value for Id parameter on the route. -->
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.BasicInfo.Id" class="btn btn-danger">Delete</a>
             </td>
         </tr>
 }

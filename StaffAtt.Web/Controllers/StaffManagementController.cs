@@ -23,30 +23,58 @@ public class StaffManagementController : Controller
 
     public async Task<IActionResult> List()
     {
+        List<StaffManagementListViewModel> staffsList = new List<StaffManagementListViewModel>();
         List<StaffBasicModel> staffs = await _sqlData.GetAllBasicStaff();
 
-        return View(staffs);
+        foreach (StaffBasicModel staff in staffs)
+        {
+            StaffManagementListViewModel viewModel = new StaffManagementListViewModel();
+            viewModel.BasicInfo.Id = staff.Id;
+            viewModel.BasicInfo.FirstName = staff.FirstName;
+            viewModel.BasicInfo.LastName = staff.LastName;
+            viewModel.BasicInfo.EmailAddress = staff.EmailAddress;
+            viewModel.BasicInfo.Alias = staff.Alias;
+            viewModel.BasicInfo.Title = staff.Title;
+            viewModel.BasicInfo.IsApproved = staff.IsApproved;
+
+            staffsList.Add(viewModel);
+        }
+
+        return View(staffsList);
     }
 
     public async Task<IActionResult> Update(int id)
     {
-        StaffManagementUpdateModel updateModel = new StaffManagementUpdateModel();
+        StaffManagementUpdateViewModel updateModel = new StaffManagementUpdateViewModel();
+        StaffBasicModel basicModel = await _sqlData.GetBasicStaffById(id);
 
-        updateModel.BasicInfo = await _sqlData.GetBasicStaffById(id);
+        updateModel.BasicInfo.Id = basicModel.Id;
+        updateModel.BasicInfo.FirstName = basicModel.FirstName;
+        updateModel.BasicInfo.LastName = basicModel.LastName;
+        updateModel.BasicInfo.EmailAddress = basicModel.EmailAddress;
+        updateModel.BasicInfo.Alias = basicModel.Alias;
+        updateModel.BasicInfo.IsApproved = basicModel.IsApproved;
+        updateModel.BasicInfo.DepartmentId = basicModel.DepartmentId;
+        updateModel.BasicInfo.Title = basicModel.Title;
 
         // We get all Departments from our database.
         List<DepartmentModel> departments = await _sqlData.GetAllDepartments();
 
-        // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user, both expect string.
-        updateModel.DepartmentItems = new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));        
+        // Source is departments, value (Id here) gonna be saved to database,
+        // Text (Title) gets displayed to user, both expect string.
+        updateModel.DepartmentItems = new SelectList(departments,
+                                                     nameof(DepartmentModel.Id),
+                                                     nameof(DepartmentModel.Title));
 
         return View(updateModel);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(StaffManagementUpdateModel updateModel)
+    public async Task<IActionResult> Update(StaffManagementUpdateViewModel updateModel)
     {
-        await _sqlData.UpdateStaffByAdmin(updateModel.BasicInfo.Id, Convert.ToInt32(updateModel.BasicInfo.DepartmentId), updateModel.BasicInfo.IsApproved);
+        await _sqlData.UpdateStaffByAdmin(updateModel.BasicInfo.Id,
+                                          Convert.ToInt32(updateModel.BasicInfo.DepartmentId),
+                                          updateModel.BasicInfo.IsApproved);
 
         return RedirectToAction("List");
     }
@@ -58,10 +86,18 @@ public class StaffManagementController : Controller
     /// <returns>View with populated StaffBasicModel to delete inside.</returns>
     public async Task<IActionResult> Delete(int id)
     {
+        StaffManagementDeleteViewModel deleteModel = new StaffManagementDeleteViewModel();
         StaffBasicModel basicModel = await _sqlData.GetBasicStaffById(id);
 
+        deleteModel.BasicInfo.Id = basicModel.Id;
+        deleteModel.BasicInfo.FirstName = basicModel.FirstName;
+        deleteModel.BasicInfo.LastName = basicModel.LastName;
+        deleteModel.BasicInfo.EmailAddress = basicModel.EmailAddress;
+        deleteModel.BasicInfo.Alias = basicModel.Alias;
+        deleteModel.BasicInfo.Title = basicModel.Title;
+
         // return View with our Staff Info to delete.
-        return View(basicModel);
+        return View(deleteModel);
     }
 
     /// <summary>

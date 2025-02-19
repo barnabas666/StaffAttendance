@@ -6,12 +6,12 @@ namespace StaffAtt.Web.Models;
 /// <summary>
 /// ViewModel for displaying list of all CheckIns by Date and Staff for given Staff.
 /// </summary>
-public class CheckInDateDisplayStaffModel
+public class CheckInDisplayStaffViewModel
 {
     /// <summary>
     /// List of CheckIns.
     /// </summary>
-    public List<CheckInFullModel> CheckIns { get; set; } = new List<CheckInFullModel>();
+    public List<CheckInFullViewModel> CheckIns { get; set; } = new List<CheckInFullViewModel>();
 
     /// <summary>
     /// CheckIn's Start Date for Search Range. Default time is yesterday.

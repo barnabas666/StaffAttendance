@@ -60,10 +60,7 @@ public class SqlData : IDatabaseData
     /// <param name="emailAddress"></param>
     /// <param name="phoneNumbers"></param>
     public async Task CreateStaff(int departmentId,
-                                 string street,
-                                 string city,
-                                 string zip,
-                                 string state,
+                                 AddressModel address,
                                  string pIN,
                                  string firstName,
                                  string lastName,
@@ -72,7 +69,10 @@ public class SqlData : IDatabaseData
     {
         // Save Address into Db and returns back Id.
         int addressId = await _db.SaveDataGetId("spAddresses_Insert",
-                                                new { street, city, zip, state },
+                                                new { street = address.Street, 
+                                                      city = address.City, 
+                                                      zip = address.Zip, 
+                                                      state = address.State },
                                                 connectionStringName);
 
         int orderNumber = 0;
@@ -129,10 +129,7 @@ public class SqlData : IDatabaseData
         }
     }
 
-    public async Task UpdateStaff(string street,
-                                 string city,
-                                 string zip,
-                                 string state,
+    public async Task UpdateStaff(AddressModel address,
                                  string pIN,
                                  string firstName,
                                  string lastName,
@@ -143,7 +140,11 @@ public class SqlData : IDatabaseData
 
         // Update Address
         await _db.SaveData("spAddresses_Update",
-                           new { id = staff.AddressId, street, city, zip, state },
+                           new { id = staff.AddressId, 
+                                 street = address.Street, 
+                                 city = address.City, 
+                                 zip = address.Zip, 
+                                 state = address.State },
                            connectionStringName);
 
         // Update Alias

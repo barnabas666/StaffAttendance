@@ -8,19 +8,13 @@ public interface IDatabaseData
     Task<int> CheckInPerform(int staffId);
     Task<int> CheckOutPerform(int checkInId);
     Task CreateStaff(int departmentId,
-                     string street,
-                     string city,
-                     string zip,
-                     string state,
+                     AddressModel address,
                      string pIN,
                      string firstName,
                      string lastName,
                      string emailAddress,
                      List<PhoneNumberModel> phoneNumbers);
-    Task UpdateStaff(string street,
-                     string city,
-                     string zip,
-                     string state,
+    Task UpdateStaff(AddressModel address,
                      string pIN,
                      string firstName,
                      string lastName,

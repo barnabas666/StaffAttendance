@@ -1,4 +1,4 @@
-﻿@model StaffAttLibrary.Models.StaffBasicModel
+﻿@model StaffAtt.Web.Models.StaffManagementDeleteViewModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -11,34 +11,28 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
+            @Html.DisplayNameFor(model => model.BasicInfo.FullName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
+            @Html.DisplayFor(model => model.BasicInfo.FullName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
+            @Html.DisplayNameFor(model => model.BasicInfo.EmailAddress)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
+            @Html.DisplayFor(model => model.BasicInfo.EmailAddress)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EmailAddress)
+            @Html.DisplayNameFor(model => model.BasicInfo.Alias)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EmailAddress)
+            @Html.DisplayFor(model => model.BasicInfo.Alias)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Alias)
+            @Html.DisplayNameFor(model => model.BasicInfo.Title)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Alias)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayName("Department")
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
+            @Html.DisplayFor(model => model.BasicInfo.Title)
         </dd>
     </dl>
     

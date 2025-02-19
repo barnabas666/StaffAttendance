@@ -1,4 +1,4 @@
-﻿@model StaffAtt.Web.Models.CheckInDateDisplayStaffModel
+﻿@model StaffAtt.Web.Models.CheckInDisplayStaffViewModel
 
 @{
     ViewData["Title"] = "Display";
@@ -42,16 +42,13 @@ else
     <thead>
         <tr>
             <th>
-                @Html.DisplayName("First Name")
+                @Html.DisplayNameFor(model => model.CheckIns[0].FullName)
             </th>
             <th>
-                @Html.DisplayName("Last Name")
+                @Html.DisplayNameFor(model => model.CheckIns[0].CheckInDate)
             </th>
             <th>
-                @Html.DisplayName("Check-In")
-            </th>
-            <th>
-                @Html.DisplayName("Check-Out")
+                @Html.DisplayNameFor(model => model.CheckIns[0].CheckOutDate)
             </th>
         </tr>
     </thead>
@@ -60,10 +57,7 @@ else
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
+                    @Html.DisplayFor(modelItem => item.FullName)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CheckInDate)

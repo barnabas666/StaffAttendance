@@ -1,4 +1,4 @@
-﻿@model StaffAtt.Web.Models.CheckInDateDisplayAdminModel
+﻿@model StaffAtt.Web.Models.CheckInDisplayAdminViewModel
 
 @{
     ViewData["Title"] = "List";
@@ -10,7 +10,7 @@
 }
 else
 {
-    <h4>CheckIns for dates in range: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</h4>
+    <h4>Check-Ins for dates in range: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</h4>
 }
 
 <p>
@@ -45,22 +45,19 @@ else
     <thead>
         <tr>
             <th>
-                @Html.DisplayName("First Name")
+                @Html.DisplayNameFor(model => model.CheckIns[0].FullName)
             </th>
             <th>
-                @Html.DisplayName("Last Name")
+                @Html.DisplayNameFor(model => model.StaffList[0].EmailAddress)
             </th>
             <th>
-                @Html.DisplayName("Email")
+                @Html.DisplayNameFor(model => model.StaffList[0].Title)
             </th>
             <th>
-                @Html.DisplayName("Department")
+                @Html.DisplayNameFor(model => model.CheckIns[0].CheckInDate)
             </th>
             <th>
-                @Html.DisplayName("Check-In")
-            </th>
-            <th>
-                @Html.DisplayName("Check-Out")
+                @Html.DisplayNameFor(model => model.CheckIns[0].CheckOutDate)
             </th>
             <th></th>
         </tr>
@@ -70,10 +67,7 @@ else
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
+                    @Html.DisplayFor(modelItem => item.FullName)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.EmailAddress)

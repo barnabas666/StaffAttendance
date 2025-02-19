@@ -1,58 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
-namespace StaffAttLibrary.Models;
+namespace StaffAtt.Web.Models;
 
 /// <summary>
-/// Hold Full CheckIn data - StaffBasicModel and CheckInModel.
+/// ViewModel for StaffBasicModel.
 /// </summary>
-public class CheckInFullModel
+public class StaffBasicViewModel
 {
     /// <summary>
-    /// CheckIn's Id.
+    /// Staff's Id.
     /// </summary>
     public int Id { get; set; }
 
     /// <summary>
     /// Staff's First Name.
     /// </summary>
+    [DisplayName("First Name")]
     public string FirstName { get; set; }
 
     /// <summary>
     /// Staff's Last Name.
     /// </summary>
+    [DisplayName("Last Name")]
     public string LastName { get; set; }
 
     /// <summary>
     /// Staff's Full Name.
     /// </summary>
+    [DisplayName("Full Name")]
     public string FullName { get { return FirstName + " " + LastName; } }
 
     /// <summary>
     /// Staff's Email Address.
     /// </summary>
+    [DisplayName("Email Address")]
     public string EmailAddress { get; set; }
+
+    /// <summary>
+    /// Staff's Alias.
+    /// </summary>
+    public string Alias { get; set; }
+
+    /// <summary>
+    /// Staff's Approved status.
+    /// </summary>
+    [DisplayName("Is Approved")]
+    public bool IsApproved { get; set; }
+
+    /// <summary>
+    /// Department's Id.
+    /// </summary>
+    public int DepartmentId { get; set; }
 
     /// <summary>
     /// Staff's Department Title.
     /// </summary>
+    [DisplayName("Department")]
     public string Title { get; set; }
-
-    /// <summary>
-    /// Staff's Id.
-    /// </summary>
-    public int StaffId { get; set; }
-
-    /// <summary>
-    /// CheckIn's Date.
-    /// </summary>
-    public DateTime CheckInDate { get; set; }
-
-    /// <summary>
-    /// CheckOut's Date, possible null value.
-    /// </summary>
-    public DateTime? CheckOutDate { get; set; }
 }

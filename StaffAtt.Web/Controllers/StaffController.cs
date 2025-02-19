@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
 using StaffAttLibrary.Models;
 using System.Security.Claims;
 
@@ -41,7 +40,7 @@ public class StaffController : Controller
         List<DepartmentModel> departments = await _sqlData.GetAllDepartments();
 
         // Model to send to our View, populate it there and send model back.
-        StaffCreateModel model = new StaffCreateModel();
+        StaffCreateViewModel model = new StaffCreateViewModel();
 
         // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user, both expect string.
         model.DepartmentItems = new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
@@ -57,7 +56,7 @@ public class StaffController : Controller
     /// <param name="staff">Staff information.</param>
     /// <returns>Redirect to Details Action.</returns>
     [HttpPost]
-    public async Task<IActionResult> Create(StaffCreateModel staff)
+    public async Task<IActionResult> Create(StaffCreateViewModel staff)
     {
         // this is validation for model we are passing as parameter
         if (ModelState.IsValid == false)
@@ -81,11 +80,16 @@ public class StaffController : Controller
             phoneNumbers.Add(new PhoneNumberModel { PhoneNumber = cols[i].Trim() });
         }
 
+        AddressModel address = new AddressModel
+        {
+            Street = staff.Street,
+            City = staff.City,
+            Zip = staff.Zip,
+            State = staff.State
+        };
+
         await _sqlData.CreateStaff(Convert.ToInt32(staff.DepartmentId),
-                                   staff.Street,
-                                   staff.City,
-                                   staff.Zip,
-                                   staff.State,
+                                   address,
                                    staff.PIN.ToString(),
                                    staff.FirstName,
                                    staff.LastName,
@@ -115,22 +119,22 @@ public class StaffController : Controller
         if (isCreated == false)
             return RedirectToAction("Create");
 
-        StaffDetailsModel detailsModel = new StaffDetailsModel();
+        StaffDetailsViewModel detailsModel = new StaffDetailsViewModel();
 
         StaffFullModel fullModel = await _sqlData.GetStaffByEmail(userEmail);
 
         // maybe we could use AutoMapper here
-        detailsModel.Id = fullModel.Id;
-        detailsModel.FirstName = fullModel.FirstName;
-        detailsModel.LastName = fullModel.LastName;
-        detailsModel.EmailAddress = fullModel.EmailAddress;
-        detailsModel.Alias = fullModel.Alias;
-        detailsModel.IsApproved = fullModel.IsApproved;
-        detailsModel.Title = fullModel.Title;
-        detailsModel.Street = fullModel.Street;
-        detailsModel.City = fullModel.City;
-        detailsModel.Zip = fullModel.Zip;
-        detailsModel.State = fullModel.State;
+        detailsModel.BasicInfo.Id = fullModel.Id;
+        detailsModel.BasicInfo.FirstName = fullModel.FirstName;
+        detailsModel.BasicInfo.LastName = fullModel.LastName;
+        detailsModel.BasicInfo.EmailAddress = fullModel.EmailAddress;
+        detailsModel.BasicInfo.Alias = fullModel.Alias;
+        detailsModel.BasicInfo.IsApproved = fullModel.IsApproved;
+        detailsModel.BasicInfo.Title = fullModel.Title;
+        detailsModel.Street = fullModel.Address.Street;
+        detailsModel.City = fullModel.Address.City;
+        detailsModel.Zip = fullModel.Address.Zip;
+        detailsModel.State = fullModel.Address.State;
         detailsModel.PhoneNumbers = fullModel.PhoneNumbers;
         detailsModel.Message = message;
 
@@ -145,7 +149,7 @@ public class StaffController : Controller
     {
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        StaffUpdateModel updateModel = new StaffUpdateModel();
+        StaffUpdateViewModel updateModel = new StaffUpdateViewModel();
         StaffFullModel fullModel = await _sqlData.GetStaffByEmail(userEmail);
 
         foreach (PhoneNumberModel phoneNumber in fullModel.PhoneNumbers)
@@ -158,10 +162,10 @@ public class StaffController : Controller
         updateModel.FirstName = fullModel.FirstName;
         updateModel.LastName = fullModel.LastName;
         updateModel.EmailAddress = fullModel.EmailAddress;
-        updateModel.Street = fullModel.Street;
-        updateModel.City = fullModel.City;
-        updateModel.Zip = fullModel.Zip;
-        updateModel.State = fullModel.State;
+        updateModel.Street = fullModel.Address.Street;
+        updateModel.City = fullModel.Address.City;
+        updateModel.Zip = fullModel.Address.Zip;
+        updateModel.State = fullModel.Address.State;
 
         return View(updateModel);
     }
@@ -172,7 +176,7 @@ public class StaffController : Controller
     /// <param name="updateModel">Staff Updated Information.</param>
     /// <returns>Redirect to Details Action.</returns>
     [HttpPost]
-    public async Task<IActionResult> Update(StaffUpdateModel updateModel)
+    public async Task<IActionResult> Update(StaffUpdateViewModel updateModel)
     {
         if (ModelState.IsValid == false)
             return RedirectToAction("Update");
@@ -186,10 +190,15 @@ public class StaffController : Controller
             phoneNumbers.Add(new PhoneNumberModel { PhoneNumber = cols[i].Trim() });
         }
 
-        await _sqlData.UpdateStaff(updateModel.Street,
-                                   updateModel.City,
-                                   updateModel.Zip,
-                                   updateModel.State,
+        AddressModel address = new AddressModel
+        {
+            Street = updateModel.Street,
+            City = updateModel.City,
+            Zip = updateModel.Zip,
+            State = updateModel.State
+        };
+
+        await _sqlData.UpdateStaff(address,
                                    updateModel.PIN.ToString(),
                                    updateModel.FirstName,
                                    updateModel.LastName,
