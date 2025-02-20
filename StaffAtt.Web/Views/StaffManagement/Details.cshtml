@@ -4,24 +4,14 @@
     ViewData["Title"] = "Details";
 }
 
-@* Some warning message from different Action, probably from Create *@
-@if (string.IsNullOrEmpty(Model.Message) == false) {
-    <h4 class="text-danger">@Model.Message</h4>
-}
-
-@if (Model.BasicInfo.IsApproved == false)
-{
-    <h4 class="text-danger">You are not approved to Check-in.</h4>
-}
-
 @if (Model == null)
 {
     <h4>The requested record was not found.</h4>
 }
-else 
+else
 {
     <div>
-        <h4>Your personal information.</h4>
+        <h4>Staff personal information.</h4>
         <hr />
         <dl class="row">
             <dt class="col-sm-2">
@@ -94,6 +84,10 @@ else
                 </dd>
             }
         </dl>
+    </div>
+    <div>
+        <!-- We redirect Back to List Page (with Button). -->
+        <a asp-action="List" class="btn btn-primary">Back</a>
     </div>
 }
 

@@ -33,6 +33,14 @@ public class StaffManagementController : Controller
         return View(staffsList);
     }
 
+    public async Task<IActionResult> Details(int id)
+    {
+        StaffFullModel staff = await _sqlData.GetStaffById(id);
+        StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(staff);
+
+        return View(detailsModel);
+    }
+
     public async Task<IActionResult> Update(int id)
     {
         StaffBasicModel basicModel = await _sqlData.GetBasicStaffById(id);

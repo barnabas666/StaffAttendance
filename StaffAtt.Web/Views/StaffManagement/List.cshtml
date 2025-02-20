@@ -1,14 +1,11 @@
 ﻿@model IEnumerable<StaffAtt.Web.Models.StaffManagementListViewModel>
 
 @{
-    ViewData["Title"] = "List of all staff";
+    ViewData["Title"] = "List";
 }
 
-<h1>List</h1>
+<h4>List of all staff</h4>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -51,7 +48,8 @@
             <td>
                     <!-- We redirect to Update Page (with Button) and we set value for Id parameter on the route. -->
                     <a asp-action="Update" asp-route-id="@item.BasicInfo.Id" class="btn btn-secondary">Edit</a> |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |                
+                    <!-- We redirect to Details Page (with Button) and we set value for Id parameter on the route. -->
+                    <a asp-action="Details" asp-route-id="@item.BasicInfo.Id" class="btn btn-primary">Details</a> |
                     <!-- We redirect to Delete Page (with Button) and we set value for Id parameter on the route. -->
                     <a asp-action="Delete" asp-route-id="@item.BasicInfo.Id" class="btn btn-danger">Delete</a>
             </td>
