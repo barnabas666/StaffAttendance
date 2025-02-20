@@ -14,9 +14,9 @@ public class StaffDetailsViewModel
     public StaffBasicViewModel BasicInfo { get; set; } = new StaffBasicViewModel();
 
     /// <summary>
-    /// Staff's Address.
+    /// Staff's Address, ViewModel.
     /// </summary>
-    public AddressModel Address { get; set; } = new AddressModel();
+    public AddressViewModel Address { get; set; } = new AddressViewModel();
 
     /// <summary>
     /// Staff's Phone Numbers.

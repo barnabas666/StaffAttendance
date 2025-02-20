@@ -84,13 +84,7 @@ public class StaffController : Controller
             phoneNumbers.Add(new PhoneNumberModel { PhoneNumber = cols[i].Trim() });
         }
 
-        AddressModel address = new AddressModel
-        {
-            Street = staff.Street,
-            City = staff.City,
-            Zip = staff.Zip,
-            State = staff.State
-        };
+        AddressModel address = _mapper.Map<AddressModel>(staff.Address);
 
         await _sqlData.CreateStaff(Convert.ToInt32(staff.DepartmentId),
                                    address,
@@ -172,13 +166,7 @@ public class StaffController : Controller
             phoneNumbers.Add(new PhoneNumberModel { PhoneNumber = cols[i].Trim() });
         }
 
-        AddressModel address = new AddressModel
-        {
-            Street = updateModel.Street,
-            City = updateModel.City,
-            Zip = updateModel.Zip,
-            State = updateModel.State
-        };
+        AddressModel address = _mapper.Map<AddressModel>(updateModel.Address);
 
         await _sqlData.UpdateStaff(address,
                                    updateModel.PIN.ToString(),

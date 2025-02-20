@@ -12,10 +12,10 @@ public class StaffUpdateProfile : Profile
             .ForPath(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
             .ForPath(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
             .ForPath(dest => dest.EmailAddress, opt => opt.MapFrom(src => src.EmailAddress))
-            .ForPath(dest => dest.Street, opt => opt.MapFrom(src => src.Address.Street))
-            .ForPath(dest => dest.City, opt => opt.MapFrom(src => src.Address.City))
-            .ForPath(dest => dest.Zip, opt => opt.MapFrom(src => src.Address.Zip))
-            .ForPath(dest => dest.State, opt => opt.MapFrom(src => src.Address.State))
+            .ForPath(dest => dest.Address.Street, opt => opt.MapFrom(src => src.Address.Street))
+            .ForPath(dest => dest.Address.City, opt => opt.MapFrom(src => src.Address.City))
+            .ForPath(dest => dest.Address.Zip, opt => opt.MapFrom(src => src.Address.Zip))
+            .ForPath(dest => dest.Address.State, opt => opt.MapFrom(src => src.Address.State))
             .ReverseMap();
     }
 }

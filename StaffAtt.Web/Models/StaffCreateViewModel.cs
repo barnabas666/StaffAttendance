@@ -44,33 +44,9 @@ public class StaffCreateViewModel
     public string DepartmentId { get; set; }
 
     /// <summary>
-    /// Staff's Address - Street.
+    /// Staff's Address, ViewModel.
     /// </summary>
-    [Required(ErrorMessage = "Please enter an Address - Street.")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "Street must be between 2 and 50 chars.")]
-    public string Street { get; set; }
-
-    /// <summary>
-    /// Staff's Address - City.
-    /// </summary>
-    [Required(ErrorMessage = "Please enter an Address - City.")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "City must be between 2 and 50 chars.")]
-    public string City { get; set; }
-
-    /// <summary>
-    /// Staff's Address - Zip.
-    /// </summary>
-
-    [Required(ErrorMessage = "Please enter an Address - Zip.")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "Zip must be between 6 and 10 chars.")]
-    public string Zip { get; set; }
-
-    /// <summary>
-    /// Staff's Address - State.
-    /// </summary>
-    [Required(ErrorMessage = "Please enter an Address - State.")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "State must be between 2 and 50 chars.")]
-    public string State { get; set; }
+    public AddressViewModel Address { get; set; }
 
     /// <summary>
     /// Staff's Phone Numbers.
