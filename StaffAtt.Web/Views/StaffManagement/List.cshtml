@@ -1,4 +1,4 @@
-﻿@model IEnumerable<StaffAtt.Web.Models.StaffManagementListViewModel>
+﻿@model StaffAtt.Web.Models.StaffManagementListViewModel
 
 @{
     ViewData["Title"] = "List";
@@ -6,52 +6,84 @@
 
 <h4>List of all staff</h4>
 
+
+@if (Model.BasicInfos.All(x => x.IsApproved) == false)
+{
+    <h4 class="text-danger">There is staff waiting for approval.</h4>
+}
+else
+{
+    <h4 class="text-primary">All staff has approve status.</h4>
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="List">
+            <div class="form-group">
+                <label asp-for="@Model.DepartmentItems" class="control-label"></label>
+                <select asp-items="@Model.DepartmentItems" asp-for="@Model.DepartmentId" new { onchange="this.form.submit();" }></select>
+            </div>
+            <div class="form-group">
+                All Staff
+                @Html.RadioButtonFor(model => model.ApprovedRadio, "All", new { onchange = "this.form.submit();" })
+                Approved
+                @Html.RadioButtonFor(model => model.ApprovedRadio, "Approved", new { onchange = "this.form.submit();" })
+                Not Approved
+                @Html.RadioButtonFor(model => model.ApprovedRadio, "NotApproved", new { onchange = "this.form.submit();" })
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-primary" />                
+            </div>
+        </form>
+    </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.BasicInfo.FullName)
+                @Html.DisplayNameFor(model => model.BasicInfos[0].FullName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BasicInfo.EmailAddress)
+                @Html.DisplayNameFor(model => model.BasicInfos[0].EmailAddress)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BasicInfo.Alias)
+                @Html.DisplayNameFor(model => model.BasicInfos[0].Alias)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BasicInfo.IsApproved)
+                @Html.DisplayNameFor(model => model.BasicInfos[0].IsApproved)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BasicInfo.Title)
+                @Html.DisplayNameFor(model => model.BasicInfos[0].Title)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.BasicInfos) {
         <tr>
             <td>
-                    @Html.DisplayFor(modelItem => item.BasicInfo.FullName)
+                    @Html.DisplayFor(modelItem => item.FullName)
             </td>
             <td>
-                    @Html.DisplayFor(modelItem => item.BasicInfo.EmailAddress)
+                    @Html.DisplayFor(modelItem => item.EmailAddress)
             </td>
             <td>
-                    @Html.DisplayFor(modelItem => item.BasicInfo.Alias)
+                    @Html.DisplayFor(modelItem => item.Alias)
             </td>
             <td>
-                    @Html.DisplayFor(modelItem => item.BasicInfo.IsApproved)
+                    @Html.DisplayFor(modelItem => item.IsApproved)
             </td>
             <td>
-                    @Html.DisplayFor(modelItem => item.BasicInfo.Title)
+                    @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
                     <!-- We redirect to Update Page (with Button) and we set value for Id parameter on the route. -->
-                    <a asp-action="Update" asp-route-id="@item.BasicInfo.Id" class="btn btn-secondary">Edit</a> |
+                    <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-secondary">Edit</a> |
                     <!-- We redirect to Details Page (with Button) and we set value for Id parameter on the route. -->
-                    <a asp-action="Details" asp-route-id="@item.BasicInfo.Id" class="btn btn-primary">Details</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">Details</a> |
                     <!-- We redirect to Delete Page (with Button) and we set value for Id parameter on the route. -->
-                    <a asp-action="Delete" asp-route-id="@item.BasicInfo.Id" class="btn btn-danger">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
             </td>
         </tr>
 }

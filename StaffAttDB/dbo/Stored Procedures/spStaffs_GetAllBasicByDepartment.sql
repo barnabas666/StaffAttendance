@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE [dbo].[spStaffs_GetAllNotApproved]
+﻿CREATE PROCEDURE [dbo].[spStaffs_GetAllBasicByDepartment]
+	@departmentId int
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -8,5 +9,5 @@ BEGIN
 	FROM dbo.Staffs s
 	INNER JOIN dbo.Departments d ON s.DepartmentId = d.Id
 	INNER JOIN dbo.Aliases al ON s.AliasId = al.Id
-	WHERE s.IsApproved = 0;
+	WHERE s.DepartmentId = @departmentId;
 END

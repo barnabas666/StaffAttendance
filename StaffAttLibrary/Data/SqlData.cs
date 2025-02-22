@@ -1,4 +1,5 @@
 ﻿using StaffAttLibrary.Db;
+using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
 using System;
 using System.Collections;
@@ -249,11 +250,20 @@ public class SqlData : IDatabaseData
     /// <returns>Collection of StaffFullModel</returns>
     public async Task<List<StaffFullModel>> GetAllStaff(bool getAll = true)
     {
-        string sql = getAll ? "spStaffs_GetAll" : "spStaffs_GetAllNotApproved";
+        List<StaffFullModel> output = new List<StaffFullModel>();
 
-        List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>(sql,
-                                                                                  new { },
-                                                                                  connectionStringName);
+        if (getAll)
+        {
+            output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetAll",
+                                                                 new { },
+                                                                 connectionStringName);
+        }
+        else
+        {
+            output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetAllByApproved",
+                                                               new { isApproved = false },
+                                                               connectionStringName);
+        }
 
         foreach (StaffFullModel staff in output)
         {
@@ -265,6 +275,39 @@ public class SqlData : IDatabaseData
             staff.PhoneNumbers = await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
                                                                                new { staffId = staff.Id },
                                                                                connectionStringName);
+        }
+
+        return output;
+    }
+
+    public async Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAndApproved(int departmentId,
+                                                                                     ApprovedType approvedType)
+    {
+        List<StaffBasicModel> output = new List<StaffBasicModel>();
+
+        if (departmentId == 0 && approvedType == ApprovedType.All)
+        {
+            output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasic",
+                                                                  new { },
+                                                                  connectionStringName);
+        }
+        else if (departmentId == 0 && approvedType != ApprovedType.All)
+        {
+            output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasicByApproved",
+                                                                  new { isApproved = approvedType == ApprovedType.Approved ? true : false },
+                                                                  connectionStringName);
+        }
+        else if (departmentId != 0 && approvedType == ApprovedType.All)
+        {
+            output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasicByDepartment",
+                                                                  new { departmentId },
+                                                                  connectionStringName);
+        }
+        else if (departmentId != 0 && approvedType != ApprovedType.All)
+        {
+            output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasicByDepartmentAndApproved",
+                                                                  new { departmentId, isApproved = approvedType == ApprovedType.Approved ? true : false },
+                                                                  connectionStringName);
         }
 
         return output;

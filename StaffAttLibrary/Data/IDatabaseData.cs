@@ -1,4 +1,5 @@
-﻿using StaffAttLibrary.Models;
+﻿using StaffAttLibrary.Enums;
+using StaffAttLibrary.Models;
 
 namespace StaffAttLibrary.Data;
 public interface IDatabaseData
@@ -22,6 +23,7 @@ public interface IDatabaseData
                      List<PhoneNumberModel> phoneNumbers);
     Task<List<DepartmentModel>> GetAllDepartments();
     Task<List<StaffFullModel>> GetAllStaff(bool getAll = true);
+    Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAndApproved(int departmentId, ApprovedType approvedType);
     Task<List<StaffBasicModel>> GetAllBasicStaff();
     Task<CheckInModel> GetLastCheckIn(int staffId);
     Task<StaffFullModel> GetStaffByEmail(string emailAddress);

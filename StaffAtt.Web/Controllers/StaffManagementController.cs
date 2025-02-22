@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
+using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
 
 namespace StaffAtt.Web.Controllers;
@@ -28,9 +29,52 @@ public class StaffManagementController : Controller
     {
         List<StaffBasicModel> staffs = await _sqlData.GetAllBasicStaff();
 
-        List<StaffManagementListViewModel> staffsList = _mapper.Map<List<StaffManagementListViewModel>>(staffs);
+        StaffManagementListViewModel staffModel = new StaffManagementListViewModel();
 
-        return View(staffsList);
+        staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
+        
+        List<DepartmentModel> departments = await _sqlData.GetAllDepartments();
+
+        // Creating default item = All Departments for DropDown.
+        departments.Insert(0, new DepartmentModel()
+        {
+            Id = 0,
+            Title = "All"
+        });
+
+        // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user.
+        staffModel.DepartmentItems = new SelectList(departments,
+                                                    nameof(DepartmentModel.Id),
+                                                    nameof(DepartmentModel.Title));
+
+        return View(staffModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> List(StaffManagementListViewModel staffModel)
+    {
+        ApprovedType approvedType = staffModel.ApprovedRadio;
+
+        List<StaffBasicModel> staffs = await _sqlData.GetAllBasicStaffByDepartmentAndApproved(Convert.ToInt32(staffModel.DepartmentId),
+                                                                                              approvedType);
+
+        staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
+
+        List<DepartmentModel> departments = await _sqlData.GetAllDepartments();
+
+        // Creating default item = All Departments for DropDown.
+        departments.Insert(0, new DepartmentModel()
+        {
+            Id = 0,
+            Title = "All"
+        });
+
+        // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user.
+        staffModel.DepartmentItems = new SelectList(departments,
+                                                    nameof(DepartmentModel.Id),
+                                                    nameof(DepartmentModel.Title));
+
+        return View(staffModel);
     }
 
     public async Task<IActionResult> Details(int id)
