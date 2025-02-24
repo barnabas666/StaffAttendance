@@ -40,6 +40,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConfiguration>(configuration);
 
         services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
+        services.AddSingleton<IStaffService, StaffService>();
+        services.AddSingleton<ICheckInService, CheckInService>();
         services.AddSingleton<IStaffData, StaffData>();
         services.AddSingleton<ICheckInData, CheckInData>();
         services.AddTransient<MainWindow>();

@@ -16,17 +16,17 @@ namespace StaffAtt.Web.Controllers;
 [Authorize]
 public class StaffController : Controller
 {
-    private readonly IStaffData _staffData;
+    private readonly IStaffService _staffService;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly IMapper _mapper;
 
-    public StaffController(IStaffData staffData,
+    public StaffController(IStaffService staffService,
                            UserManager<IdentityUser> userManager,
                            SignInManager<IdentityUser> signInManager,
                            IMapper mapper)
     {
-        _staffData = staffData;
+        _staffService = staffService;
         _userManager = userManager;
         _signInManager = signInManager;
         _mapper = mapper;
@@ -41,7 +41,7 @@ public class StaffController : Controller
     public async Task<IActionResult> Create()
     {
         // We get all Departments from our database.
-        List<DepartmentModel> departments = await _staffData.GetAllDepartments();
+        List<DepartmentModel> departments = await _staffService.GetAllDepartments();
 
         // Model to send to our View, populate it there and send model back.
         StaffCreateViewModel model = new StaffCreateViewModel();
@@ -68,7 +68,7 @@ public class StaffController : Controller
 
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
         // check if user has already created Staff account
-        bool isCreated = await _staffData.CheckStaffByEmail(userEmail);
+        bool isCreated = await _staffService.CheckStaffByEmail(userEmail);
         // if user has already created account we redirect him to Details action
         if (isCreated)
             return RedirectToAction("Details", new { message = "You have already created account!" });
@@ -82,7 +82,7 @@ public class StaffController : Controller
 
         AddressModel address = _mapper.Map<AddressModel>(staff.Address);
 
-        await _staffData.CreateStaff(Convert.ToInt32(staff.DepartmentId),
+        await _staffService.CreateStaff(Convert.ToInt32(staff.DepartmentId),
                                    address,
                                    staff.PIN.ToString(),
                                    staff.FirstName,
@@ -107,13 +107,13 @@ public class StaffController : Controller
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
         // check if user has already created Staff account
-        bool isCreated = await _staffData.CheckStaffByEmail(userEmail);
+        bool isCreated = await _staffService.CheckStaffByEmail(userEmail);
 
         // if user has no account yet we redirect him to Create Staff action
         if (isCreated == false)
             return RedirectToAction("Create");
 
-        StaffFullModel fullModel = await _staffData.GetStaffByEmailProcess(userEmail);
+        StaffFullModel fullModel = await _staffService.GetStaffByEmailProcess(userEmail);
 
         StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(fullModel);
         detailsModel.Message = message;
@@ -129,7 +129,7 @@ public class StaffController : Controller
     {
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        StaffFullModel fullModel = await _staffData.GetStaffByEmailProcess(userEmail);
+        StaffFullModel fullModel = await _staffService.GetStaffByEmailProcess(userEmail);
 
         StaffUpdateViewModel updateModel = _mapper.Map<StaffUpdateViewModel>(fullModel);
 
@@ -164,7 +164,7 @@ public class StaffController : Controller
 
         AddressModel address = _mapper.Map<AddressModel>(updateModel.Address);
 
-        await _staffData.UpdateStaffProcess(address,
+        await _staffService.UpdateStaffProcess(address,
                                    updateModel.PIN.ToString(),
                                    updateModel.FirstName,
                                    updateModel.LastName,

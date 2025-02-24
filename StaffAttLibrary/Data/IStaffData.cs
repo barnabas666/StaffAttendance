@@ -1,31 +1,28 @@
-﻿using StaffAttLibrary.Enums;
+﻿
+using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
 
 namespace StaffAttLibrary.Data;
+
 public interface IStaffData
 {
-    Task CreateStaff(int departmentId,
-                     AddressModel address,
-                     string pIN,
-                     string firstName,
-                     string lastName,
-                     string emailAddress,
-                     List<PhoneNumberModel> phoneNumbers);
-    Task UpdateStaffProcess(AddressModel address,
-                     string pIN,
-                     string firstName,
-                     string lastName,
-                     string emailAddress,
-                     List<PhoneNumberModel> phoneNumbers);
-    Task<AliasModel> AliasVerification(string alias, string pIN);
-    Task<List<DepartmentModel>> GetAllDepartments();
-    Task<List<StaffBasicModel>> GetAllBasicStaffFiltered(int departmentId, ApprovedType approvedType);
-    Task<List<StaffBasicModel>> GetAllBasicStaff();
-    Task<StaffFullModel> GetStaffByEmailProcess(string emailAddress);
-    Task<StaffFullModel> GetStaffByIdProcess(int id);
-    Task<StaffBasicModel> GetBasicStaffById(int id);
-    Task<StaffBasicModel> GetBasicStaffByAliasId(int aliasId);
-    Task<bool> CheckStaffByEmail(string emailAddress);
-    Task UpdateStaffByAdmin(int id, int departmentId, bool isApproved);
-    Task DeleteStaffProcess(int staffId);
+    Task<int> CheckAndInsertAlias(string pIN, string alias, int aliasId);
+    string CreateAlias(string firstName, string lastName, int orderNumber);
+    Task CreatePhoneNumbers(int staffId, List<PhoneNumberModel> phoneNumbers);
+    Task DeleteAddress(StaffFullModel staffModel);
+    Task DeleteAlias(StaffFullModel staffModel);
+    Task DeletePhoneNumbers(int staffId, List<PhoneNumberModel> phoneNumbers);
+    Task DeleteStaff(int staffId);
+    Task<AddressModel> GetAddressByEmail(string emailAddress);
+    Task<AddressModel> GetAddressById(int id);
+    Task<List<StaffBasicModel>> GetAllBasicStaffByDepartment(int departmentId);
+    Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAndApproved(int departmentId, ApprovedType approvedType);
+    Task<List<PhoneNumberModel>> GetPhoneNumbersByStaffId(int staffId);
+    Task<StaffFullModel> GetStaffByEmail(string emailAddress);
+    Task<StaffFullModel> GetStaffById(int id);
+    Task<int> SaveAddress(AddressModel address);
+    Task<int> SaveStaff(int departmentId, string firstName, string lastName, string emailAddress, int addressId, int aliasId);
+    Task UpdateAddress(AddressModel address, StaffFullModel staff);
+    Task UpdateAlias(string pIN, StaffFullModel staff);
+    Task UpdateStaff(string firstName, string lastName, StaffFullModel staff);
 }

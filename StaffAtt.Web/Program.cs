@@ -13,6 +13,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+builder.Services.AddTransient<IStaffService, StaffService>();
+builder.Services.AddTransient<ICheckInService, CheckInService>();
 builder.Services.AddTransient<IStaffData, StaffData>();
 builder.Services.AddTransient<ICheckInData, CheckInData>();
 

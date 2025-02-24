@@ -16,22 +16,22 @@ namespace StaffAtt.Web.Controllers;
 [Authorize(Roles = "Administrator")]
 public class StaffManagementController : Controller
 {
-    private readonly IStaffData _staffData;
+    private readonly IStaffService _staffService;
     private readonly IMapper _mapper;
 
-    public StaffManagementController(IStaffData staffData, IMapper mapper)
+    public StaffManagementController(IStaffService staffService, IMapper mapper)
     {
-        this._staffData = staffData;
+        this._staffService = staffService;
         _mapper = mapper;
     }
 
     public async Task<IActionResult> List()
     {
         StaffManagementListViewModel staffModel = new StaffManagementListViewModel();
-        List<StaffBasicModel> staffs = await _staffData.GetAllBasicStaff();
+        List<StaffBasicModel> staffs = await _staffService.GetAllBasicStaff();
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
         
-        List<DepartmentModel> departments = await _staffData.GetAllDepartments();
+        List<DepartmentModel> departments = await _staffService.GetAllDepartments();
         // Creating default item = All Departments for DropDown.
         departments.Insert(0, new DepartmentModel()
         {
@@ -49,11 +49,11 @@ public class StaffManagementController : Controller
     [HttpPost]
     public async Task<IActionResult> List(StaffManagementListViewModel staffModel)
     {
-        List<StaffBasicModel> staffs = await _staffData.GetAllBasicStaffFiltered(Convert.ToInt32(staffModel.DepartmentId),
+        List<StaffBasicModel> staffs = await _staffService.GetAllBasicStaffFiltered(Convert.ToInt32(staffModel.DepartmentId),
                                                                                               staffModel.ApprovedRadio);
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
 
-        List<DepartmentModel> departments = await _staffData.GetAllDepartments();
+        List<DepartmentModel> departments = await _staffService.GetAllDepartments();
         // Creating default item = All Departments for DropDown.
         departments.Insert(0, new DepartmentModel()
         {
@@ -70,7 +70,7 @@ public class StaffManagementController : Controller
 
     public async Task<IActionResult> Details(int id)
     {
-        StaffFullModel staff = await _staffData.GetStaffByIdProcess(id);
+        StaffFullModel staff = await _staffService.GetStaffByIdProcess(id);
         StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(staff);
 
         return View(detailsModel);
@@ -78,11 +78,11 @@ public class StaffManagementController : Controller
 
     public async Task<IActionResult> Update(int id)
     {
-        StaffBasicModel basicModel = await _staffData.GetBasicStaffById(id);
+        StaffBasicModel basicModel = await _staffService.GetBasicStaffById(id);
         StaffManagementUpdateViewModel updateModel = _mapper.Map<StaffManagementUpdateViewModel>(basicModel);
 
         // We get all Departments from our database.
-        List<DepartmentModel> departments = await _staffData.GetAllDepartments();
+        List<DepartmentModel> departments = await _staffService.GetAllDepartments();
         // Source is departments, value (Id here) gonna be saved to database,
         // Text (Title) gets displayed to user, both expect string.
         updateModel.DepartmentItems = new SelectList(departments,
@@ -95,7 +95,7 @@ public class StaffManagementController : Controller
     [HttpPost]
     public async Task<IActionResult> Update(StaffManagementUpdateViewModel updateModel)
     {
-        await _staffData.UpdateStaffByAdmin(updateModel.BasicInfo.Id,
+        await _staffService.UpdateStaffByAdmin(updateModel.BasicInfo.Id,
                                           Convert.ToInt32(updateModel.BasicInfo.DepartmentId),
                                           updateModel.BasicInfo.IsApproved);
 
@@ -109,7 +109,7 @@ public class StaffManagementController : Controller
     /// <returns>View with populated StaffBasicModel to delete inside.</returns>
     public async Task<IActionResult> Delete(int id)
     {
-        StaffBasicModel basicModel = await _staffData.GetBasicStaffById(id);
+        StaffBasicModel basicModel = await _staffService.GetBasicStaffById(id);
 
         StaffManagementDeleteViewModel deleteModel = _mapper.Map<StaffManagementDeleteViewModel>(basicModel);
 
@@ -125,7 +125,7 @@ public class StaffManagementController : Controller
     [HttpPost]
     public async Task<IActionResult> Delete(StaffBasicModel staffModel)
     {
-        await _staffData.DeleteStaffProcess(staffModel.Id);
+        await _staffService.DeleteStaffProcess(staffModel.Id);
 
         // After deleting Staff we redirect back to List Action.
         return RedirectToAction("List");

@@ -24,8 +24,8 @@ public partial class CheckInForm : Window
     /// <summary>
     /// Instance of class servicing Staffs - CRUD actions.
     /// </summary>
-    private readonly IStaffData _staffData;
-    private readonly ICheckInData _checkInData;
+    private readonly IStaffService _staffData;
+    private readonly ICheckInService _checkInData;
 
     /// <summary>
     /// Instance of class which holds Basic Staff data.
@@ -41,7 +41,7 @@ public partial class CheckInForm : Window
     /// Constructor, initialize instance of this class.
     /// </summary>
     /// <param name="staffData">Instance of class servicing Staffs - CRUD actions.</param>
-    public CheckInForm(IStaffData staffData, ICheckInData checkInData)
+    public CheckInForm(IStaffService staffData, ICheckInService checkInData)
     {
         InitializeComponent();
         _staffData = staffData;

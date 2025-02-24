@@ -22,13 +22,13 @@ public partial class MainWindow : Window
     /// <summary>
     /// Instance of class servicing Staffs - CRUD actions.
     /// </summary>
-    private readonly IStaffData _staffData;
+    private readonly IStaffService _staffData;
 
     /// <summary>
     /// Constructor, initialize instance of this class.
     /// </summary>
     /// <param name="staffData">Instance of class servicing Staffs - CRUD actions.</param>
-    public MainWindow(IStaffData staffData)
+    public MainWindow(IStaffService staffData)
     {
         InitializeComponent();
         _staffData = staffData;
