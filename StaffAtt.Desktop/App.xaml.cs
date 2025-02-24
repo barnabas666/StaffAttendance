@@ -40,7 +40,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConfiguration>(configuration);
 
         services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
-        services.AddSingleton<IDatabaseData, SqlData>();
+        services.AddSingleton<IStaffData, StaffData>();
+        services.AddSingleton<ICheckInData, CheckInData>();
         services.AddTransient<MainWindow>();
         services.AddTransient<CheckInForm>(); // cant be AddSingleton or after attempt to reopen this Window app crash
     }

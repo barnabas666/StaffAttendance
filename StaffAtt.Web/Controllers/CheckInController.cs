@@ -15,12 +15,14 @@ namespace StaffAtt.Web.Controllers;
 [Authorize]
 public class CheckInController : Controller
 {
-    private readonly IDatabaseData _sqlData;
+    private readonly IStaffData _staffData;
+    private readonly ICheckInData _checkInData;
     private readonly IMapper _mapper;
 
-    public CheckInController(IDatabaseData sqlData, IMapper mapper)
+    public CheckInController(IStaffData staffData, ICheckInData checkInData, IMapper mapper)
     {
-        _sqlData = sqlData;
+        _staffData = staffData;
+        _checkInData = checkInData;
         _mapper = mapper;
     }
 
@@ -39,11 +41,11 @@ public class CheckInController : Controller
     {
         CheckInDisplayAdminViewModel dateDisplayModel = new CheckInDisplayAdminViewModel();
 
-        List<CheckInFullModel> checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
+        List<CheckInFullModel> checkIns = await _checkInData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
                                                                               dateDisplayModel.EndDate);
         dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
 
-        List<StaffBasicModel> basicStaff = await _sqlData.GetAllBasicStaff();
+        List<StaffBasicModel> basicStaff = await _staffData.GetAllBasicStaff();
         dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
 
         // Creating default item = All Staff for DropDown. FullName prop is just getter so we setup here FirstName.
@@ -80,19 +82,19 @@ public class CheckInController : Controller
 
         if (dateDisplayModel.SelectedId == "0")
         {
-            checkIns = await _sqlData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
+            checkIns = await _checkInData.GetAllCheckInsByDate(dateDisplayModel.StartDate,
                                                            dateDisplayModel.EndDate);
             dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
         }
         else
         {
-            checkIns = await _sqlData.GetCheckInsByDateAndId(Convert.ToInt32(dateDisplayModel.SelectedId),
+            checkIns = await _checkInData.GetCheckInsByDateAndId(Convert.ToInt32(dateDisplayModel.SelectedId),
                                                                              dateDisplayModel.StartDate,
                                                                              dateDisplayModel.EndDate);
             dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
         }
 
-        List<StaffBasicModel> basicStaff = await _sqlData.GetAllBasicStaff();
+        List<StaffBasicModel> basicStaff = await _staffData.GetAllBasicStaff();
         dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
 
         // Creating default item = All Staff for DropDown. FullName prop is just getter so we setup here FirstName.
@@ -122,7 +124,7 @@ public class CheckInController : Controller
 
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
+        List<CheckInFullModel> checkIns = await _checkInData.GetCheckInsByDateAndEmail(userEmail,
                                                                                    dateDisplayModel.StartDate,
                                                                                    dateDisplayModel.EndDate);
         dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
@@ -144,7 +146,7 @@ public class CheckInController : Controller
                 
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        List<CheckInFullModel> checkIns = await _sqlData.GetCheckInsByDateAndEmail(userEmail,
+        List<CheckInFullModel> checkIns = await _checkInData.GetCheckInsByDateAndEmail(userEmail,
                                                                              dateDisplayModel.StartDate,
                                                                              dateDisplayModel.EndDate);
         dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns); 

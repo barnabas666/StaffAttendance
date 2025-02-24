@@ -22,16 +22,16 @@ public partial class MainWindow : Window
     /// <summary>
     /// Instance of class servicing Staffs - CRUD actions.
     /// </summary>
-    private readonly IDatabaseData _sqlData;
+    private readonly IStaffData _staffData;
 
     /// <summary>
     /// Constructor, initialize instance of this class.
     /// </summary>
-    /// <param name="sqlData">Instance of class servicing Staffs - CRUD actions.</param>
-    public MainWindow(IDatabaseData sqlData)
+    /// <param name="staffData">Instance of class servicing Staffs - CRUD actions.</param>
+    public MainWindow(IStaffData staffData)
     {
         InitializeComponent();
-        _sqlData = sqlData;
+        _staffData = staffData;
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public partial class MainWindow : Window
         try
         {
             // If Alias and PIN are correct AliasModel is returned
-            aliasModel = await _sqlData.AliasVerification(aliasText.Text, pINText.Text);
+            aliasModel = await _staffData.AliasVerification(aliasText.Text, pINText.Text);
         }
         catch (Exception ex)
         {
@@ -61,7 +61,7 @@ public partial class MainWindow : Window
 
             try
             {
-                staffBasicModel = await _sqlData.GetBasicStaffByAliasId(aliasModel.Id);
+                staffBasicModel = await _staffData.GetBasicStaffByAliasId(aliasModel.Id);
             }
             catch (Exception ex)
             {

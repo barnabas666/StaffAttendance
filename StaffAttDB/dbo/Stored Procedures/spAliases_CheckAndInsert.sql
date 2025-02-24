@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[spAliases_Insert]
+﻿CREATE PROCEDURE [dbo].[spAliases_CheckAndInsert]
 	@alias nvarchar(10),
 	@pIN nvarchar(10)
 AS

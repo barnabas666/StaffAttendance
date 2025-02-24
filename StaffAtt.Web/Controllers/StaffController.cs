@@ -16,17 +16,17 @@ namespace StaffAtt.Web.Controllers;
 [Authorize]
 public class StaffController : Controller
 {
-    private readonly IDatabaseData _sqlData;
+    private readonly IStaffData _staffData;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly IMapper _mapper;
 
-    public StaffController(IDatabaseData sqlData,
+    public StaffController(IStaffData staffData,
                            UserManager<IdentityUser> userManager,
                            SignInManager<IdentityUser> signInManager,
                            IMapper mapper)
     {
-        _sqlData = sqlData;
+        _staffData = staffData;
         _userManager = userManager;
         _signInManager = signInManager;
         _mapper = mapper;
@@ -41,7 +41,7 @@ public class StaffController : Controller
     public async Task<IActionResult> Create()
     {
         // We get all Departments from our database.
-        List<DepartmentModel> departments = await _sqlData.GetAllDepartments();
+        List<DepartmentModel> departments = await _staffData.GetAllDepartments();
 
         // Model to send to our View, populate it there and send model back.
         StaffCreateViewModel model = new StaffCreateViewModel();
@@ -67,12 +67,8 @@ public class StaffController : Controller
             return RedirectToAction("Create");
 
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
-
-        // lines below (similar in Details Action) should be in some controller base class:
-        // https://stackoverflow.com/questions/70402830/what-is-the-best-way-to-move-your-code-out-of-the-controller-and-into-a-helper-m
         // check if user has already created Staff account
-        bool isCreated = await _sqlData.CheckStaffByEmail(userEmail);
-
+        bool isCreated = await _staffData.CheckStaffByEmail(userEmail);
         // if user has already created account we redirect him to Details action
         if (isCreated)
             return RedirectToAction("Details", new { message = "You have already created account!" });
@@ -86,7 +82,7 @@ public class StaffController : Controller
 
         AddressModel address = _mapper.Map<AddressModel>(staff.Address);
 
-        await _sqlData.CreateStaff(Convert.ToInt32(staff.DepartmentId),
+        await _staffData.CreateStaff(Convert.ToInt32(staff.DepartmentId),
                                    address,
                                    staff.PIN.ToString(),
                                    staff.FirstName,
@@ -111,13 +107,13 @@ public class StaffController : Controller
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
         // check if user has already created Staff account
-        bool isCreated = await _sqlData.CheckStaffByEmail(userEmail);
+        bool isCreated = await _staffData.CheckStaffByEmail(userEmail);
 
         // if user has no account yet we redirect him to Create Staff action
         if (isCreated == false)
             return RedirectToAction("Create");
 
-        StaffFullModel fullModel = await _sqlData.GetStaffByEmail(userEmail);
+        StaffFullModel fullModel = await _staffData.GetStaffByEmailProcess(userEmail);
 
         StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(fullModel);
         detailsModel.Message = message;
@@ -133,7 +129,7 @@ public class StaffController : Controller
     {
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        StaffFullModel fullModel = await _sqlData.GetStaffByEmail(userEmail);
+        StaffFullModel fullModel = await _staffData.GetStaffByEmailProcess(userEmail);
 
         StaffUpdateViewModel updateModel = _mapper.Map<StaffUpdateViewModel>(fullModel);
 
@@ -168,7 +164,7 @@ public class StaffController : Controller
 
         AddressModel address = _mapper.Map<AddressModel>(updateModel.Address);
 
-        await _sqlData.UpdateStaff(address,
+        await _staffData.UpdateStaffProcess(address,
                                    updateModel.PIN.ToString(),
                                    updateModel.FirstName,
                                    updateModel.LastName,

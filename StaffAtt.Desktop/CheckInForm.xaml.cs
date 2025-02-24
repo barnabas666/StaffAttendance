@@ -24,7 +24,8 @@ public partial class CheckInForm : Window
     /// <summary>
     /// Instance of class servicing Staffs - CRUD actions.
     /// </summary>
-    private readonly IDatabaseData _sqlData;
+    private readonly IStaffData _staffData;
+    private readonly ICheckInData _checkInData;
 
     /// <summary>
     /// Instance of class which holds Basic Staff data.
@@ -39,11 +40,12 @@ public partial class CheckInForm : Window
     /// <summary>
     /// Constructor, initialize instance of this class.
     /// </summary>
-    /// <param name="sqlData">Instance of class servicing Staffs - CRUD actions.</param>
-    public CheckInForm(IDatabaseData sqlData)
+    /// <param name="staffData">Instance of class servicing Staffs - CRUD actions.</param>
+    public CheckInForm(IStaffData staffData, ICheckInData checkInData)
     {
         InitializeComponent();
-        _sqlData = sqlData;
+        _staffData = staffData;
+        _checkInData = checkInData;
     }
 
     /// <summary>
@@ -61,7 +63,7 @@ public partial class CheckInForm : Window
 
         try
         {
-            _checkInModel = await _sqlData.GetLastCheckIn(_basicStaffModel.Id);
+            _checkInModel = await _checkInData.GetLastCheckIn(_basicStaffModel.Id);
         }
         catch (Exception ex)
         {
@@ -92,11 +94,11 @@ public partial class CheckInForm : Window
             // Button's value decide if we do Check-In or Check-Out
             if (checkInButton.Content == "Check-In")
             {
-                await _sqlData.CheckInPerform(_basicStaffModel.Id);
+                await _checkInData.CheckInPerform(_basicStaffModel.Id);
             }
             else
             {
-                await _sqlData.CheckOutPerform(_checkInModel.Id);
+                await _checkInData.CheckOutPerform(_checkInModel.Id);
             }
         }
         catch (Exception ex)

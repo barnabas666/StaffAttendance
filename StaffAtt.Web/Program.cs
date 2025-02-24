@@ -13,7 +13,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-builder.Services.AddTransient<IDatabaseData, SqlData>();
+builder.Services.AddTransient<IStaffData, StaffData>();
+builder.Services.AddTransient<ICheckInData, CheckInData>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
