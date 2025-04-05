@@ -27,16 +27,17 @@ public class StaffService : IStaffService
     /// <summary>
     /// Holds default connection string name.
     /// </summary>
-    private const string connectionStringName = "Testing";
+    private readonly string _connectionStringName;
 
     /// <summary>
     /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
     /// </summary>
     /// <param name="db">Servicing SQL database connection.</param>
-    public StaffService(ISqlDataAccess db, IStaffData staffData)
+    public StaffService(ISqlDataAccess db, IStaffData staffData, ConnectionStringData connectionString)
     {
         _db = db;
         _staffData = staffData;
+        _connectionStringName = connectionString.SqlConnectionName;
     }
 
     /// <summary>
@@ -47,7 +48,7 @@ public class StaffService : IStaffService
     {
         return await _db.LoadData<DepartmentModel, dynamic>("spDepartments_GetAll",
                                                             new { },
-                                                            connectionStringName);
+                                                            _connectionStringName);
     }
 
     /// <summary>
@@ -76,7 +77,7 @@ public class StaffService : IStaffService
         string alias = "";
         int aliasId = 0;
         // Repeat until we have available Alias
-        // (SP checks if Alias is available and if yes creates new Alias and returns last inserted Id).
+        // We use AliasId to check if Alias is available. If we get aliasId = 0 than Alias is not available.
         do
         {
             orderNumber++;
@@ -132,7 +133,7 @@ public class StaffService : IStaffService
     {
         List<AliasModel> output = await _db.LoadData<AliasModel, dynamic>("spAliases_GetByAliasAndPIN",
                                                                           new { alias, pIN },
-                                                                          connectionStringName);
+                                                                          _connectionStringName);
 
         return output.FirstOrDefault();
     }
@@ -162,7 +163,7 @@ public class StaffService : IStaffService
     {
         return await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasic",
                                                                                     new { },
-                                                                                    connectionStringName);        
+                                                                                    _connectionStringName);        
     }
 
     /// <summary>
@@ -206,7 +207,7 @@ public class StaffService : IStaffService
     {
         List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicById",
                                                                             new { id },
-                                                                            connectionStringName);
+                                                                            _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -219,7 +220,7 @@ public class StaffService : IStaffService
     {
         List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
                                                                             new { aliasId },
-                                                                            connectionStringName);
+                                                                            _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -232,7 +233,7 @@ public class StaffService : IStaffService
     {
         List<bool> output = await _db.LoadData<bool, dynamic>("spStaffs_CheckByEmail",
                                                                             new { emailAddress },
-                                                                            connectionStringName);
+                                                                            _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -246,7 +247,7 @@ public class StaffService : IStaffService
     {
         await _db.SaveData("spStaffs_UpdateByAdmin",
                            new { id, departmentId, isApproved },
-                           connectionStringName);
+                           _connectionStringName);
     }
 
     /// <summary>

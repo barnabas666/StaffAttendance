@@ -22,16 +22,16 @@ public partial class MainWindow : Window
     /// <summary>
     /// Instance of class servicing Staffs - CRUD actions.
     /// </summary>
-    private readonly IStaffService _staffData;
+    private readonly IStaffService _staffService;
 
     /// <summary>
     /// Constructor, initialize instance of this class.
     /// </summary>
-    /// <param name="staffData">Instance of class servicing Staffs - CRUD actions.</param>
-    public MainWindow(IStaffService staffData)
+    /// <param name="staffService">Instance of class servicing Staffs - CRUD actions.</param>
+    public MainWindow(IStaffService staffService)
     {
         InitializeComponent();
-        _staffData = staffData;
+        _staffService = staffService;
     }
 
     /// <summary>
@@ -48,54 +48,54 @@ public partial class MainWindow : Window
         try
         {
             // If Alias and PIN are correct AliasModel is returned
-            aliasModel = await _staffData.AliasVerification(aliasText.Text, pINText.Text);
+            aliasModel = await _staffService.AliasVerification(aliasText.Text, pINText.Text);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
+            return;
+        }
+
+        if (aliasModel == null)
+        {
+            MessageBox.Show("You have entered incorrect login information.",
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
+        StaffBasicModel staffBasicModel = new StaffBasicModel();
+        try
+        {
+            staffBasicModel = await _staffService.GetBasicStaffByAliasId(aliasModel.Id);
         }
         catch (Exception ex)
         {
             MessageBox.Show(ex.Message);
         }
 
-        if (aliasModel != null)
+        if (staffBasicModel.IsApproved)
         {
-            StaffBasicModel staffBasicModel = new StaffBasicModel();
+            CheckInForm checkInForm = App.serviceProvider.GetRequiredService<CheckInForm>();
 
-            try
-            {
-                staffBasicModel = await _staffData.GetBasicStaffByAliasId(aliasModel.Id);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            // we populate instance of CheckInForm window with data from our StaffBasicModel
+            checkInForm.PopulateStaff(staffBasicModel);
 
-            if (staffBasicModel.IsApproved)
-            {       
-                CheckInForm checkInForm = App.serviceProvider.GetRequiredService<CheckInForm>();
-
-                // we populate instance of CheckInForm window with data from our StaffBasicModel
-                checkInForm.PopulateStaff(staffBasicModel);
-
-                checkInForm.ShowDialog();
-
-                ClearBoxes();
-            }
-            else
-            {
-                MessageBox.Show("You are not approved to do CheckIn/Out.",
-                                "Error",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Warning);
-            }
+            checkInForm.ShowDialog();
 
             ClearBoxes();
         }
         else
         {
-            MessageBox.Show("You have entered incorrect login information.",
+            MessageBox.Show("You are not approved to do CheckIn/Out.",
                             "Error",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning);
         }
+
+        ClearBoxes();
+
     }
 
     /// <summary>

@@ -29,7 +29,7 @@ public class CheckInDisplayAdminViewModel
     /// <summary>
     /// Selected Staff's Id from DropDown.
     /// </summary>
-    public string SelectedId { get; set; }
+    public string SelectedStaffId { get; set; }
 
     /// <summary>
     /// CheckIn's Start Date for Search Range. Default time is yesterday.

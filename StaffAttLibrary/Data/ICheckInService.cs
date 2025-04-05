@@ -10,9 +10,8 @@ namespace StaffAttLibrary.Data
     public interface ICheckInService
     {        
         Task<bool> CheckApproveStatus(int aliasId);
+        Task DoCheckInOrCheckOut(int staffId);
         Task<CheckInModel> GetLastCheckIn(int staffId);
-        Task<int> CheckInPerform(int staffId);
-        Task<int> CheckOutPerform(int checkInId);
         Task<List<CheckInFullModel>> GetAllCheckIns();
         Task<List<CheckInFullModel>> GetAllCheckInsByDate(DateTime startDate, DateTime endDate);
         Task<List<CheckInFullModel>> GetCheckInsByEmail(string emailAddress);

@@ -12,13 +12,38 @@ namespace StaffAttLibrary.Data
     {
         private readonly ISqlDataAccess _db;
         /// <summary>
-        /// Holds default connection string name. Must go to one place - GlobalSettings.
+        /// Holds default connection string name.
         /// </summary>
-        private const string connectionStringName = "Testing";
+        private readonly string _connectionStringName;
 
-        public CheckInData(ISqlDataAccess db)
+        public CheckInData(ISqlDataAccess db, ConnectionStringData connectionString)
         {
             _db = db;
+            _connectionStringName = connectionString.SqlConnectionName;
+        }
+
+        /// <summary>
+        /// Perform CheckIn for given Staff with current date.
+        /// </summary>
+        /// <param name="staffId">Staff's id.</param>
+        /// <returns>CheckIn id.</returns>
+        public async Task<int> CheckInPerform(int staffId)
+        {
+            return await _db.SaveDataGetId("spCheckIns_InsertCheckIn",
+                               new { staffId },
+                               _connectionStringName);
+        }
+
+        /// <summary>
+        /// Perform CheckOut for given CheckIn record with current date.
+        /// </summary>
+        /// <param name="checkInId">CheckIn's id.</param>
+        /// <returns>CheckIn id.</returns>
+        public async Task<int> CheckOutPerform(int checkInId)
+        {
+            return await _db.SaveDataGetId("spCheckIns_InsertCheckOut",
+                               new { checkInId },
+                               _connectionStringName);
         }
 
         /// <summary>
@@ -31,7 +56,7 @@ namespace StaffAttLibrary.Data
         {
             List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
                                                                                      new { aliasId },
-                                                                                     connectionStringName);
+                                                                                     _connectionStringName);
             if (output.FirstOrDefault() == null)
                 throw new ArgumentException("You passed in an invalid parameter", "aliasId");
 

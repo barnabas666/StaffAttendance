@@ -12,6 +12,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+builder.Services.AddSingleton(new ConnectionStringData
+{
+    SqlConnectionName = "Testing"
+});
+
 builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
 builder.Services.AddTransient<IStaffService, StaffService>();
 builder.Services.AddTransient<ICheckInService, CheckInService>();

@@ -24,8 +24,8 @@ public partial class CheckInForm : Window
     /// <summary>
     /// Instance of class servicing Staffs - CRUD actions.
     /// </summary>
-    private readonly IStaffService _staffData;
-    private readonly ICheckInService _checkInData;
+    private readonly IStaffService _staffService;
+    private readonly ICheckInService _checkInService;
 
     /// <summary>
     /// Instance of class which holds Basic Staff data.
@@ -40,12 +40,12 @@ public partial class CheckInForm : Window
     /// <summary>
     /// Constructor, initialize instance of this class.
     /// </summary>
-    /// <param name="staffData">Instance of class servicing Staffs - CRUD actions.</param>
-    public CheckInForm(IStaffService staffData, ICheckInService checkInData)
+    /// <param name="staffService">Instance of class servicing Staffs - CRUD actions.</param>
+    public CheckInForm(IStaffService staffService, ICheckInService checkInService)
     {
         InitializeComponent();
-        _staffData = staffData;
-        _checkInData = checkInData;
+        _staffService = staffService;
+        _checkInService = checkInService;
     }
 
     /// <summary>
@@ -63,23 +63,26 @@ public partial class CheckInForm : Window
 
         try
         {
-            _checkInModel = await _checkInData.GetLastCheckIn(_basicStaffModel.Id);
+            _checkInModel = await _checkInService.GetLastCheckIn(_basicStaffModel.Id);
         }
         catch (Exception ex)
         {
             MessageBox.Show(ex.Message);
+            return;
         }
 
-        // For first CheckIn ever or if last record is CheckOut we setup Button's value for new record: Check-In
-        if(_checkInModel == null || _checkInModel.CheckOutDate != null)
-        {
-            checkInButton.Content = "Check-In";
-        }
-        // If last CheckIn has no CheckOut value than we setup Button value to: Check-Out
-        else
-        {
-            checkInButton.Content = "Check-Out";
-        }
+        checkInButton.Content = IsNextCheckIn() ? "Check-In" : "Check-Out";  
+    }
+
+    /// <summary>
+    /// Check if we are doing CheckIn or CheckOut.
+    /// For first CheckIn ever or if last record is CheckOut we return true.
+    /// If last CheckIn has no CheckOut value than we return false.
+    /// </summary>
+    /// <returns>True for CheckIn, false for CheckOut.</returns>
+    private bool IsNextCheckIn()
+    {
+        return _checkInModel == null || _checkInModel.CheckOutDate != null;
     }
 
     /// <summary>
@@ -91,15 +94,7 @@ public partial class CheckInForm : Window
     {
         try
         {
-            // Button's value decide if we do Check-In or Check-Out
-            if (checkInButton.Content == "Check-In")
-            {
-                await _checkInData.CheckInPerform(_basicStaffModel.Id);
-            }
-            else
-            {
-                await _checkInData.CheckOutPerform(_checkInModel.Id);
-            }
+            await _checkInService.DoCheckInOrCheckOut(_basicStaffModel.Id);
         }
         catch (Exception ex)
         {

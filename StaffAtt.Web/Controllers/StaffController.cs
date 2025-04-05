@@ -98,7 +98,9 @@ public class StaffController : Controller
     }
 
     /// <summary>
-    /// Get Details Action. Display Staff's personal info. Homepage for Staff.
+    /// Get Details Action. Display Staff's personal info. Starting Action of app.
+    /// After Staff logs in using Identity we check if he has already created Staff account. 
+    /// If not we redirect him to Create Staff action.
     /// </summary>
     /// <param name="message">Optional parameter. Some warning message from different Action.</param>
     /// <returns>View with populated StaffDetailsModel inside.</returns>

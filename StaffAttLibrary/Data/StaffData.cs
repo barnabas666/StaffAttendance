@@ -13,13 +13,14 @@ namespace StaffAttLibrary.Data
     {
         private readonly ISqlDataAccess _db;
         /// <summary>
-        /// Holds default connection string name. Must go to one place - GlobalSettings.
+        /// Holds default connection string name.
         /// </summary>
-        private const string connectionStringName = "Testing";
+        private readonly string _connectionStringName;
 
-        public StaffData(ISqlDataAccess db)
+        public StaffData(ISqlDataAccess db, ConnectionStringData connectionString)
         {
             _db = db;
+            _connectionStringName = connectionString.SqlConnectionName;
         }
 
         /// <summary>
@@ -51,11 +52,12 @@ namespace StaffAttLibrary.Data
                                                       lastName,
                                                       emailAddress
                                                   },
-                                                  connectionStringName);
+                                                  _connectionStringName);
         }
 
         /// <summary>
-        /// Check if Alias exists in Db, if not than insert it.
+        /// Check if Alias exists in Db, if not than insert it and return Id.
+        /// If same Alias exists just return Id with default passed value = 0.
         /// </summary>
         /// <param name="pIN"></param>
         /// <param name="alias"></param>
@@ -65,7 +67,7 @@ namespace StaffAttLibrary.Data
         {
             aliasId = await _db.SaveDataGetId("spAliases_CheckAndInsert",
                                               new { alias, pIN },
-                                              connectionStringName);
+                                              _connectionStringName);
             return aliasId;
         }
 
@@ -84,7 +86,7 @@ namespace StaffAttLibrary.Data
                                                                 zip = address.Zip,
                                                                 state = address.State
                                                             },
-                                                            connectionStringName);
+                                                            _connectionStringName);
         }
 
         /// <summary>
@@ -102,24 +104,24 @@ namespace StaffAttLibrary.Data
                 List<PhoneNumberModel> phoneNumberList = await _db.LoadData<PhoneNumberModel, dynamic>(
                     "spPhoneNumbers_GetByPhoneNumber",
                     new { phoneNumber = phoneNumber.PhoneNumber },
-                    connectionStringName);
+                    _connectionStringName);
 
                 // If we found that Phone Number in Db we just store it inside relation StaffPhoneNumbers Table.
                 if (phoneNumberList.Count == 1)
                 {
                     await _db.SaveData("spStaffPhoneNumbers_Insert",
                                        new { staffId, phoneNumberId = phoneNumberList.First().Id },
-                                       connectionStringName);
+                                       _connectionStringName);
                 }
                 // If its new Phone Number we add it to PhoneNumbers Table too.
                 else
                 {
                     phoneNumberId = await _db.SaveDataGetId("spPhoneNumbers_Insert",
                                                             new { phoneNumber = phoneNumber.PhoneNumber },
-                                                            connectionStringName);
+                                                            _connectionStringName);
                     await _db.SaveData("spStaffPhoneNumbers_Insert",
                                        new { staffId, phoneNumberId },
-                                       connectionStringName);
+                                       _connectionStringName);
                 }
             }
         }
@@ -137,11 +139,11 @@ namespace StaffAttLibrary.Data
             // Update Staff, set isApproved to false because Admin must approve those changes.
             await _db.SaveData("spStaffs_Update",
                                new { id = staff.Id, firstName, lastName, isApproved = false },
-                               connectionStringName);
+                               _connectionStringName);
         }
 
         /// <summary>
-        /// Update Alias in Db.
+        /// Update Alias - PIN in Db.
         /// </summary>
         /// <param name="pIN"></param>
         /// <param name="staff"></param>
@@ -149,10 +151,10 @@ namespace StaffAttLibrary.Data
         public async Task UpdateAlias(string pIN, StaffFullModel staff)
         {
 
-            // Update Alias
+            // Update Alias - PIN
             await _db.SaveData("spAliases_Update",
                                new { id = staff.AliasId, pIN },
-                               connectionStringName);
+                               _connectionStringName);
         }
 
         /// <summary>
@@ -174,7 +176,7 @@ namespace StaffAttLibrary.Data
                                    zip = address.Zip,
                                    state = address.State
                                },
-                               connectionStringName);
+                               _connectionStringName);
         }
 
         /// <summary>
@@ -188,7 +190,7 @@ namespace StaffAttLibrary.Data
         {
             return await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasicByDepartmentAndApproved",
                                                                   new { departmentId, isApproved = approvedType == ApprovedType.Approved ? true : false },
-                                                                  connectionStringName);
+                                                                  _connectionStringName);
         }
 
         /// <summary>
@@ -200,7 +202,7 @@ namespace StaffAttLibrary.Data
         {
             return await _db.LoadData<StaffBasicModel, dynamic>(storedProcedure: "spStaffs_GetAllBasicByDepartment",
                                                                   new { departmentId },
-                                                                  connectionStringName);
+                                                                  _connectionStringName);
         }
 
         /// <summary>
@@ -212,7 +214,7 @@ namespace StaffAttLibrary.Data
         {
             return await _db.LoadData<PhoneNumberModel, dynamic>("spPhoneNumbers_GetByStaffId",
                                                                                    new { staffId },
-                                                                                   connectionStringName);
+                                                                                   _connectionStringName);
         }
 
         /// <summary>
@@ -224,7 +226,7 @@ namespace StaffAttLibrary.Data
         {
             List<AddressModel> output = await _db.LoadData<AddressModel, dynamic>("spAddresses_GetByEmail",
                                                                                   new { emailAddress },
-                                                                                  connectionStringName);
+                                                                                  _connectionStringName);
             return output.FirstOrDefault();
         }
 
@@ -237,7 +239,7 @@ namespace StaffAttLibrary.Data
         {
             List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetBasicByEmail",
                                                                                 new { emailAddress },
-                                                                                connectionStringName);
+                                                                                _connectionStringName);
             return output.FirstOrDefault();
         }
 
@@ -250,7 +252,7 @@ namespace StaffAttLibrary.Data
         {
             List<AddressModel> output = await _db.LoadData<AddressModel, dynamic>("spAddresses_GetById",
                                                                           new { id },
-                                                                          connectionStringName);
+                                                                          _connectionStringName);
             return output.FirstOrDefault();
         }
 
@@ -263,7 +265,7 @@ namespace StaffAttLibrary.Data
         {
             List<StaffFullModel> output = await _db.LoadData<StaffFullModel, dynamic>("spStaffs_GetById",
                                                                                 new { id },
-                                                                                connectionStringName);
+                                                                                _connectionStringName);
             return output.FirstOrDefault();
         }
 
@@ -274,7 +276,7 @@ namespace StaffAttLibrary.Data
         /// <returns></returns>
         public async Task DeleteAlias(StaffFullModel staffModel)
         {
-            await _db.SaveData("spAliases_Delete", new { id = staffModel.AliasId }, connectionStringName);
+            await _db.SaveData("spAliases_Delete", new { id = staffModel.AliasId }, _connectionStringName);
         }
 
         /// <summary>
@@ -284,7 +286,7 @@ namespace StaffAttLibrary.Data
         /// <returns></returns>
         public async Task DeleteAddress(StaffFullModel staffModel)
         {
-            await _db.SaveData("spAddresses_Delete", new { id = staffModel.AddressId }, connectionStringName);
+            await _db.SaveData("spAddresses_Delete", new { id = staffModel.AddressId }, _connectionStringName);
         }
 
         /// <summary>
@@ -294,7 +296,7 @@ namespace StaffAttLibrary.Data
         /// <returns></returns>
         public async Task DeleteStaff(int staffId)
         {
-            await _db.SaveData("spStaffs_Delete", new { staffId }, connectionStringName);
+            await _db.SaveData("spStaffs_Delete", new { staffId }, _connectionStringName);
         }
 
         /// <summary>
@@ -313,19 +315,19 @@ namespace StaffAttLibrary.Data
                 List<StaffPhoneNumberModel> staffPhoneNumberList = await _db.LoadData<StaffPhoneNumberModel, dynamic>(
                     "spStaffPhoneNumbers_GetByPhoneNumber",
                     new { phoneNumberId },
-                    connectionStringName);
+                    _connectionStringName);
 
                 // First we delete link Staff-PhoneNumber from relation StaffPhoneNumbers Table just for given Staff Id.
                 await _db.SaveData("spStaffPhoneNumbers_Delete",
                                    new { staffId, phoneNumberId },
-                                   connectionStringName);
+                                   _connectionStringName);
 
                 // If there was only one link Staff-PhoneNumber than we can delete PhoneNumber from PhoneNumbers Table too.
                 if (staffPhoneNumberList.Count == 1)
                 {
                     await _db.SaveData("spPhoneNumbers_Delete",
                                        new { phoneNumberId },
-                                       connectionStringName);
+                                       _connectionStringName);
                 }
             }
         }

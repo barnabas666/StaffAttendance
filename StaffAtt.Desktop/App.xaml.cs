@@ -39,6 +39,11 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IConfiguration>(configuration);
 
+        services.AddSingleton(new ConnectionStringData
+        {
+            SqlConnectionName = "Testing"
+        });
+
         services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
         services.AddSingleton<IStaffService, StaffService>();
         services.AddSingleton<ICheckInService, CheckInService>();

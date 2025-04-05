@@ -23,16 +23,17 @@ namespace StaffAttLibrary.Data
         /// <summary>
         /// Holds default connection string name.
         /// </summary>
-        private const string connectionStringName = "Testing";
+        private readonly string _connectionStringName;
 
         /// <summary>
         /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
         /// </summary>
         /// <param name="db">Servicing SQL database connection.</param>
-        public CheckInService(ISqlDataAccess db, ICheckInData checkInData)
+        public CheckInService(ISqlDataAccess db, ICheckInData checkInData, ConnectionStringData connectionString)
         {
             _db = db;
             _checkInData = checkInData;
+            _connectionStringName = connectionString.SqlConnectionName;
         }
 
         /// <summary>
@@ -56,33 +57,9 @@ namespace StaffAttLibrary.Data
         {
             List<CheckInModel> output = await _db.LoadData<CheckInModel, dynamic>("spCheckIns_GetLastRecord",
                                                                       new { staffId },
-                                                                      connectionStringName);
+                                                                      _connectionStringName);
 
             return output.FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Perform CheckIn for given Staff with current date.
-        /// </summary>
-        /// <param name="staffId">Staff's id.</param>
-        /// <returns>CheckIn id.</returns>
-        public async Task<int> CheckInPerform(int staffId)
-        {
-            return await _db.SaveDataGetId("spCheckIns_InsertCheckIn",
-                               new { staffId },
-                               connectionStringName);             
-        }
-
-        /// <summary>
-        /// Perform CheckOut for given CheckIn record with current date.
-        /// </summary>
-        /// <param name="checkInId">CheckIn's id.</param>
-        /// <returns>CheckIn id.</returns>
-        public async Task<int> CheckOutPerform(int checkInId)
-        {
-            return await _db.SaveDataGetId("spCheckIns_InsertCheckOut",
-                               new { checkInId },
-                               connectionStringName);             
         }
 
         /// <summary>
@@ -93,7 +70,7 @@ namespace StaffAttLibrary.Data
         {
             return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetAll",
                                                                  new { },
-                                                                 connectionStringName);
+                                                                 _connectionStringName);
         }
 
         /// <summary>
@@ -106,7 +83,7 @@ namespace StaffAttLibrary.Data
         {
             return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetAllByDate",
                                                                                 new { startDate, endDate },
-                                                                                connectionStringName);
+                                                                                _connectionStringName);
         }
 
         /// <summary>
@@ -118,7 +95,7 @@ namespace StaffAttLibrary.Data
         {
             return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByEmail",
                                                                                 new { emailAddress },
-                                                                                connectionStringName);
+                                                                                _connectionStringName);
         }
 
         /// <summary>
@@ -134,7 +111,7 @@ namespace StaffAttLibrary.Data
         {
             return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndEmail",
                                                                                 new { emailAddress, startDate, endDate },
-                                                                                connectionStringName);
+                                                                                _connectionStringName);
         }
 
         /// <summary>
@@ -150,7 +127,7 @@ namespace StaffAttLibrary.Data
         {
             return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndId",
                                                                                 new { id, startDate, endDate },
-                                                                                connectionStringName);
+                                                                                _connectionStringName);
         }
 
         /// <summary>
@@ -160,7 +137,7 @@ namespace StaffAttLibrary.Data
         /// </summary>
         /// <param name="staffId">Staff's Id.</param>
         /// <exception cref="ArgumentException"></exception>
-        private async void DoCheckInOrCheckOut(int staffId)
+        public async Task DoCheckInOrCheckOut(int staffId)
         {
             CheckInModel model = await GetLastCheckIn(staffId);
 
@@ -168,9 +145,9 @@ namespace StaffAttLibrary.Data
                 throw new ArgumentException("You passed in an invalid parameter", "staffId");
 
             if (model.CheckOutDate == null)
-                await CheckOutPerform(model.Id);
+                await _checkInData.CheckOutPerform(model.Id);
             else
-                await CheckInPerform(staffId);
+                await _checkInData.CheckInPerform(staffId);
         }
     }
 }

@@ -80,15 +80,15 @@ public class CheckInController : Controller
         
         List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
 
-        if (dateDisplayModel.SelectedId == "0")
+        if (dateDisplayModel.SelectedStaffId == "0")
         {
             checkIns = await _checkInService.GetAllCheckInsByDate(dateDisplayModel.StartDate,
-                                                           dateDisplayModel.EndDate);
+                                                                  dateDisplayModel.EndDate);
             dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
         }
         else
         {
-            checkIns = await _checkInService.GetCheckInsByDateAndId(Convert.ToInt32(dateDisplayModel.SelectedId),
+            checkIns = await _checkInService.GetCheckInsByDateAndId(Convert.ToInt32(dateDisplayModel.SelectedStaffId),
                                                                              dateDisplayModel.StartDate,
                                                                              dateDisplayModel.EndDate);
             dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
