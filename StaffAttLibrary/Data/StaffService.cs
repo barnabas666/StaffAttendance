@@ -14,7 +14,7 @@ namespace StaffAttLibrary.Data;
 
 /// <summary>
 /// Class servicing Staffs - CRUD actions.
-/// UIs (MVC, WPF) talk to this class. This class calls SqlDataAccess methods.
+/// UIs (MVC, WPF) talk to this class. This class calls StaffData class and SqlDataAccess methods.
 /// </summary>
 public class StaffService : IStaffService
 {
@@ -108,7 +108,7 @@ public class StaffService : IStaffService
                                  string emailAddress,
                                  List<PhoneNumberModel> phoneNumbers)
     {
-        StaffFullModel staff = await GetStaffByEmailProcess(emailAddress);
+        StaffFullModel staff = await GetStaffByEmail(emailAddress);
         await _staffData.UpdateAddress(address, staff);
         await _staffData.UpdateAlias(pIN, staff);
         await _staffData.UpdateStaff(firstName, lastName, staff);
@@ -171,7 +171,7 @@ public class StaffService : IStaffService
     /// </summary>
     /// <param name="emailAddress">Staff's email.</param>
     /// <returns>Staff info.</returns>
-    public async Task<StaffFullModel> GetStaffByEmailProcess(string emailAddress)
+    public async Task<StaffFullModel> GetStaffByEmail(string emailAddress)
     {
         StaffFullModel staffModel = await _staffData.GetStaffByEmail(emailAddress);
 
@@ -187,7 +187,7 @@ public class StaffService : IStaffService
     /// </summary>
     /// <param name="id">Staff's Id.</param>
     /// <returns>Staff info.</returns>
-    public async Task<StaffFullModel> GetStaffByIdProcess(int id)
+    public async Task<StaffFullModel> GetStaffById(int id)
     {
         StaffFullModel staffModel = await _staffData.GetStaffById(id);
 

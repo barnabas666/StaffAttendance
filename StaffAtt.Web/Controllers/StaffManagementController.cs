@@ -70,7 +70,7 @@ public class StaffManagementController : Controller
 
     public async Task<IActionResult> Details(int id)
     {
-        StaffFullModel staff = await _staffService.GetStaffByIdProcess(id);
+        StaffFullModel staff = await _staffService.GetStaffById(id);
         StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(staff);
 
         return View(detailsModel);

@@ -21,8 +21,8 @@ public interface IStaffService
     Task<List<DepartmentModel>> GetAllDepartments();
     Task<List<StaffBasicModel>> GetAllBasicStaffFiltered(int departmentId, ApprovedType approvedType);
     Task<List<StaffBasicModel>> GetAllBasicStaff();
-    Task<StaffFullModel> GetStaffByEmailProcess(string emailAddress);
-    Task<StaffFullModel> GetStaffByIdProcess(int id);
+    Task<StaffFullModel> GetStaffByEmail(string emailAddress);
+    Task<StaffFullModel> GetStaffById(int id);
     Task<StaffBasicModel> GetBasicStaffById(int id);
     Task<StaffBasicModel> GetBasicStaffByAliasId(int aliasId);
     Task<bool> CheckStaffByEmail(string emailAddress);

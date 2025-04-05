@@ -22,6 +22,7 @@ builder.Services.AddTransient<IStaffService, StaffService>();
 builder.Services.AddTransient<ICheckInService, CheckInService>();
 builder.Services.AddTransient<IStaffData, StaffData>();
 builder.Services.AddTransient<ICheckInData, CheckInData>();
+builder.Services.AddTransient<IStaffDataProcessor, StaffDataProcessor>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

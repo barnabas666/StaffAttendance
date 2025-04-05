@@ -115,7 +115,7 @@ public class StaffController : Controller
         if (isCreated == false)
             return RedirectToAction("Create");
 
-        StaffFullModel fullModel = await _staffService.GetStaffByEmailProcess(userEmail);
+        StaffFullModel fullModel = await _staffService.GetStaffByEmail(userEmail);
 
         StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(fullModel);
         detailsModel.Message = message;
@@ -131,7 +131,7 @@ public class StaffController : Controller
     {
         string userEmail = User.FindFirst(ClaimTypes.Email).Value;
 
-        StaffFullModel fullModel = await _staffService.GetStaffByEmailProcess(userEmail);
+        StaffFullModel fullModel = await _staffService.GetStaffByEmail(userEmail);
 
         StaffUpdateViewModel updateModel = _mapper.Map<StaffUpdateViewModel>(fullModel);
 
