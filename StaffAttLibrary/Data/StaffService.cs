@@ -33,7 +33,7 @@ public class StaffService : IStaffService
     /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
     /// </summary>
     /// <param name="db">Servicing SQL database connection.</param>
-    public StaffService(ISqlDataAccess db, IStaffData staffData, ConnectionStringData connectionString)
+    public StaffService(ISqlDataAccess db, IStaffData staffData, IConnectionStringData connectionString)
     {
         _db = db;
         _staffData = staffData;

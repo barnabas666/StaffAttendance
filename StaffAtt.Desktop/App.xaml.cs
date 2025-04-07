@@ -50,6 +50,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IStaffData, StaffData>();
         services.AddSingleton<ICheckInData, CheckInData>();
         services.AddSingleton<IStaffDataProcessor, StaffDataProcessor>();
+        services.AddSingleton<IConnectionStringData, ConnectionStringData>();
         services.AddTransient<MainWindow>();
         services.AddTransient<CheckInForm>(); // cant be AddSingleton or after attempt to reopen this Window app crash
     }

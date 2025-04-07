@@ -23,7 +23,7 @@ public class StaffData : IStaffData
     /// </summary>
     private readonly string _connectionStringName;
 
-    public StaffData(ISqlDataAccess db, IStaffDataProcessor staffDataProcessor, ConnectionStringData connectionString)
+    public StaffData(ISqlDataAccess db, IStaffDataProcessor staffDataProcessor, IConnectionStringData connectionString)
     {
         _db = db;
         _staffDataProcessor = staffDataProcessor;
