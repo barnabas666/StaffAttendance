@@ -63,7 +63,7 @@ public partial class CheckInForm : Window
 
         try
         {
-            _checkInModel = await _checkInService.GetLastCheckIn(_basicStaffModel.Id);
+            _checkInModel = await _checkInService.GetLastCheckInAsync(_basicStaffModel.Id);
         }
         catch (Exception ex)
         {
@@ -94,7 +94,7 @@ public partial class CheckInForm : Window
     {
         try
         {
-            await _checkInService.DoCheckInOrCheckOut(_basicStaffModel.Id);
+            await _checkInService.DoCheckInOrCheckOutAsync(_basicStaffModel.Id);
         }
         catch (Exception ex)
         {

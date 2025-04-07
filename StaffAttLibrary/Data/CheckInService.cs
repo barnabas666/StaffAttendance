@@ -41,9 +41,9 @@ public class CheckInService : ICheckInService
     /// </summary>
     /// <param name="aliasId">Staff's Alias info.</param>
     /// <returns>True if Staff is approved, false if not.</returns>
-    public async Task<bool> CheckApproveStatus(int aliasId)
+    public async Task<bool> CheckApproveStatusAsync(int aliasId)
     {
-        StaffBasicModel staffModel = await _checkInData.GetBasicStaffByAliasId(aliasId);           
+        StaffBasicModel staffModel = await _checkInData.GetBasicStaffByAliasIdAsync(aliasId);
 
         return staffModel.IsApproved;
     }
@@ -53,9 +53,9 @@ public class CheckInService : ICheckInService
     /// </summary>
     /// <param name="staffId">Staff's Id.</param>
     /// <returns>Last CheckIn (CheckOut prop can be null) info or null for invalid staffId.</returns>
-    public async Task<CheckInModel> GetLastCheckIn(int staffId)
+    public async Task<CheckInModel> GetLastCheckInAsync(int staffId)
     {
-        List<CheckInModel> output = await _db.LoadData<CheckInModel, dynamic>("spCheckIns_GetLastRecord",
+        List<CheckInModel> output = await _db.LoadDataAsync<CheckInModel, dynamic>("spCheckIns_GetLastRecord",
                                                                   new { staffId },
                                                                   _connectionStringName);
 
@@ -66,9 +66,9 @@ public class CheckInService : ICheckInService
     /// Get all CheckIns from our database.
     /// </summary>
     /// <returns>Collection of CheckInModel.</returns>
-    public async Task<List<CheckInFullModel>> GetAllCheckIns()
+    public async Task<List<CheckInFullModel>> GetAllCheckInsAsync()
     {
-        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetAll",
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetAll",
                                                              new { },
                                                              _connectionStringName);
     }
@@ -79,9 +79,9 @@ public class CheckInService : ICheckInService
     /// <param name="startDate">Start Date.</param>
     /// <param name="endDate">End Date.</param>
     /// <returns>Collection of CheckIn Info.</returns>
-    public async Task<List<CheckInFullModel>> GetAllCheckInsByDate(DateTime startDate, DateTime endDate)
+    public async Task<List<CheckInFullModel>> GetAllCheckInsByDateAsync(DateTime startDate, DateTime endDate)
     {
-        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetAllByDate",
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetAllByDate",
                                                                             new { startDate, endDate },
                                                                             _connectionStringName);
     }
@@ -91,9 +91,9 @@ public class CheckInService : ICheckInService
     /// </summary>
     /// <param name="emailAddress">Staff's EmailAddress.</param>
     /// <returns>CheckIn info.</returns>
-    public async Task<List<CheckInFullModel>> GetCheckInsByEmail(string emailAddress)
+    public async Task<List<CheckInFullModel>> GetCheckInsByEmailAsync(string emailAddress)
     {
-        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByEmail",
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetByEmail",
                                                                             new { emailAddress },
                                                                             _connectionStringName);
     }
@@ -105,11 +105,11 @@ public class CheckInService : ICheckInService
     /// <param name="startDate">Start Date for CheckIns range.</param>
     /// <param name="endDate">End Date for CheckIns range.</param>
     /// <returns>CheckIn info.</returns>
-    public async Task<List<CheckInFullModel>> GetCheckInsByDateAndEmail(string emailAddress,
+    public async Task<List<CheckInFullModel>> GetCheckInsByDateAndEmailAsync(string emailAddress,
                                                                         DateTime startDate,
                                                                         DateTime endDate)
     {
-        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndEmail",
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndEmail",
                                                                             new { emailAddress, startDate, endDate },
                                                                             _connectionStringName);
     }
@@ -121,11 +121,11 @@ public class CheckInService : ICheckInService
     /// <param name="startDate">Start Date for CheckIns range.</param>
     /// <param name="endDate">End Date for CheckIns range.</param>
     /// <returns>CheckIn info.</returns>
-    public async Task<List<CheckInFullModel>> GetCheckInsByDateAndId(int id,
+    public async Task<List<CheckInFullModel>> GetCheckInsByDateAndIdAsync(int id,
                                                                         DateTime startDate,
                                                                         DateTime endDate)
     {
-        return await _db.LoadData<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndId",
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndId",
                                                                             new { id, startDate, endDate },
                                                                             _connectionStringName);
     }
@@ -137,16 +137,16 @@ public class CheckInService : ICheckInService
     /// </summary>
     /// <param name="staffId">Staff's Id.</param>
     /// <exception cref="ArgumentException"></exception>
-    public async Task DoCheckInOrCheckOut(int staffId)
+    public async Task DoCheckInOrCheckOutAsync(int staffId)
     {
-        CheckInModel model = await GetLastCheckIn(staffId);
+        CheckInModel model = await GetLastCheckInAsync(staffId);
 
         if (model == null)
             throw new ArgumentException("You passed in an invalid parameter", "staffId");
 
         if (model.CheckOutDate == null)
-            await _checkInData.CheckOutPerform(model.Id);
+            await _checkInData.CheckOutPerformAsync(model.Id);
         else
-            await _checkInData.CheckInPerform(staffId);
+            await _checkInData.CheckInPerformAsync(staffId);
     }
 }

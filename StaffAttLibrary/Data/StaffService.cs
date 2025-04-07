@@ -44,9 +44,9 @@ public class StaffService : IStaffService
     /// Get all Departments from our database.
     /// </summary>
     /// <returns>Collection of DepartmentModel.</returns>
-    public async Task<List<DepartmentModel>> GetAllDepartments()
+    public async Task<List<DepartmentModel>> GetAllDepartmentsAsync()
     {
-        return await _db.LoadData<DepartmentModel, dynamic>("spDepartments_GetAll",
+        return await _db.LoadDataAsync<DepartmentModel, dynamic>("spDepartments_GetAll",
                                                             new { },
                                                             _connectionStringName);
     }
@@ -62,7 +62,7 @@ public class StaffService : IStaffService
     /// <param name="emailAddress"></param>
     /// <param name="phoneNumbers"></param>
     /// <returns></returns>
-    public async Task CreateStaff(int departmentId,
+    public async Task CreateStaffAsync(int departmentId,
                                  AddressModel address,
                                  string pIN,
                                  string firstName,
@@ -71,7 +71,7 @@ public class StaffService : IStaffService
                                  List<PhoneNumberModel> phoneNumbers)
     {
         // Save Address into Db and returns back Id.
-        int addressId = await _staffData.SaveAddress(address);
+        int addressId = await _staffData.SaveAddressAsync(address);
 
         int orderNumber = 0;
         string alias = "";
@@ -82,13 +82,13 @@ public class StaffService : IStaffService
         {
             orderNumber++;
             alias = _staffData.CreateAlias(firstName, lastName, orderNumber);
-            aliasId = await _staffData.CheckAndInsertAlias(pIN, alias, aliasId);
+            aliasId = await _staffData.CheckAndInsertAliasAsync(pIN, alias, aliasId);
         } while (aliasId == 0);
 
-        int staffId = await _staffData.SaveStaff(departmentId, firstName, lastName, emailAddress, addressId, aliasId);
+        int staffId = await _staffData.SaveStaffAsync(departmentId, firstName, lastName, emailAddress, addressId, aliasId);
 
         // Add Phone Numbers into Db.
-        await _staffData.CreatePhoneNumbers(staffId, phoneNumbers);
+        await _staffData.CreatePhoneNumbersAsync(staffId, phoneNumbers);
     }
 
     /// <summary>
@@ -101,25 +101,25 @@ public class StaffService : IStaffService
     /// <param name="emailAddress"></param>
     /// <param name="phoneNumbers"></param>
     /// <returns></returns>
-    public async Task UpdateStaffProcess(AddressModel address,
+    public async Task UpdateStaffAsync(AddressModel address,
                                  string pIN,
                                  string firstName,
                                  string lastName,
                                  string emailAddress,
                                  List<PhoneNumberModel> phoneNumbers)
     {
-        StaffFullModel staff = await GetStaffByEmail(emailAddress);
-        await _staffData.UpdateAddress(address, staff);
-        await _staffData.UpdateAlias(pIN, staff);
-        await _staffData.UpdateStaff(firstName, lastName, staff);
+        StaffFullModel staff = await GetStaffByEmailAsync(emailAddress);
+        await _staffData.UpdateAddressAsync(address, staff);
+        await _staffData.UpdateAliasAsync(pIN, staff);
+        await _staffData.UpdateStaffAsync(firstName, lastName, staff);
 
         // Check if Updated Phone Numbers and Phone Numbers from Db are the same than we do nothing.
         bool isSamePhoneNumber = staff.PhoneNumbers.All(phoneNumbers.Contains) && staff.PhoneNumbers.Count == phoneNumbers.Count;
         if (isSamePhoneNumber == false)
         {
             // Update Phone Numbers, we simply delete old and insert new ones.
-            await _staffData.DeletePhoneNumbers(staff.Id, staff.PhoneNumbers);
-            await _staffData.CreatePhoneNumbers(staff.Id, phoneNumbers);
+            await _staffData.DeletePhoneNumbersAsync(staff.Id, staff.PhoneNumbers);
+            await _staffData.CreatePhoneNumbersAsync(staff.Id, phoneNumbers);
         }
     }
 
@@ -129,9 +129,9 @@ public class StaffService : IStaffService
     /// <param name="alias">Staff's Alias.</param>
     /// <param name="pIN">Staff's PIN.</param>
     /// <returns>Correct: Alias info. False: null</returns>
-    public async Task<AliasModel> AliasVerification(string alias, string pIN)
+    public async Task<AliasModel> AliasVerificationAsync(string alias, string pIN)
     {
-        List<AliasModel> output = await _db.LoadData<AliasModel, dynamic>("spAliases_GetByAliasAndPIN",
+        List<AliasModel> output = await _db.LoadDataAsync<AliasModel, dynamic>("spAliases_GetByAliasAndPIN",
                                                                           new { alias, pIN },
                                                                           _connectionStringName);
 
@@ -145,25 +145,25 @@ public class StaffService : IStaffService
     /// <param name="departmentId">Departments Id.</param>
     /// <param name="approvedType">Enum for Staff's Approved status.</param>
     /// <returns>Collection of Basic Staff Info.</returns>
-    public async Task<List<StaffBasicModel>> GetAllBasicStaffFiltered(int departmentId,
+    public async Task<List<StaffBasicModel>> GetAllBasicStaffFilteredAsync(int departmentId,
                                                                       ApprovedType approvedType)
-    {       
+    {
         if (approvedType == ApprovedType.All)
-            return await _staffData.GetAllBasicStaffByDepartment(departmentId);
+            return await _staffData.GetAllBasicStaffByDepartmentAsync(departmentId);
 
         else
-            return await _staffData.GetAllBasicStaffByDepartmentAndApproved(departmentId, approvedType);        
-    }   
+            return await _staffData.GetAllBasicStaffByDepartmentAndApprovedAsync(departmentId, approvedType);
+    }
 
     /// <summary>
     /// Get all Basic Staff Info from Db.
     /// </summary>
     /// <returns>Collection of Basic Staff Info.</returns>
-    public async Task<List<StaffBasicModel>> GetAllBasicStaff()
+    public async Task<List<StaffBasicModel>> GetAllBasicStaffAsync()
     {
-        return await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetAllBasic",
+        return await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetAllBasic",
                                                                                     new { },
-                                                                                    _connectionStringName);        
+                                                                                    _connectionStringName);
     }
 
     /// <summary>
@@ -171,13 +171,13 @@ public class StaffService : IStaffService
     /// </summary>
     /// <param name="emailAddress">Staff's email.</param>
     /// <returns>Staff info.</returns>
-    public async Task<StaffFullModel> GetStaffByEmail(string emailAddress)
+    public async Task<StaffFullModel> GetStaffByEmailAsync(string emailAddress)
     {
-        StaffFullModel staffModel = await _staffData.GetStaffByEmail(emailAddress);
+        StaffFullModel staffModel = await _staffData.GetStaffByEmailAsync(emailAddress);
 
-        staffModel.Address = await _staffData.GetAddressByEmail(emailAddress);
+        staffModel.Address = await _staffData.GetAddressByEmailAsync(emailAddress);
 
-        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffId(staffModel.Id);
+        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffModel.Id);
 
         return staffModel;
     }
@@ -187,13 +187,13 @@ public class StaffService : IStaffService
     /// </summary>
     /// <param name="id">Staff's Id.</param>
     /// <returns>Staff info.</returns>
-    public async Task<StaffFullModel> GetStaffById(int id)
+    public async Task<StaffFullModel> GetStaffByIdAsync(int id)
     {
-        StaffFullModel staffModel = await _staffData.GetStaffById(id);
+        StaffFullModel staffModel = await _staffData.GetStaffByIdAsync(id);
 
-        staffModel.Address = await _staffData.GetAddressById(id);
+        staffModel.Address = await _staffData.GetAddressByIdAsync(id);
 
-        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffId(staffModel.Id);
+        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffModel.Id);
 
         return staffModel;
     }
@@ -203,9 +203,9 @@ public class StaffService : IStaffService
     /// </summary>
     /// <param name="id">Staff's id.</param>
     /// <returns>Basic Staff info.</returns>
-    public async Task<StaffBasicModel> GetBasicStaffById(int id)
+    public async Task<StaffBasicModel> GetBasicStaffByIdAsync(int id)
     {
-        List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicById",
+        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetBasicById",
                                                                             new { id },
                                                                             _connectionStringName);
         return output.FirstOrDefault();
@@ -216,9 +216,9 @@ public class StaffService : IStaffService
     /// </summary>
     /// <param name="aliasId">Alias id.</param>
     /// <returns>Basic Staff info.</returns>
-    public async Task<StaffBasicModel> GetBasicStaffByAliasId(int aliasId)
+    public async Task<StaffBasicModel> GetBasicStaffByAliasIdAsync(int aliasId)
     {
-        List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
+        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
                                                                             new { aliasId },
                                                                             _connectionStringName);
         return output.FirstOrDefault();
@@ -229,9 +229,9 @@ public class StaffService : IStaffService
     /// </summary>
     /// <param name="emailAddress">Staff's email.</param>
     /// <returns>True if Staff exists.</returns>
-    public async Task<bool> CheckStaffByEmail(string emailAddress)
+    public async Task<bool> CheckStaffByEmailAsync(string emailAddress)
     {
-        List<bool> output = await _db.LoadData<bool, dynamic>("spStaffs_CheckByEmail",
+        List<bool> output = await _db.LoadDataAsync<bool, dynamic>("spStaffs_CheckByEmail",
                                                                             new { emailAddress },
                                                                             _connectionStringName);
         return output.FirstOrDefault();
@@ -243,9 +243,9 @@ public class StaffService : IStaffService
     /// <param name="id">Staff's id.</param>
     /// <param name="departmentId">Department's id.</param>
     /// <param name="isApproved">is Approved status</param>
-    public async Task UpdateStaffByAdmin(int id, int departmentId, bool isApproved)
+    public async Task UpdateStaffByAdminAsync(int id, int departmentId, bool isApproved)
     {
-        await _db.SaveData("spStaffs_UpdateByAdmin",
+        await _db.SaveDataAsync("spStaffs_UpdateByAdmin",
                            new { id, departmentId, isApproved },
                            _connectionStringName);
     }
@@ -258,14 +258,14 @@ public class StaffService : IStaffService
     /// </summary>
     /// <param name="staffId">Staff Id.</param>
     /// <returns></returns>
-    public async Task DeleteStaffProcess(int staffId)
+    public async Task DeleteStaffAsync(int staffId)
     {
-        StaffFullModel staffModel = await _staffData.GetStaffById(staffId);
-        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffId(staffId);
+        StaffFullModel staffModel = await _staffData.GetStaffByIdAsync(staffId);
+        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffId);
 
-        await _staffData.DeletePhoneNumbers(staffId, staffModel.PhoneNumbers);
-        await _staffData.DeleteStaff(staffId);
-        await _staffData.DeleteAddress(staffModel);
-        await _staffData.DeleteAlias(staffModel);
+        await _staffData.DeletePhoneNumbersAsync(staffId, staffModel.PhoneNumbers);
+        await _staffData.DeleteStaffAsync(staffId);
+        await _staffData.DeleteAddressAsync(staffModel);
+        await _staffData.DeleteAliasAsync(staffModel);
     }
 }

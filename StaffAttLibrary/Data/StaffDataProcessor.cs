@@ -26,46 +26,46 @@ public class StaffDataProcessor : IStaffDataProcessor
         _connectionStringName = connectionString.SqlConnectionName;
     }
 
-    public async Task<int> CreatePhoneNumber(int phoneNumberId, PhoneNumberModel phoneNumber)
+    public async Task<int> CreatePhoneNumberAsync(int phoneNumberId, PhoneNumberModel phoneNumber)
     {
-        phoneNumberId = await _db.SaveDataGetId("spPhoneNumbers_Insert",
+        phoneNumberId = await _db.SaveDataGetIdAsync("spPhoneNumbers_Insert",
                                                 new { phoneNumber = phoneNumber.PhoneNumber },
                                                 _connectionStringName);
         return phoneNumberId;
     }
 
-    public async Task CreatePhoneNumberLink(int staffId, int phoneNumberId)
+    public async Task CreatePhoneNumberLinkAsync(int staffId, int phoneNumberId)
     {
-        await _db.SaveData("spStaffPhoneNumbers_Insert",
+        await _db.SaveDataAsync("spStaffPhoneNumbers_Insert",
                            new { staffId, phoneNumberId },
                            _connectionStringName);
     }
 
-    public async Task<List<PhoneNumberModel>> GetByPhoneNumber(PhoneNumberModel phoneNumber)
+    public async Task<List<PhoneNumberModel>> GetByPhoneNumberAsync(PhoneNumberModel phoneNumber)
     {
-        return await _db.LoadData<PhoneNumberModel, dynamic>(
+        return await _db.LoadDataAsync<PhoneNumberModel, dynamic>(
             "spPhoneNumbers_GetByPhoneNumber",
             new { phoneNumber = phoneNumber.PhoneNumber },
             _connectionStringName);
     }
 
-    public async Task DeletePhoneNumber(int phoneNumberId)
+    public async Task DeletePhoneNumberAsync(int phoneNumberId)
     {
-        await _db.SaveData("spPhoneNumbers_Delete",
+        await _db.SaveDataAsync("spPhoneNumbers_Delete",
                            new { phoneNumberId },
                            _connectionStringName);
     }
 
-    public async Task DeletePhoneNumberLink(int staffId, int phoneNumberId)
+    public async Task DeletePhoneNumberLinkAsync(int staffId, int phoneNumberId)
     {
-        await _db.SaveData("spStaffPhoneNumbers_Delete",
+        await _db.SaveDataAsync("spStaffPhoneNumbers_Delete",
                            new { staffId, phoneNumberId },
                            _connectionStringName);
     }
 
-    public async Task<List<StaffPhoneNumberModel>> GetPhoneNumberLinks(int phoneNumberId)
+    public async Task<List<StaffPhoneNumberModel>> GetPhoneNumberLinksAsync(int phoneNumberId)
     {
-        return await _db.LoadData<StaffPhoneNumberModel, dynamic>(
+        return await _db.LoadDataAsync<StaffPhoneNumberModel, dynamic>(
             "spStaffPhoneNumbers_GetByPhoneNumber",
             new { phoneNumberId },
             _connectionStringName);

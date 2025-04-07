@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 namespace StaffAttLibrary.Data
 {
     public interface ICheckInService
-    {        
-        Task<bool> CheckApproveStatus(int aliasId);
-        Task DoCheckInOrCheckOut(int staffId);
-        Task<CheckInModel> GetLastCheckIn(int staffId);
-        Task<List<CheckInFullModel>> GetAllCheckIns();
-        Task<List<CheckInFullModel>> GetAllCheckInsByDate(DateTime startDate, DateTime endDate);
-        Task<List<CheckInFullModel>> GetCheckInsByEmail(string emailAddress);
-        Task<List<CheckInFullModel>> GetCheckInsByDateAndEmail(string emailAddress, DateTime startDate, DateTime endDate);
-        Task<List<CheckInFullModel>> GetCheckInsByDateAndId(int id, DateTime startDate, DateTime endDate);
+    {
+        Task<bool> CheckApproveStatusAsync(int aliasId);
+        Task DoCheckInOrCheckOutAsync(int staffId);
+        Task<CheckInModel> GetLastCheckInAsync(int staffId);
+        Task<List<CheckInFullModel>> GetAllCheckInsAsync();
+        Task<List<CheckInFullModel>> GetAllCheckInsByDateAsync(DateTime startDate, DateTime endDate);
+        Task<List<CheckInFullModel>> GetCheckInsByEmailAsync(string emailAddress);
+        Task<List<CheckInFullModel>> GetCheckInsByDateAndEmailAsync(string emailAddress, DateTime startDate, DateTime endDate);
+        Task<List<CheckInFullModel>> GetCheckInsByDateAndIdAsync(int id, DateTime startDate, DateTime endDate);
     }
 }

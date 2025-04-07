@@ -48,7 +48,7 @@ public partial class MainWindow : Window
         try
         {
             // If Alias and PIN are correct AliasModel is returned
-            aliasModel = await _staffService.AliasVerification(aliasText.Text, pINText.Text);
+            aliasModel = await _staffService.AliasVerificationAsync(aliasText.Text, pINText.Text);
         }
         catch (Exception ex)
         {
@@ -68,7 +68,7 @@ public partial class MainWindow : Window
         StaffBasicModel staffBasicModel = new StaffBasicModel();
         try
         {
-            staffBasicModel = await _staffService.GetBasicStaffByAliasId(aliasModel.Id);
+            staffBasicModel = await _staffService.GetBasicStaffByAliasIdAsync(aliasModel.Id);
         }
         catch (Exception ex)
         {

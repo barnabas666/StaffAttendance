@@ -3,10 +3,10 @@
 namespace StaffAttLibrary.Data;
 public interface IStaffDataProcessor
 {
-    Task<int> CreatePhoneNumber(int phoneNumberId, PhoneNumberModel phoneNumber);
-    Task CreatePhoneNumberLink(int staffId, int phoneNumberId);
-    Task DeletePhoneNumber(int phoneNumberId);
-    Task DeletePhoneNumberLink(int staffId, int phoneNumberId);
-    Task<List<PhoneNumberModel>> GetByPhoneNumber(PhoneNumberModel phoneNumber);
-    Task<List<StaffPhoneNumberModel>> GetPhoneNumberLinks(int phoneNumberId);
+    Task<int> CreatePhoneNumberAsync(int phoneNumberId, PhoneNumberModel phoneNumber);
+    Task CreatePhoneNumberLinkAsync(int staffId, int phoneNumberId);
+    Task DeletePhoneNumberAsync(int phoneNumberId);
+    Task DeletePhoneNumberLinkAsync(int staffId, int phoneNumberId);
+    Task<List<PhoneNumberModel>> GetByPhoneNumberAsync(PhoneNumberModel phoneNumber);
+    Task<List<StaffPhoneNumberModel>> GetPhoneNumberLinksAsync(int phoneNumberId);
 }

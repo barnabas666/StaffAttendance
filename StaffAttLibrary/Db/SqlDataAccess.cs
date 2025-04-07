@@ -16,7 +16,7 @@ namespace StaffAttLibrary.Db;
 public class SqlDataAccess : ISqlDataAccess
 {
     /// <summary>
-    /// IConfiguration interface is used to read Settings and Connection Strings from appsettings.json file.    /// 
+    /// IConfiguration interface is used to read Settings and Connection Strings from appsettings.json file.    
     /// </summary>
     private readonly IConfiguration _config;
 
@@ -38,7 +38,7 @@ public class SqlDataAccess : ISqlDataAccess
     /// <param name="parameters">Parameters inserted into Stored Procedure.</param>
     /// <param name="connectionStringName">Connection String Name from appsettings.json.</param>
     /// <returns>Collection of T representing some Model.</returns>
-    public async Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
+    public async Task<List<T>> LoadDataAsync<T, U>(string storedProcedure, U parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
 
@@ -59,7 +59,7 @@ public class SqlDataAccess : ISqlDataAccess
     /// <param name="parameters">Parameters inserted into Stored Procedure.</param>
     /// <param name="connectionStringName">Connection String Name from appsettings.json.</param>
     /// <returns>Returns number of inserted/affected rows</returns>
-    public async Task<int> SaveData<T>(string storedProcedure, T parameters, string connectionStringName)
+    public async Task<int> SaveDataAsync<T>(string storedProcedure, T parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
 
@@ -79,7 +79,7 @@ public class SqlDataAccess : ISqlDataAccess
     /// <param name="parameters">Parameters inserted into Stored Procedure.</param>
     /// <param name="connectionStringName">Connection String Name from appsettings.json.</param>
     /// <returns>Returns Id of last inserted object, query/SP should end with: SELECT SCOPE_IDENTITY();</returns>
-    public async Task<int> SaveDataGetId<T>(string storedProcedure, T parameters, string connectionStringName)
+    public async Task<int> SaveDataGetIdAsync<T>(string storedProcedure, T parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
 

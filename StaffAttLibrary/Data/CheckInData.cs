@@ -31,9 +31,9 @@ public class CheckInData : ICheckInData
     /// </summary>
     /// <param name="staffId">Staff's id.</param>
     /// <returns>CheckIn id.</returns>
-    public async Task<int> CheckInPerform(int staffId)
+    public async Task<int> CheckInPerformAsync(int staffId)
     {
-        return await _db.SaveDataGetId("spCheckIns_InsertCheckIn",
+        return await _db.SaveDataGetIdAsync("spCheckIns_InsertCheckIn",
                            new { staffId },
                            _connectionStringName);
     }
@@ -43,9 +43,9 @@ public class CheckInData : ICheckInData
     /// </summary>
     /// <param name="checkInId">CheckIn's id.</param>
     /// <returns>CheckIn id.</returns>
-    public async Task<int> CheckOutPerform(int checkInId)
+    public async Task<int> CheckOutPerformAsync(int checkInId)
     {
-        return await _db.SaveDataGetId("spCheckIns_InsertCheckOut",
+        return await _db.SaveDataGetIdAsync("spCheckIns_InsertCheckOut",
                            new { checkInId },
                            _connectionStringName);
     }
@@ -56,9 +56,9 @@ public class CheckInData : ICheckInData
     /// <param name="aliasId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException">For invalid aliasId.</exception>
-    public async Task<StaffBasicModel> GetBasicStaffByAliasId(int aliasId)
+    public async Task<StaffBasicModel> GetBasicStaffByAliasIdAsync(int aliasId)
     {
-        List<StaffBasicModel> output = await _db.LoadData<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
+        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
                                                                                  new { aliasId },
                                                                                  _connectionStringName);
         if (output.FirstOrDefault() == null)

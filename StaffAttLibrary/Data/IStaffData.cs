@@ -6,23 +6,23 @@ namespace StaffAttLibrary.Data;
 
 public interface IStaffData
 {
-    Task<int> CheckAndInsertAlias(string pIN, string alias, int aliasId);
+    Task<int> CheckAndInsertAliasAsync(string pIN, string alias, int aliasId);
     string CreateAlias(string firstName, string lastName, int orderNumber);
-    Task CreatePhoneNumbers(int staffId, List<PhoneNumberModel> phoneNumbers);
-    Task DeleteAddress(StaffFullModel staffModel);
-    Task DeleteAlias(StaffFullModel staffModel);
-    Task DeletePhoneNumbers(int staffId, List<PhoneNumberModel> phoneNumbers);
-    Task DeleteStaff(int staffId);
-    Task<AddressModel> GetAddressByEmail(string emailAddress);
-    Task<AddressModel> GetAddressById(int id);
-    Task<List<StaffBasicModel>> GetAllBasicStaffByDepartment(int departmentId);
-    Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAndApproved(int departmentId, ApprovedType approvedType);
-    Task<List<PhoneNumberModel>> GetPhoneNumbersByStaffId(int staffId);
-    Task<StaffFullModel> GetStaffByEmail(string emailAddress);
-    Task<StaffFullModel> GetStaffById(int id);
-    Task<int> SaveAddress(AddressModel address);
-    Task<int> SaveStaff(int departmentId, string firstName, string lastName, string emailAddress, int addressId, int aliasId);
-    Task UpdateAddress(AddressModel address, StaffFullModel staff);
-    Task UpdateAlias(string pIN, StaffFullModel staff);
-    Task UpdateStaff(string firstName, string lastName, StaffFullModel staff);
+    Task CreatePhoneNumbersAsync(int staffId, List<PhoneNumberModel> phoneNumbers);
+    Task DeleteAddressAsync(StaffFullModel staffModel);
+    Task DeleteAliasAsync(StaffFullModel staffModel);
+    Task DeletePhoneNumbersAsync(int staffId, List<PhoneNumberModel> phoneNumbers);
+    Task DeleteStaffAsync(int staffId);
+    Task<AddressModel> GetAddressByEmailAsync(string emailAddress);
+    Task<AddressModel> GetAddressByIdAsync(int id);
+    Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAsync(int departmentId);
+    Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAndApprovedAsync(int departmentId, ApprovedType approvedType);
+    Task<List<PhoneNumberModel>> GetPhoneNumbersByStaffIdAsync(int staffId);
+    Task<StaffFullModel> GetStaffByEmailAsync(string emailAddress);
+    Task<StaffFullModel> GetStaffByIdAsync(int id);
+    Task<int> SaveAddressAsync(AddressModel address);
+    Task<int> SaveStaffAsync(int departmentId, string firstName, string lastName, string emailAddress, int addressId, int aliasId);
+    Task UpdateAddressAsync(AddressModel address, StaffFullModel staff);
+    Task UpdateAliasAsync(string pIN, StaffFullModel staff);
+    Task UpdateStaffAsync(string firstName, string lastName, StaffFullModel staff);
 }

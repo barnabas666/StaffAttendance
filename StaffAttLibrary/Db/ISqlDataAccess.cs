@@ -6,7 +6,7 @@ namespace StaffAttLibrary.Db;
 /// </summary>
 public interface ISqlDataAccess
 {
-    Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName);
-    Task<int> SaveData<T>(string storedProcedure, T parameters, string connectionStringName);
-    Task<int> SaveDataGetId<T>(string storedProcedure, T parameters, string connectionStringName);
+    Task<List<T>> LoadDataAsync<T, U>(string storedProcedure, U parameters, string connectionStringName);
+    Task<int> SaveDataAsync<T>(string storedProcedure, T parameters, string connectionStringName);
+    Task<int> SaveDataGetIdAsync<T>(string storedProcedure, T parameters, string connectionStringName);
 }
