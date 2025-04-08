@@ -16,8 +16,8 @@ public class StaffDataTests
 {
     private readonly StaffData _sut;
     private readonly Mock<ISqlDataAccess> _dbMock = new();
-    private readonly Mock<IConnectionStringData> _connectionStringMock = new();
     private readonly Mock<IStaffDataProcessor> _staffDataProcessorMock = new();
+    private readonly Mock<IConnectionStringData> _connectionStringMock = new();
 
     public StaffDataTests()
     {

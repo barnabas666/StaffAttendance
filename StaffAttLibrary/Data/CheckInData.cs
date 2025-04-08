@@ -42,7 +42,7 @@ public class CheckInData : ICheckInData
     /// Perform CheckOut for given CheckIn record with current date.
     /// </summary>
     /// <param name="checkInId">CheckIn's id.</param>
-    /// <returns>CheckIn id.</returns>
+    /// <returns>CheckOut id.</returns>
     public async Task<int> CheckOutPerformAsync(int checkInId)
     {
         return await _db.SaveDataGetIdAsync("spCheckIns_InsertCheckOut",
