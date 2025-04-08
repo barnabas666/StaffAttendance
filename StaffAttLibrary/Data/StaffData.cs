@@ -129,12 +129,12 @@ public class StaffData : IStaffData
     /// <param name="lastName"></param>
     /// <param name="staff"></param>
     /// <returns></returns>
-    public async Task UpdateStaffAsync(string firstName, string lastName, StaffFullModel staff)
+    public async Task UpdateStaffAsync(string firstName, string lastName, int staffId)
     {
 
         // Update Staff, set isApproved to false because Admin must approve those changes.
         await _db.SaveDataAsync("spStaffs_Update",
-                           new { id = staff.Id, firstName, lastName, isApproved = false },
+                           new { id = staffId, firstName, lastName, isApproved = false },
                            _connectionStringName);
     }
 
@@ -144,12 +144,12 @@ public class StaffData : IStaffData
     /// <param name="pIN"></param>
     /// <param name="staff"></param>
     /// <returns></returns>
-    public async Task UpdateAliasAsync(string pIN, StaffFullModel staff)
+    public async Task UpdateAliasAsync(string pIN, int aliasId)
     {
 
         // Update Alias - PIN
         await _db.SaveDataAsync("spAliases_Update",
-                           new { id = staff.AliasId, pIN },
+                           new { id = aliasId, pIN },
                            _connectionStringName);
     }
 
@@ -159,14 +159,14 @@ public class StaffData : IStaffData
     /// <param name="address"></param>
     /// <param name="staff"></param>
     /// <returns></returns>
-    public async Task UpdateAddressAsync(AddressModel address, StaffFullModel staff)
+    public async Task UpdateAddressAsync(AddressModel address, int addressId)
     {
 
         // Update Address
         await _db.SaveDataAsync("spAddresses_Update",
                            new
                            {
-                               id = staff.AddressId,
+                               id = addressId,
                                street = address.Street,
                                city = address.City,
                                zip = address.Zip,
@@ -242,7 +242,7 @@ public class StaffData : IStaffData
     /// <summary>
     /// Get Address by Id from Db.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">Staff's Id.</param>
     /// <returns>Address Info.</returns>
     public async Task<AddressModel> GetAddressByIdAsync(int id)
     {
@@ -255,7 +255,7 @@ public class StaffData : IStaffData
     /// <summary>
     /// Get Staff by Id from Db.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">Staff's Id.</param>
     /// <returns>Staff Info.</returns>
     public async Task<StaffFullModel> GetStaffByIdAsync(int id)
     {
@@ -270,9 +270,9 @@ public class StaffData : IStaffData
     /// </summary>
     /// <param name="staffModel"></param>
     /// <returns></returns>
-    public async Task DeleteAliasAsync(StaffFullModel staffModel)
+    public async Task DeleteAliasAsync(int aliasId)
     {
-        await _db.SaveDataAsync("spAliases_Delete", new { id = staffModel.AliasId }, _connectionStringName);
+        await _db.SaveDataAsync("spAliases_Delete", new { id = aliasId }, _connectionStringName);
     }
 
     /// <summary>
@@ -280,9 +280,9 @@ public class StaffData : IStaffData
     /// </summary>
     /// <param name="staffModel"></param>
     /// <returns></returns>
-    public async Task DeleteAddressAsync(StaffFullModel staffModel)
+    public async Task DeleteAddressAsync(int addressId)
     {
-        await _db.SaveDataAsync("spAddresses_Delete", new { id = staffModel.AddressId }, _connectionStringName);
+        await _db.SaveDataAsync("spAddresses_Delete", new { id = addressId }, _connectionStringName);
     }
 
     /// <summary>

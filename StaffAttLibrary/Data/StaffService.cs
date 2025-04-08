@@ -109,9 +109,9 @@ public class StaffService : IStaffService
                                  List<PhoneNumberModel> phoneNumbers)
     {
         StaffFullModel staff = await GetStaffByEmailAsync(emailAddress);
-        await _staffData.UpdateAddressAsync(address, staff);
-        await _staffData.UpdateAliasAsync(pIN, staff);
-        await _staffData.UpdateStaffAsync(firstName, lastName, staff);
+        await _staffData.UpdateAddressAsync(address, staff.AddressId);
+        await _staffData.UpdateAliasAsync(pIN, staff.AliasId);
+        await _staffData.UpdateStaffAsync(firstName, lastName, staff.Id);
 
         // Check if Updated Phone Numbers and Phone Numbers from Db are the same than we do nothing.
         bool isSamePhoneNumber = staff.PhoneNumbers.All(phoneNumbers.Contains) && staff.PhoneNumbers.Count == phoneNumbers.Count;
@@ -265,7 +265,7 @@ public class StaffService : IStaffService
 
         await _staffData.DeletePhoneNumbersAsync(staffId, staffModel.PhoneNumbers);
         await _staffData.DeleteStaffAsync(staffId);
-        await _staffData.DeleteAddressAsync(staffModel);
-        await _staffData.DeleteAliasAsync(staffModel);
+        await _staffData.DeleteAddressAsync(staffModel.AddressId);
+        await _staffData.DeleteAliasAsync(staffModel.AliasId);
     }
 }

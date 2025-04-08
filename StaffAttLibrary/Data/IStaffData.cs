@@ -9,8 +9,8 @@ public interface IStaffData
     Task<int> CheckAndInsertAliasAsync(string pIN, string alias, int aliasId);
     string CreateAlias(string firstName, string lastName, int orderNumber);
     Task CreatePhoneNumbersAsync(int staffId, List<PhoneNumberModel> phoneNumbers);
-    Task DeleteAddressAsync(StaffFullModel staffModel);
-    Task DeleteAliasAsync(StaffFullModel staffModel);
+    Task DeleteAddressAsync(int addressId);
+    Task DeleteAliasAsync(int aliasId);
     Task DeletePhoneNumbersAsync(int staffId, List<PhoneNumberModel> phoneNumbers);
     Task DeleteStaffAsync(int staffId);
     Task<AddressModel> GetAddressByEmailAsync(string emailAddress);
@@ -22,7 +22,7 @@ public interface IStaffData
     Task<StaffFullModel> GetStaffByIdAsync(int id);
     Task<int> SaveAddressAsync(AddressModel address);
     Task<int> SaveStaffAsync(int departmentId, string firstName, string lastName, string emailAddress, int addressId, int aliasId);
-    Task UpdateAddressAsync(AddressModel address, StaffFullModel staff);
-    Task UpdateAliasAsync(string pIN, StaffFullModel staff);
-    Task UpdateStaffAsync(string firstName, string lastName, StaffFullModel staff);
+    Task UpdateAddressAsync(AddressModel address, int addressId);
+    Task UpdateAliasAsync(string pIN, int aliasId);
+    Task UpdateStaffAsync(string firstName, string lastName, int staffId);
 }
