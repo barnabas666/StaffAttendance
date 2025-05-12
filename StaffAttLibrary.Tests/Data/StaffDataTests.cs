@@ -46,24 +46,6 @@ public class StaffDataTests
     }
 
     [Fact]
-    public async Task CheckAndInsertAliasAsync_ShouldReturnAliasId()
-    {
-        // Arrange
-        string pIN = "1234";
-        string alias = "AAD1";
-        int aliasId = 1;
-        int expectedId = 1;
-        _dbMock.Setup(db => db.SaveDataGetIdAsync("spAliases_CheckAndInsert",
-                                                  It.IsAny<object>(),
-                                                  It.IsAny<string>()))
-            .ReturnsAsync(expectedId);
-        // Act
-        var result = await _sut.CheckAndInsertAliasAsync(pIN, alias, aliasId);
-        // Assert
-        result.Should().Be(expectedId);
-    }
-
-    [Fact]
     public async Task SaveAddressAsync_ShouldReturnAddressId()
     {
         // Arrange
@@ -370,19 +352,5 @@ public class StaffDataTests
         _dbMock.Verify(db => db.SaveDataAsync("spStaffs_Delete",
                                                It.IsAny<object>(),
                                                It.IsAny<string>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task CreateAlias_ShouldReturnAlias()
-    {
-        // Arrange
-        string firstName = "John";
-        string lastName = "Doe";
-        int orderNumber = 1;
-        string expectedAlias = "JDO1";
-        // Act
-        var result = _sut.CreateAlias(firstName, lastName, orderNumber);
-        // Assert
-        result.Should().Be(expectedAlias);
     }
 }

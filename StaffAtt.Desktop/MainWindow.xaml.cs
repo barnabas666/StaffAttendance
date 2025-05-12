@@ -36,7 +36,7 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Login Staff and open CheckIn/Out form.
-    /// If Staff enter correct Alias and PIN and he is approved to perform CheckIn/Out than new
+    /// If Staff enter correct Alias and PIN and if is approved to perform CheckIn/Out than new
     /// CheckIn/Out window will open.
     /// </summary>
     /// <param name="sender"></param>
@@ -81,10 +81,7 @@ public partial class MainWindow : Window
 
             // we populate instance of CheckInForm window with data from our StaffBasicModel
             checkInForm.PopulateStaff(staffBasicModel);
-
             checkInForm.ShowDialog();
-
-            ClearBoxes();
         }
         else
         {
@@ -95,7 +92,6 @@ public partial class MainWindow : Window
         }
 
         ClearBoxes();
-
     }
 
     /// <summary>

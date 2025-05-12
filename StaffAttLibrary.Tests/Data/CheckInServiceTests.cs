@@ -23,30 +23,6 @@ public class CheckInServiceTests
     }
 
     [Fact]
-    public async Task CheckApproveStatusAsync_ShouldReturnTrue_WhenStaffIsApproved()
-    {
-        // Arrange
-        int aliasId = 1;
-        var expectedStaff = new StaffBasicModel
-        {
-            Id = 1,
-            FirstName = "John",
-            LastName = "Doe",
-            EmailAddress = "john.doe@johndoe.com",
-            Alias = "JDO1",
-            IsApproved = true,
-            DepartmentId = 1,
-            Title = "IT"
-        };
-        _checkInDataMock.Setup(data => data.GetBasicStaffByAliasIdAsync(aliasId))
-            .ReturnsAsync(expectedStaff);
-        // Act
-        var result = await _sut.CheckApproveStatusAsync(aliasId);
-        // Assert
-        result.Should().BeTrue();
-    }
-
-    [Fact]
     public async Task GetLastCheckInAsync_ShouldReturnCheckInModel_WhenStaffIdIsValid()
     {
         // Arrange
@@ -65,29 +41,6 @@ public class CheckInServiceTests
         var result = await _sut.GetLastCheckInAsync(staffId);
         // Assert
         result.Should().BeEquivalentTo(expectedCheckIn);
-    }
-
-    [Fact]
-    public async Task GetAllCheckInsAsync_ShouldReturnListOfCheckInFullModel()
-    {
-        // Arrange
-        var expectedCheckIns = new List<CheckInFullModel>
-        {
-            new CheckInFullModel
-            {
-                Id = 1,
-                StaffId = 1,
-                CheckInDate = DateTime.Now,
-                CheckOutDate = null
-            }
-        };
-        _dbMock.Setup(db => db.LoadDataAsync<CheckInFullModel, dynamic>(
-                "spCheckIns_GetAll", It.IsAny<object>(), It.IsAny<string>()))
-            .ReturnsAsync(expectedCheckIns);
-        // Act
-        var result = await _sut.GetAllCheckInsAsync();
-        // Assert
-        result.Should().BeEquivalentTo(expectedCheckIns);
     }
 
     [Fact]
@@ -111,30 +64,6 @@ public class CheckInServiceTests
             .ReturnsAsync(expectedCheckIns);
         // Act
         var result = await _sut.GetAllCheckInsByDateAsync(startDate, endDate);
-        // Assert
-        result.Should().BeEquivalentTo(expectedCheckIns);
-    }
-
-    [Fact]
-    public async Task GetCheckInsByEmailAsync_ShouldReturnListOfCheckInFullModel()
-    {
-        // Arrange
-        string emailAddrress = "john.doe@johndoe.com";
-        var expectedCheckIns = new List<CheckInFullModel>
-        {
-            new CheckInFullModel
-            {
-                Id = 1,
-                StaffId = 1,
-                CheckInDate = DateTime.Now,
-                CheckOutDate = null
-            }
-        };
-        _dbMock.Setup(db => db.LoadDataAsync<CheckInFullModel, dynamic>(
-                "spCheckIns_GetByEmail", It.IsAny<object>(), It.IsAny<string>()))
-            .ReturnsAsync(expectedCheckIns);
-        // Act
-        var result = await _sut.GetCheckInsByEmailAsync(emailAddrress);
         // Assert
         result.Should().BeEquivalentTo(expectedCheckIns);
     }

@@ -37,18 +37,6 @@ public class CheckInService : ICheckInService
     }
 
     /// <summary>
-    /// Check if Staff is approved to do CheckIn/CheckOut
-    /// </summary>
-    /// <param name="aliasId">Staff's Alias info.</param>
-    /// <returns>True if Staff is approved, false if not.</returns>
-    public async Task<bool> CheckApproveStatusAsync(int aliasId)
-    {
-        StaffBasicModel staffModel = await _checkInData.GetBasicStaffByAliasIdAsync(aliasId);
-
-        return staffModel.IsApproved;
-    }
-
-    /// <summary>
     /// Get last record from CheckIn Table.
     /// </summary>
     /// <param name="staffId">Staff's Id.</param>
@@ -63,17 +51,6 @@ public class CheckInService : ICheckInService
     }
 
     /// <summary>
-    /// Get all CheckIns from our database.
-    /// </summary>
-    /// <returns>Collection of CheckInModel.</returns>
-    public async Task<List<CheckInFullModel>> GetAllCheckInsAsync()
-    {
-        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetAll",
-                                                             new { },
-                                                             _connectionStringName);
-    }
-
-    /// <summary>
     /// Get all CheckIns from our database by Date range.
     /// </summary>
     /// <param name="startDate">Start Date.</param>
@@ -83,18 +60,6 @@ public class CheckInService : ICheckInService
     {
         return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetAllByDate",
                                                                             new { startDate, endDate },
-                                                                            _connectionStringName);
-    }
-
-    /// <summary>
-    /// Get CheckIns by Email from Db.
-    /// </summary>
-    /// <param name="emailAddress">Staff's EmailAddress.</param>
-    /// <returns>CheckIn info.</returns>
-    public async Task<List<CheckInFullModel>> GetCheckInsByEmailAsync(string emailAddress)
-    {
-        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetByEmail",
-                                                                            new { emailAddress },
                                                                             _connectionStringName);
     }
 
@@ -131,7 +96,6 @@ public class CheckInService : ICheckInService
     }
 
     /// <summary>
-    /// Should move into some helper class!
     /// Perform CheckOut if last record in CheckIns Table has CheckOut set to null,
     /// otherwise perform CheckIn.
     /// </summary>

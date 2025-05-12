@@ -73,7 +73,7 @@
     <Build Include="dbo\Stored Procedures\spDepartments_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spAddresses_Insert.sql" />
-    <Build Include="dbo\Stored Procedures\spPhoneNumbers_GetByPhoneNumber.sql" />
+    <Build Include="dbo\Stored Procedures\spPhoneNumbers_CheckPhoneNumber.sql" />
     <Build Include="dbo\Stored Procedures\spPhoneNumbers_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spStaffPhoneNumbers_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetAll.sql" />
@@ -94,9 +94,7 @@
     <Build Include="dbo\Stored Procedures\spPhoneNumbers_Delete.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_Delete.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetBasicByAliasId.sql" />
-    <Build Include="dbo\Stored Procedures\spCheckIns_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\spAliases_GetByAliasAndPIN.sql" />
-    <Build Include="dbo\Stored Procedures\spCheckIns_GetByEmail.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_GetAllByDate.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_GetByDateAndEmail.sql" />
     <Build Include="dbo\Stored Procedures\spCheckIns_GetByDateAndId.sql" />
@@ -107,7 +105,9 @@
     <Build Include="dbo\Stored Procedures\spAddresses_GetById.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetAllBasicByDepartment.sql" />
     <Build Include="dbo\Stored Procedures\spStaffs_GetAllBasicByDepartmentAndApproved.sql" />
-    <Build Include="dbo\Stored Procedures\spAliases_CheckAndInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spPhoneNumbers_GetPhoneNumber.sql" />
+    <Build Include="dbo\Stored Procedures\spAliases_Check.sql" />
+    <Build Include="dbo\Stored Procedures\spAliases_Insert.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />

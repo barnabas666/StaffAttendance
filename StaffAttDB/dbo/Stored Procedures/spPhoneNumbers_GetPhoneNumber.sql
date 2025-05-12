@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[spPhoneNumbers_GetByPhoneNumber]
+﻿CREATE PROCEDURE [dbo].[spPhoneNumbers_GetPhoneNumber]
 	@phoneNumber nvarchar(50)	
 AS
 BEGIN

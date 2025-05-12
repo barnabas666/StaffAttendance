@@ -51,7 +51,7 @@ public class CheckInData : ICheckInData
     }
 
     /// <summary>
-    /// 
+    /// Get Basic Staff data by AliasId.
     /// </summary>
     /// <param name="aliasId"></param>
     /// <returns></returns>

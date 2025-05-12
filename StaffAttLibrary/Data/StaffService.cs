@@ -69,27 +69,19 @@ public class StaffService : IStaffService
                                  string lastName,
                                  string emailAddress,
                                  List<PhoneNumberModel> phoneNumbers)
-    {
-        // Save Address into Db and returns back Id.
+    {        
         int addressId = await _staffData.SaveAddressAsync(address);
-
-        int orderNumber = 0;
-        string alias = "";
-        int aliasId = 0;
-        // Repeat until we have available Alias
-        // We use AliasId to check if Alias is available. If we get aliasId = 0 than Alias is not available.
-        do
-        {
-            orderNumber++;
-            alias = _staffData.CreateAlias(firstName, lastName, orderNumber);
-            aliasId = await _staffData.CheckAndInsertAliasAsync(pIN, alias, aliasId);
-        } while (aliasId == 0);
-
-        int staffId = await _staffData.SaveStaffAsync(departmentId, firstName, lastName, emailAddress, addressId, aliasId);
-
-        // Add Phone Numbers into Db.
+        int aliasId = await _staffData.CreateAliasAsync(pIN, firstName, lastName);
+        int staffId = await _staffData.SaveStaffAsync(departmentId,
+                                                      firstName,
+                                                      lastName,
+                                                      emailAddress,
+                                                      addressId,
+                                                      aliasId);                
         await _staffData.CreatePhoneNumbersAsync(staffId, phoneNumbers);
     }
+
+
 
     /// <summary>
     /// Update Staff and save it to our database.
@@ -174,9 +166,7 @@ public class StaffService : IStaffService
     public async Task<StaffFullModel> GetStaffByEmailAsync(string emailAddress)
     {
         StaffFullModel staffModel = await _staffData.GetStaffByEmailAsync(emailAddress);
-
         staffModel.Address = await _staffData.GetAddressByEmailAsync(emailAddress);
-
         staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffModel.Id);
 
         return staffModel;
@@ -190,9 +180,7 @@ public class StaffService : IStaffService
     public async Task<StaffFullModel> GetStaffByIdAsync(int id)
     {
         StaffFullModel staffModel = await _staffData.GetStaffByIdAsync(id);
-
         staffModel.Address = await _staffData.GetAddressByIdAsync(id);
-
         staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffModel.Id);
 
         return staffModel;
