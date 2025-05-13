@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using StaffAtt.Web.Models;
+using StaffAtt.Web.Helpers;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
 using System.Security.Claims;
@@ -17,19 +18,25 @@ namespace StaffAtt.Web.Controllers;
 public class StaffController : Controller
 {
     private readonly IStaffService _staffService;
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IUserService _userService;
+    private readonly IUserContext _userContext;
     private readonly IMapper _mapper;
+    private readonly IPhoneNumberParser _phoneNumberParser;
+    private readonly IDepartmentSelectListService _departmentService;
 
     public StaffController(IStaffService staffService,
-                           UserManager<IdentityUser> userManager,
-                           SignInManager<IdentityUser> signInManager,
-                           IMapper mapper)
+                           IUserService userService,
+                           IUserContext userContext,
+                           IMapper mapper, 
+                           IPhoneNumberParser phoneNumberParser,
+                           IDepartmentSelectListService departmentService)
     {
         _staffService = staffService;
-        _userManager = userManager;
-        _signInManager = signInManager;
+        _userService = userService;
+        _userContext = userContext;
         _mapper = mapper;
+        _phoneNumberParser = phoneNumberParser;
+        _departmentService = departmentService;
     }
 
     /// <summary>
@@ -40,14 +47,9 @@ public class StaffController : Controller
     /// <returns>View with populated StaffCreateModel.</returns>
     public async Task<IActionResult> Create()
     {
-        // We get all Departments from our database.
-        List<DepartmentModel> departments = await _staffService.GetAllDepartmentsAsync();
-
         // Model to send to our View, populate it there and send model back.
-        StaffCreateViewModel model = new StaffCreateViewModel();
-
-        // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user, both expect string.
-        model.DepartmentItems = new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
+        StaffCreateViewModel model = new StaffCreateViewModel();        
+        model.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync(String.Empty);
 
         return View(model);
     }
@@ -55,29 +57,23 @@ public class StaffController : Controller
     /// <summary>
     /// This is Post Create Action. We use form to create new Staff and save it to database.
     /// We get Phone Numbers from PhoneNumbersText string property and Email from currently logged User info.
-    /// Than we assign new Staff to Member Role.
+    /// Than we assign new Staff to Member Role. 
+    /// We use Custom Action Filter (class ValidateModelAttribute) to validate model state - [ValidateModel].
     /// </summary>
     /// <param name="staff">Staff information.</param>
     /// <returns>Redirect to Details Action.</returns>
     [HttpPost]
+    [ValidateModel]
     public async Task<IActionResult> Create(StaffCreateViewModel staff)
     {
-        if (ModelState.IsValid == false)
-            return RedirectToAction("Create");
-
-        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+        string userEmail = _userContext.GetUserEmail();
         // check if user has already created Staff account
         bool isCreated = await _staffService.CheckStaffByEmailAsync(userEmail);
         // if user has already created account we redirect him to Details action
         if (isCreated)
             return RedirectToAction("Details", new { message = "You have already created account!" });
 
-        List<PhoneNumberModel> phoneNumbers = new List<PhoneNumberModel>();
-        string[] cols = staff.PhoneNumbersText.Split(',');
-        for (int i = 0; i < cols.Length; i++)
-        {
-            phoneNumbers.Add(new PhoneNumberModel { PhoneNumber = cols[i].Trim() });
-        }
+        List<PhoneNumberModel> phoneNumbers = _phoneNumberParser.ParseStringToPhoneNumbers(staff.PhoneNumbersText);
 
         AddressModel address = _mapper.Map<AddressModel>(staff.Address);
 
@@ -89,9 +85,9 @@ public class StaffController : Controller
                                    userEmail,
                                    phoneNumbers);
 
-        IdentityUser newUser = await _userManager.FindByEmailAsync(userEmail);
-        await _userManager.AddToRoleAsync(newUser, "Member");
-        await _signInManager.SignInAsync(newUser, false);
+        IdentityUser newUser = await _userService.FindByEmailAsync(userEmail);
+        await _userService.AddToRoleAsync(newUser, "Member");
+        await _userService.SignInAsync(newUser, false);
 
         return RedirectToAction("Details");
     }
@@ -105,7 +101,7 @@ public class StaffController : Controller
     /// <returns>View with populated StaffDetailsModel inside.</returns>
     public async Task<IActionResult> Details(string message = "")
     {
-        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+        string userEmail = _userContext.GetUserEmail();
 
         // check if user has already created Staff account
         bool isCreated = await _staffService.CheckStaffByEmailAsync(userEmail);
@@ -128,40 +124,30 @@ public class StaffController : Controller
     /// <returns>View with populated StaffUpdateModel.</returns>
     public async Task<IActionResult> Update()
     {
-        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+        string userEmail = _userContext.GetUserEmail();
 
         StaffFullModel fullModel = await _staffService.GetStaffByEmailAsync(userEmail);
 
         StaffUpdateViewModel updateModel = _mapper.Map<StaffUpdateViewModel>(fullModel);
 
-        foreach (PhoneNumberModel phoneNumber in fullModel.PhoneNumbers)
-        {
-            updateModel.PhoneNumbersText += phoneNumber.PhoneNumber + ",";
-        }
-        updateModel.PhoneNumbersText = updateModel.PhoneNumbersText.TrimEnd(',');
+        updateModel.PhoneNumbersText = _phoneNumberParser.ParsePhoneNumbersToString(fullModel.PhoneNumbers);
 
         return View(updateModel);
     }
 
     /// <summary>
     /// Post Update Action. We update Staff's personal info.
+    /// We use Custom Action Filter (class ValidateModelAttribute) to validate model state - [ValidateModel].
     /// </summary>
     /// <param name="updateModel">Staff Updated Information.</param>
     /// <returns>Redirect to Details Action.</returns>
     [HttpPost]
+    [ValidateModel]
     public async Task<IActionResult> Update(StaffUpdateViewModel updateModel)
     {
-        if (ModelState.IsValid == false)
-            return RedirectToAction("Update");
+        string userEmail = _userContext.GetUserEmail();
 
-        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
-
-        List<PhoneNumberModel> phoneNumbers = new List<PhoneNumberModel>();
-        string[] cols = updateModel.PhoneNumbersText.Split(',');
-        for (int i = 0; i < cols.Length; i++)
-        {
-            phoneNumbers.Add(new PhoneNumberModel { PhoneNumber = cols[i].Trim() });
-        }
+        List<PhoneNumberModel> phoneNumbers = _phoneNumberParser.ParseStringToPhoneNumbers(updateModel.PhoneNumbersText);
 
         AddressModel address = _mapper.Map<AddressModel>(updateModel.Address);
 

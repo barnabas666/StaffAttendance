@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StaffAtt.Web.Data;
+using StaffAtt.Web.Helpers;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Db;
 
@@ -24,6 +25,11 @@ builder.Services.AddTransient<IStaffData, StaffData>();
 builder.Services.AddTransient<ICheckInData, CheckInData>();
 builder.Services.AddTransient<IStaffDataProcessor, StaffDataProcessor>();
 builder.Services.AddTransient<IConnectionStringData, ConnectionStringData>();
+builder.Services.AddTransient<IPhoneNumberParser, PhoneNumberParser>();
+builder.Services.AddTransient<IUserContext, UserContext>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IDepartmentSelectListService, DepartmentSelectListService>();
+builder.Services.AddTransient<IStaffSelectListService, StaffSelectListService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

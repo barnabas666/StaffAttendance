@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Enums;
@@ -18,11 +19,13 @@ public class StaffManagementController : Controller
 {
     private readonly IStaffService _staffService;
     private readonly IMapper _mapper;
+    private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffManagementController(IStaffService staffService, IMapper mapper)
+    public StaffManagementController(IStaffService staffService, IMapper mapper, IDepartmentSelectListService departmentService)
     {
         this._staffService = staffService;
         _mapper = mapper;
+        _departmentService = departmentService;
     }
 
     public async Task<IActionResult> List()
@@ -31,17 +34,7 @@ public class StaffManagementController : Controller
         List<StaffBasicModel> staffs = await _staffService.GetAllBasicStaffAsync();
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
         
-        List<DepartmentModel> departments = await _staffService.GetAllDepartmentsAsync();
-        // Creating default item = All Departments for DropDown.
-        departments.Insert(0, new DepartmentModel()
-        {
-            Id = 0,
-            Title = "All"
-        });
-        // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user.
-        staffModel.DepartmentItems = new SelectList(departments,
-                                                    nameof(DepartmentModel.Id),
-                                                    nameof(DepartmentModel.Title));
+        staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
 
         return View(staffModel);
     }
@@ -53,17 +46,7 @@ public class StaffManagementController : Controller
                                                                                               staffModel.ApprovedRadio);
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
 
-        List<DepartmentModel> departments = await _staffService.GetAllDepartmentsAsync();
-        // Creating default item = All Departments for DropDown.
-        departments.Insert(0, new DepartmentModel()
-        {
-            Id = 0,
-            Title = "All"
-        });
-        // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user.
-        staffModel.DepartmentItems = new SelectList(departments,
-                                                    nameof(DepartmentModel.Id),
-                                                    nameof(DepartmentModel.Title));
+        staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
 
         return View(staffModel);
     }
@@ -81,13 +64,7 @@ public class StaffManagementController : Controller
         StaffBasicModel basicModel = await _staffService.GetBasicStaffByIdAsync(id);
         StaffManagementUpdateViewModel updateModel = _mapper.Map<StaffManagementUpdateViewModel>(basicModel);
 
-        // We get all Departments from our database.
-        List<DepartmentModel> departments = await _staffService.GetAllDepartmentsAsync();
-        // Source is departments, value (Id here) gonna be saved to database,
-        // Text (Title) gets displayed to user, both expect string.
-        updateModel.DepartmentItems = new SelectList(departments,
-                                                     nameof(DepartmentModel.Id),
-                                                     nameof(DepartmentModel.Title));
+        updateModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync(String.Empty);
 
         return View(updateModel);
     }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
@@ -17,13 +18,21 @@ public class CheckInController : Controller
 {
     private readonly IStaffService _staffService;
     private readonly ICheckInService _checkInService;
+    private readonly IUserContext _userContext;
     private readonly IMapper _mapper;
+    private readonly IStaffSelectListService _staffSelectListService;
 
-    public CheckInController(IStaffService staffService, ICheckInService checkInService, IMapper mapper)
+    public CheckInController(IStaffService staffService,
+                             ICheckInService checkInService,
+                             IUserContext userContext,
+                             IMapper mapper,
+                             IStaffSelectListService staffSelectListService)
     {
         _staffService = staffService;
         _checkInService = checkInService;
+        _userContext = userContext;
         _mapper = mapper;
+        _staffSelectListService = staffSelectListService;
     }
 
     public IActionResult Index()
@@ -48,19 +57,9 @@ public class CheckInController : Controller
         List<StaffBasicModel> basicStaff = await _staffService.GetAllBasicStaffAsync();
         dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
 
-        // Creating default item = All Staff for DropDown. FullName prop is just getter so we setup here FirstName.
-        dateDisplayModel.StaffList.Insert(0, new StaffBasicViewModel()
-                                                        {
-                                                            Id = 0,
-                                                            FirstName = "All",
-                                                            LastName = "Staff"
-                                                        });
+        dateDisplayModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(dateDisplayModel,
+                                                                                  "All Staff");
 
-        // Source is StaffList, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user.
-        dateDisplayModel.StaffDropDownData = new SelectList(dateDisplayModel.StaffList,
-                                                            nameof(StaffBasicModel.Id),
-                                                            nameof(StaffBasicModel.FullName));
-        
         return View(dateDisplayModel);
     }
 
@@ -93,19 +92,9 @@ public class CheckInController : Controller
 
         List<StaffBasicModel> basicStaff = await _staffService.GetAllBasicStaffAsync();
         dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
-
-        // Creating default item = All Staff for DropDown. FullName prop is just getter so we setup here FirstName.
-        dateDisplayModel.StaffList.Insert(0, new StaffBasicViewModel()
-                                                        {
-                                                            Id = 0,
-                                                            FirstName = "All",
-                                                            LastName = "Staff"
-                                                        });
-
-        // Source is StaffList, value (Id here) gonna be saved to database, Text (FirstName) gets displayed to user.
-        dateDisplayModel.StaffDropDownData = new SelectList(dateDisplayModel.StaffList,
-                                                            nameof(StaffBasicModel.Id),
-                                                            nameof(StaffBasicModel.FullName));
+                
+        dateDisplayModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(dateDisplayModel,
+                                                                                  "All Staff");
 
         return View(dateDisplayModel);
     }
@@ -117,9 +106,9 @@ public class CheckInController : Controller
     /// <returns>ViewModel with populated CheckInDateDisplayStaffModel.</returns>
     public async Task<IActionResult> Display()
     {
-        CheckInDisplayStaffViewModel dateDisplayModel = new CheckInDisplayStaffViewModel();
+        string userEmail = _userContext.GetUserEmail();
 
-        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+        CheckInDisplayStaffViewModel dateDisplayModel = new CheckInDisplayStaffViewModel();
 
         List<CheckInFullModel> checkIns = await _checkInService.GetCheckInsByDateAndEmailAsync(userEmail,
                                                                                    dateDisplayModel.StartDate,
@@ -137,8 +126,8 @@ public class CheckInController : Controller
     /// <returns>ViewModel with repopulated CheckInDateDisplayStaffModel.</returns>
     [HttpPost]
     public async Task<IActionResult> Display(CheckInDisplayStaffViewModel dateDisplayModel)
-    {                
-        string userEmail = User.FindFirst(ClaimTypes.Email).Value;
+    {
+        string userEmail = _userContext.GetUserEmail();
 
         List<CheckInFullModel> checkIns = await _checkInService.GetCheckInsByDateAndEmailAsync(userEmail,
                                                                              dateDisplayModel.StartDate,
