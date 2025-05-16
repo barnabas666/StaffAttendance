@@ -51,7 +51,7 @@ public class StaffController : Controller
         StaffCreateViewModel model = new StaffCreateViewModel();        
         model.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync(String.Empty);
 
-        return View(model);
+        return View("Create", model);
     }
 
     /// <summary>
@@ -70,6 +70,7 @@ public class StaffController : Controller
         // check if user has already created Staff account
         bool isCreated = await _staffService.CheckStaffByEmailAsync(userEmail);
         // if user has already created account we redirect him to Details action
+        // unreachable code, but we must check it in case someone get to Create action using URL
         if (isCreated)
             return RedirectToAction("Details", new { message = "You have already created account!" });
 
@@ -115,7 +116,7 @@ public class StaffController : Controller
         StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(fullModel);
         detailsModel.Message = message;
 
-        return View(detailsModel);
+        return View("Details", detailsModel);
     }
 
     /// <summary>
@@ -132,7 +133,7 @@ public class StaffController : Controller
 
         updateModel.PhoneNumbersText = _phoneNumberParser.ParsePhoneNumbersToString(fullModel.PhoneNumbers);
 
-        return View(updateModel);
+        return View("Update", updateModel);
     }
 
     /// <summary>
