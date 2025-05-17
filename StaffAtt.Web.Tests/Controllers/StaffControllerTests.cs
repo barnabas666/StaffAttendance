@@ -7,13 +7,6 @@ using StaffAtt.Web.Controllers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Principal;
-using System.Security.Claims;
 using StaffAtt.Web.Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -41,7 +34,7 @@ public class StaffControllerTests
     }
 
     [Fact]
-    public async Task Create_ShouldReturnCreateViewAndStaffCreateViewModel()
+    public async Task Create_ShouldReturnCreateViewWithStaffCreateViewModel()
     {
         // Arrange
         string expectedViewName = "Create";
@@ -123,7 +116,7 @@ public class StaffControllerTests
     }
 
     [Fact]
-    public async Task Details_ShouldReturnDetailsViewAndStaffDetailsViewModel_WhenUserHasAlreadyAccount()
+    public async Task Details_ShouldReturnDetailsViewWithStaffDetailsViewModel_WhenUserHasAlreadyAccount()
     {
         // Arrange
         string expectedViewName = "Details";
@@ -161,7 +154,7 @@ public class StaffControllerTests
     }
 
     [Fact]
-    public async Task Update_ShouldReturnUpdateViewAndStaffUpdateViewModel()
+    public async Task Update_ShouldReturnUpdateViewWithStaffUpdateViewModel()
     {
         // Arrange
         string expectedViewName = "Update";
