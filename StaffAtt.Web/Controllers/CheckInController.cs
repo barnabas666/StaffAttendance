@@ -60,7 +60,7 @@ public class CheckInController : Controller
         dateDisplayModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(dateDisplayModel,
                                                                                   "All Staff");
 
-        return View(dateDisplayModel);
+        return View("List", dateDisplayModel);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public class CheckInController : Controller
         dateDisplayModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(dateDisplayModel,
                                                                                   "All Staff");
 
-        return View(dateDisplayModel);
+        return View("List", dateDisplayModel);
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public class CheckInController : Controller
                                                                                    dateDisplayModel.EndDate);
         dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
 
-        return View(dateDisplayModel);
+        return View("Display", dateDisplayModel);
     }
 
     /// <summary>
@@ -134,6 +134,6 @@ public class CheckInController : Controller
                                                                              dateDisplayModel.EndDate);
         dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns); 
 
-        return View(dateDisplayModel);
+        return View("Display", dateDisplayModel);
     }
 }
