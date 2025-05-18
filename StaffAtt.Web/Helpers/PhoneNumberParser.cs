@@ -18,6 +18,6 @@ public class PhoneNumberParser : IPhoneNumberParser
 
     public string ParsePhoneNumbersToString(List<PhoneNumberModel> phoneNumbers)
     {
-        return string.Join(", ", phoneNumbers.Select(x => x.PhoneNumber));
+        return string.Join(",", phoneNumbers.Select(x => x.PhoneNumber));
     }
 }
