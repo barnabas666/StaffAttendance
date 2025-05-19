@@ -69,47 +69,4 @@ public class CheckInDataTests
                                                It.IsAny<object>(),
                                                It.IsAny<string>()), Times.Once);
     }
-
-    [Fact]
-    public async Task GetBasicStaffByAliasIdAsync_ShouldReturnStaffBasicModel()
-    {
-        // Arrange
-        int aliasId = 1;
-        var expectedStaff = new StaffBasicModel
-        {
-            Id = 1,
-            FirstName = "John",
-            LastName = "Doe",
-            EmailAddress = "john.doe@johndoe.com",
-            Alias = "JDO1",
-            IsApproved = true,
-            DepartmentId = 1,
-            Title = "IT"
-        };
-        _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
-                "spStaffs_GetBasicByAliasId",
-                It.IsAny<object>(),
-                It.IsAny<string>()))
-            .ReturnsAsync(new List<StaffBasicModel> { expectedStaff });
-        // Act
-        var result = await _sut.GetBasicStaffByAliasIdAsync(aliasId);
-        // Assert
-        result.Should().BeEquivalentTo(expectedStaff);
-    }
-
-    [Fact]
-    public async Task GetBasicStaffByAliasIdAsync_ShouldThrowArgumentException()
-    {
-        // Arrange
-        int aliasId = 1;
-        _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
-                "spStaffs_GetBasicByAliasId",
-                It.IsAny<object>(),
-                It.IsAny<string>())).ReturnsAsync(new List<StaffBasicModel>());
-        // Act
-        Func<Task> act = async () => await _sut.GetBasicStaffByAliasIdAsync(aliasId);
-        // Assert
-        await act.Should().ThrowAsync<ArgumentException>()
-            .WithMessage("You passed in an invalid parameter (Parameter 'aliasId')");
-    }
 }

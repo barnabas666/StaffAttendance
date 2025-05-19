@@ -61,21 +61,4 @@ public class CheckInData : ICheckInData
     {
         await _db.SaveDataAsync("spCheckIns_Delete", new { staffId }, _connectionStringName);
     }
-
-    /// <summary>
-    /// Get Basic Staff data by AliasId.
-    /// </summary>
-    /// <param name="aliasId"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException">For invalid aliasId.</exception>
-    public async Task<StaffBasicModel> GetBasicStaffByAliasIdAsync(int aliasId)
-    {
-        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
-                                                                                 new { aliasId },
-                                                                                 _connectionStringName);
-        if (output.FirstOrDefault() == null)
-            throw new ArgumentException("You passed in an invalid parameter", "aliasId");
-
-        return output.FirstOrDefault();
-    }
 }
