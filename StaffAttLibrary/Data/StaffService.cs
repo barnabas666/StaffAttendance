@@ -23,6 +23,7 @@ public class StaffService : IStaffService
     /// </summary>
     private readonly ISqlDataAccess _db;
     private readonly IStaffData _staffData;
+    private readonly ICheckInData _checkInData;
 
     /// <summary>
     /// Holds default connection string name.
@@ -33,10 +34,11 @@ public class StaffService : IStaffService
     /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
     /// </summary>
     /// <param name="db">Servicing SQL database connection.</param>
-    public StaffService(ISqlDataAccess db, IStaffData staffData, IConnectionStringData connectionString)
+    public StaffService(ISqlDataAccess db, IStaffData staffData, ICheckInData checkInData, IConnectionStringData connectionString)
     {
         _db = db;
         _staffData = staffData;
+        _checkInData = checkInData;
         _connectionStringName = connectionString.SqlConnectionName;
     }
 
@@ -251,6 +253,7 @@ public class StaffService : IStaffService
         StaffFullModel staffModel = await _staffData.GetStaffByIdAsync(staffId);
         staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffId);
 
+        await _checkInData.DeleteCheckInAsync(staffId);
         await _staffData.DeletePhoneNumbersAsync(staffId, staffModel.PhoneNumbers);
         await _staffData.DeleteStaffAsync(staffId);
         await _staffData.DeleteAddressAsync(staffModel.AddressId);

@@ -108,6 +108,7 @@
     <Build Include="dbo\Stored Procedures\spPhoneNumbers_GetPhoneNumber.sql" />
     <Build Include="dbo\Stored Procedures\spAliases_Check.sql" />
     <Build Include="dbo\Stored Procedures\spAliases_Insert.sql" />
+    <Build Include="dbo\Stored Procedures\spCheckIns_Delete.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="StaffAttDB.refactorlog" />

@@ -105,10 +105,7 @@ public class CheckInService : ICheckInService
     {
         CheckInModel model = await GetLastCheckInAsync(staffId);
 
-        if (model == null)
-            throw new ArgumentException("You passed in an invalid parameter", "staffId");
-
-        if (model.CheckOutDate == null)
+        if (model != null && model.CheckOutDate == null)
             await _checkInData.CheckOutPerformAsync(model.Id);
         else
             await _checkInData.CheckInPerformAsync(staffId);

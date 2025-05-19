@@ -5,6 +5,7 @@ using StaffAttLibrary.Db;
 using StaffAttLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +52,22 @@ public class CheckInDataTests
         var result = await _sut.CheckOutPerformAsync(checkInId);
         // Assert
         result.Should().Be(expectedId);
+    }
+
+    [Fact]
+    public async Task DeleteCheckInAsync_ShouldCallSaveDataAsync()
+    {
+        // Arrange
+        int staffId = 1;
+        _dbMock.Setup(db => db.SaveDataAsync("spCheckIns_Delete",
+                                              It.IsAny<object>(),
+                                              It.IsAny<string>()));            
+        // Act
+        await _sut.DeleteCheckInAsync(staffId);
+        // Assert
+        _dbMock.Verify(db => db.SaveDataAsync("spCheckIns_Delete",
+                                               It.IsAny<object>(),
+                                               It.IsAny<string>()), Times.Once);
     }
 
     [Fact]

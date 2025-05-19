@@ -16,11 +16,12 @@ public class StaffServiceTests
     private readonly StaffService _sut;
     private readonly Mock<ISqlDataAccess> _dbMock = new();
     private readonly Mock<IStaffData> _staffDataMock = new();
+    private readonly Mock<ICheckInData> _checkInDataMock = new();
     private readonly Mock<IConnectionStringData> _connectionStringMock = new();
 
     public StaffServiceTests()
     {
-        _sut = new StaffService(_dbMock.Object, _staffDataMock.Object, _connectionStringMock.Object);
+        _sut = new StaffService(_dbMock.Object, _staffDataMock.Object, _checkInDataMock.Object, _connectionStringMock.Object);
     }
 
     [Fact]

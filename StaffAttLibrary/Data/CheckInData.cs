@@ -51,6 +51,18 @@ public class CheckInData : ICheckInData
     }
 
     /// <summary>
+    /// Deletes a check-in record associated with the specified staff ID.
+    /// </summary>
+    /// <remarks>This method performs an asynchronous operation to delete a check-in record from the database.
+    /// Ensure that the provided <paramref name="staffId"/> corresponds to an existing record.</remarks>
+    /// <param name="staffId">The unique identifier of the staff whose check-in record is to be deleted.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task DeleteCheckInAsync(int staffId)
+    {
+        await _db.SaveDataAsync("spCheckIns_Delete", new { staffId }, _connectionStringName);
+    }
+
+    /// <summary>
     /// Get Basic Staff data by AliasId.
     /// </summary>
     /// <param name="aliasId"></param>
