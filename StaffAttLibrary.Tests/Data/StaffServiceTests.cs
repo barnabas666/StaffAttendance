@@ -165,6 +165,21 @@ public class StaffServiceTests
     }
 
     [Fact]
+    public async Task GetStaffEmailByIdAsync_ShouldReturnEmailAddress()
+    {
+        // Arrange
+        int staffId = 1;
+        string expectedEmail = "john.doe@johndoe.com";
+        _dbMock.Setup(db => db.LoadDataAsync<string, dynamic>(
+                "spStaffs_GetEmailById", It.IsAny<object>(), It.IsAny<string>()))
+            .ReturnsAsync(new List<string> { expectedEmail });
+        // Act
+        var result = await _sut.GetStaffEmailByIdAsync(staffId);
+        // Assert
+        result.Should().Be(expectedEmail);
+    }
+
+    [Fact]
     public async Task CheckStaffByEmailAsync_ShouldReturnTrue_WhenStaffExists()
     {
         // Arrange

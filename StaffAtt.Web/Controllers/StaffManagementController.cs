@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,12 +19,17 @@ namespace StaffAtt.Web.Controllers;
 public class StaffManagementController : Controller
 {
     private readonly IStaffService _staffService;
+    private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffManagementController(IStaffService staffService, IMapper mapper, IDepartmentSelectListService departmentService)
+    public StaffManagementController(IStaffService staffService,
+                                     IUserService userService,
+                                     IMapper mapper,
+                                     IDepartmentSelectListService departmentService)
     {
         _staffService = staffService;
+        _userService = userService;
         _mapper = mapper;
         _departmentService = departmentService;
     }
@@ -130,14 +136,23 @@ public class StaffManagementController : Controller
     }
 
     /// <summary>
-    /// Post Action call. After hit Submit button we delete Staff from our database.
+    /// Deletes a staff member and their associated user account.
     /// </summary>
-    /// <param name="staffModel">Staff to delete info.</param>
-    /// <returns>Redirect back to List Action.</returns>
+    /// <remarks>This method performs the following actions: Retrieves
+    /// the email address of the staff member using their ID. Deletes the staff
+    /// member from the system. Finds and deletes the associated user account
+    /// based on the retrieved email address. Ensure that the <paramref name="staffModel"/>
+    /// contains a valid staff ID before calling this method.</remarks>
+    /// <param name="staffModel">The model containing the ID of the staff member to delete.</param>
+    /// <returns>An <see cref="IActionResult"/> that redirects to the "List" action after the deletion is complete.</returns>
     [HttpPost]
     public async Task<IActionResult> Delete(StaffBasicModel staffModel)
     {
+        string userEmail = await _staffService.GetStaffEmailByIdAsync(staffModel.Id);
         await _staffService.DeleteStaffAsync(staffModel.Id);
+
+        IdentityUser userToDelete = await _userService.FindByEmailAsync(userEmail);
+        await _userService.DeleteUserAsync(userToDelete);
 
         // After deleting Staff we redirect back to List Action.
         return RedirectToAction("List");

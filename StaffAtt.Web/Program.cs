@@ -7,12 +7,14 @@ using StaffAttLibrary.Db;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// "DefaultConnection" is connectionString for Identity framework.
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// "Testing" is connectionString for our application - StaffAttTest Db.
 builder.Services.AddSingleton(new ConnectionStringData
 {
     SqlConnectionName = "Testing"

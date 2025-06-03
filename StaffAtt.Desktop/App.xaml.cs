@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IConfiguration>(configuration);
 
+        // "Testing" is connectionString for our application - StaffAttTest Db.
         services.AddSingleton(new ConnectionStringData
         {
             SqlConnectionName = "Testing"

@@ -25,6 +25,7 @@ public interface IStaffService
     Task<StaffFullModel> GetStaffByIdAsync(int id);
     Task<StaffBasicModel> GetBasicStaffByIdAsync(int id);
     Task<StaffBasicModel> GetBasicStaffByAliasIdAsync(int aliasId);
+    Task<string> GetStaffEmailByIdAsync(int id);
     Task<bool> CheckStaffByEmailAsync(string emailAddress);
     Task UpdateStaffByAdminAsync(int id, int departmentId, bool isApproved);
     Task DeleteStaffAsync(int staffId);

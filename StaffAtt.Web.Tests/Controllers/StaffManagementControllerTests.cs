@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
@@ -20,6 +21,7 @@ public class StaffManagementControllerTests
 {
     private readonly StaffManagementController _sut;
     private readonly Mock<IStaffService> _staffServiceMock = new();
+    private readonly Mock<IUserService> _userServiceMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
     private readonly Mock<IDepartmentSelectListService> _departmentSelectListServiceMock = new();
 
@@ -27,6 +29,7 @@ public class StaffManagementControllerTests
     {
         _sut = new StaffManagementController(
             _staffServiceMock.Object,
+            _userServiceMock.Object,
             _mapperMock.Object,
             _departmentSelectListServiceMock.Object
         );
@@ -185,9 +188,14 @@ public class StaffManagementControllerTests
     {
         // Arrange
         int staffId = 1;
-        string expectedActionName = "List";
+        string userEmail = "john.doe@johndoe.com";
         StaffBasicModel staffBasicModel = new StaffBasicModel { Id = staffId };
+        IdentityUser identityUser = new IdentityUser { Email = userEmail };
+        string expectedActionName = "List";
+        _staffServiceMock.Setup(m => m.GetStaffEmailByIdAsync(staffId)).ReturnsAsync(userEmail);
         _staffServiceMock.Setup(m => m.DeleteStaffAsync(staffId)).Returns(Task.CompletedTask);
+        _userServiceMock.Setup(x => x.FindByEmailAsync(userEmail)).ReturnsAsync(identityUser);
+        _userServiceMock.Setup(x => x.DeleteUserAsync(identityUser)).Returns(Task.CompletedTask);
         // Act
         IActionResult result = await _sut.Delete(staffBasicModel);
         // Assert

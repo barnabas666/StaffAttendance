@@ -215,6 +215,22 @@ public class StaffService : IStaffService
     }
 
     /// <summary>
+    /// Retrieves the email address of a staff member based on their unique identifier.
+    /// </summary>
+    /// <remarks>This method queries the database asynchronously to fetch the email address associated with
+    /// the specified staff ID. If no matching record is found, the method returns <see langword="null"/>.</remarks>
+    /// <param name="id">The unique identifier of the staff member whose email address is to be retrieved. Must be a positive integer.</param>
+    /// <returns>A <see cref="string"/> containing the email address of the staff member if found; otherwise, <see
+    /// langword="null"/>.</returns>
+    public async Task<string> GetStaffEmailByIdAsync(int id)
+    {
+        List<string> output = await _db.LoadDataAsync<string, dynamic>("spStaffs_GetEmailById",
+                                                                            new { id },
+                                                                            _connectionStringName);
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
     /// Check if Staff exists by Email from Db.
     /// </summary>
     /// <param name="emailAddress">Staff's email.</param>

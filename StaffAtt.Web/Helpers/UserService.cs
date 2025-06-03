@@ -49,4 +49,14 @@ public class UserService : IUserService
     {
         return _signInManager.SignInAsync(user, isPersistent);
     }
+
+    /// <summary>
+    /// Deletes the specified user asynchronously.
+    /// </summary>
+    /// <param name="user">The user to delete. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task DeleteUserAsync(IdentityUser user)
+    {
+        await _userManager.DeleteAsync(user);
+    }
 }
