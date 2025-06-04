@@ -4,15 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - StaffAtt.Web</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/StaffAtt.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">StaffAtt.Web</a>
+                <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Index">Attendance</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                 aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -22,22 +22,22 @@
                         @if (User.IsInRole("Member") || User.IsInRole("Administrator"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Details">Your Details</a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="Staff" asp-action="Details">Your Details</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="CheckIn" asp-action="Display">Your Check-Ins</a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="CheckIn" asp-action="Display">Your Check-Ins</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Update">Update Your Info</a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="Staff" asp-action="Update">Update Your Info</a>
                             </li>
                         }
                         @if (User.IsInRole("Administrator"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="StaffManagement" asp-action="List">List of Staff</a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="StaffManagement" asp-action="List">List of Staff</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="CheckIn" asp-action="List">All Check-Ins</a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="CheckIn" asp-action="List">All Check-Ins</a>
                             </li>
                         }
                     </ul>
@@ -54,7 +54,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - StaffAtt.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - Staff Attendance - 
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
