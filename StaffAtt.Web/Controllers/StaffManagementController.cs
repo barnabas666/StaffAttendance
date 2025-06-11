@@ -152,7 +152,7 @@ public class StaffManagementController : Controller
         await _staffService.DeleteStaffAsync(staffModel.Id);
 
         IdentityUser userToDelete = await _userService.FindByEmailAsync(userEmail);
-        await _userService.DeleteUserAsync(userToDelete);
+        await _userService.DeleteIdentityUserAsync(userToDelete);
 
         // After deleting Staff we redirect back to List Action.
         return RedirectToAction("List");

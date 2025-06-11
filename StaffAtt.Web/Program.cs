@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using StaffAtt.Web.Data;
 using StaffAtt.Web.Helpers;
@@ -32,10 +33,11 @@ builder.Services.AddTransient<IUserContext, UserContext>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IDepartmentSelectListService, DepartmentSelectListService>();
 builder.Services.AddTransient<IStaffSelectListService, StaffSelectListService>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();

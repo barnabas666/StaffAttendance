@@ -195,7 +195,7 @@ public class StaffManagementControllerTests
         _staffServiceMock.Setup(m => m.GetStaffEmailByIdAsync(staffId)).ReturnsAsync(userEmail);
         _staffServiceMock.Setup(m => m.DeleteStaffAsync(staffId)).Returns(Task.CompletedTask);
         _userServiceMock.Setup(x => x.FindByEmailAsync(userEmail)).ReturnsAsync(identityUser);
-        _userServiceMock.Setup(x => x.DeleteUserAsync(identityUser)).Returns(Task.CompletedTask);
+        _userServiceMock.Setup(x => x.DeleteIdentityUserAsync(identityUser)).Returns(Task.CompletedTask);
         // Act
         IActionResult result = await _sut.Delete(staffBasicModel);
         // Assert
