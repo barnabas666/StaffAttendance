@@ -12,12 +12,20 @@ public class HomeController : Controller
         _logger = logger;
     }
 
+    /// <summary>
+    /// Serves the default view for the current controller.
+    /// </summary>
+    /// <returns>An <see cref="IActionResult"/> that renders the Index view.</returns>
     public IActionResult Index()
     {
         return View();
     }
 
-    public IActionResult Privacy()
+    /// <summary>
+    /// Handles requests to the "About" page with info about this app and returns the corresponding view.
+    /// </summary>
+    /// <returns>An <see cref="IActionResult"/> that renders the "About" view.</returns>
+    public IActionResult About()
     {
         return View();
     }
