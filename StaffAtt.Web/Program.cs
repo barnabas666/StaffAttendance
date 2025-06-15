@@ -42,6 +42,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // Lockout settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // Block for 15 minutes
+    options.Lockout.MaxFailedAccessAttempts = 3; // Lock after 3 failed attempts
+    options.Lockout.AllowedForNewUsers = true;   // Enable lockout for new users
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

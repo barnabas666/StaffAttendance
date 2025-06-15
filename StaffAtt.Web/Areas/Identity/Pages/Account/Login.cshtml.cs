@@ -109,9 +109,7 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
@@ -123,8 +121,28 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
+                    // Fetch the user to get lockout end time
+                    var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                    if (user != null)
+                    {
+                        var lockoutEnd = await _signInManager.UserManager.GetLockoutEndDateAsync(user);
+                        if (lockoutEnd.HasValue)
+                        {
+                            var remaining = lockoutEnd.Value.UtcDateTime - DateTime.UtcNow;
+                            var minutes = Math.Ceiling(remaining.TotalMinutes);
+                            ModelState.AddModelError(string.Empty, $"This account has been locked out for {minutes} minutes, please try again later.");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "This account has been locked out, please try again later.");
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "This account has been locked out, please try again later.");
+                    }
                     _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
+                    return Page(); // Stay on login page and show message
                 }
                 else
                 {
