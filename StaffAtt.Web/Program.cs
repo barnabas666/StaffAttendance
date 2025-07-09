@@ -21,12 +21,27 @@ builder.Services.AddSingleton(new ConnectionStringData
     SqlConnectionName = "Testing"
 });
 
-builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-builder.Services.AddTransient<IStaffService, StaffService>();
-builder.Services.AddTransient<ICheckInService, CheckInService>();
-builder.Services.AddTransient<IStaffData, StaffData>();
-builder.Services.AddTransient<ICheckInData, CheckInData>();
-builder.Services.AddTransient<IStaffDataProcessor, StaffDataProcessor>();
+// Register services for dependency injection according to the DbType specified in appsettings.json
+string dbType = builder.Configuration.GetValue<string>("DbType") ?? "SQLite";
+if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddTransient<ISqliteDataAccess, SqliteDataAccess>();
+    builder.Services.AddTransient<IStaffService, StaffSqliteService>();
+    builder.Services.AddTransient<ICheckInService, CheckInSqliteService>();
+    builder.Services.AddTransient<IStaffData, StaffSqliteData>();
+    builder.Services.AddTransient<ICheckInData, CheckInSqliteData>();
+    builder.Services.AddTransient<IStaffDataProcessor, StaffSqliteDataProcessor>();
+}
+else
+{
+    builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+    builder.Services.AddTransient<IStaffService, StaffService>();
+    builder.Services.AddTransient<ICheckInService, CheckInService>();
+    builder.Services.AddTransient<IStaffData, StaffData>();
+    builder.Services.AddTransient<ICheckInData, CheckInData>();
+    builder.Services.AddTransient<IStaffDataProcessor, StaffDataProcessor>();
+}
+
 builder.Services.AddTransient<IConnectionStringData, ConnectionStringData>();
 builder.Services.AddTransient<IPhoneNumberParser, PhoneNumberParser>();
 builder.Services.AddTransient<IUserContext, UserContext>();

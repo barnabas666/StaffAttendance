@@ -45,12 +45,27 @@ public static class ServiceCollectionExtensions
             SqlConnectionName = "Testing"
         });
 
-        services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
-        services.AddSingleton<IStaffService, StaffService>();
-        services.AddSingleton<ICheckInService, CheckInService>();
-        services.AddSingleton<IStaffData, StaffData>();
-        services.AddSingleton<ICheckInData, CheckInData>();
-        services.AddSingleton<IStaffDataProcessor, StaffDataProcessor>();
+        // Register services for dependency injection according to the DbType specified in appsettings.json
+        string dbType = configuration["DbType"] ?? "SQLite";
+        if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddSingleton<ISqliteDataAccess, SqliteDataAccess>();
+            services.AddSingleton<IStaffService, StaffSqliteService>();
+            services.AddSingleton<ICheckInService, CheckInSqliteService>();
+            services.AddSingleton<IStaffData, StaffSqliteData>();
+            services.AddSingleton<ICheckInData, CheckInSqliteData>();
+            services.AddSingleton<IStaffDataProcessor, StaffSqliteDataProcessor>();
+        }
+        else
+        {
+            services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
+            services.AddSingleton<IStaffService, StaffService>();
+            services.AddSingleton<ICheckInService, CheckInService>();
+            services.AddSingleton<IStaffData, StaffData>();
+            services.AddSingleton<ICheckInData, CheckInData>();
+            services.AddSingleton<IStaffDataProcessor, StaffDataProcessor>();
+        }
+
         services.AddSingleton<IConnectionStringData, ConnectionStringData>();
         services.AddTransient<MainWindow>();
         services.AddTransient<CheckInForm>(); // cant be AddSingleton or after attempt to reopen this Window app crash
