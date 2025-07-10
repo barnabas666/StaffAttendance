@@ -32,7 +32,7 @@ public class SqliteDataAccess : ISqliteDataAccess
     /// <returns>A task that represents the asynchronous operation. The task result contains a list of objects of type
     /// <typeparamref name="T"/> representing the rows returned by the query. If no rows are returned, the list will be
     /// empty.</returns>
-    public async Task<List<T>> LoadData<T, U>(string sqlStatement, U parameters, string connectionStringName)
+    public async Task<List<T>> LoadDataAsync<T, U>(string sqlStatement, U parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
 
@@ -54,13 +54,13 @@ public class SqliteDataAccess : ISqliteDataAccess
     /// <param name="parameters">An object containing the parameters to be used in the SQL statement. Can be null if no parameters are required.</param>
     /// <param name="connectionStringName">The name of the connection string to use, as defined in the configuration.</param>
     /// <returns></returns>
-    public async Task SaveData<T>(string sqlStatement, T parameters, string connectionStringName)
+    public async Task<int> SaveDataAsync<T>(string sqlStatement, T parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
 
         using (IDbConnection connection = new SQLiteConnection(connectionString))
         {
-            await connection.ExecuteAsync(sqlStatement, parameters);
+            return await connection.ExecuteAsync(sqlStatement, parameters);
         }
     }
 

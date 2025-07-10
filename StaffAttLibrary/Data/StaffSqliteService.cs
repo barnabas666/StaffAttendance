@@ -1,5 +1,6 @@
 ﻿using StaffAttLibrary.Db;
 using StaffAttLibrary.Enums;
+using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
 using System;
 using System.Collections.Generic;
@@ -29,73 +30,252 @@ public class StaffSqliteService : IStaffService
         _connectionStringName = _connectionStringData.SQLiteConnectionName;
     }
 
-    public Task<AliasModel> AliasVerificationAsync(string alias, string pIN)
+    /// <summary>
+    /// Get all Departments from our database.
+    /// </summary>
+    /// <returns>Collection of DepartmentModel.</returns>
+    public async Task<List<DepartmentModel>> GetAllDepartmentsAsync()
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Departments_GetAll.sql");
+
+        return await _db.LoadDataAsync<DepartmentModel, dynamic>(sql,
+                                                                 new { },
+                                                                 _connectionStringName);
     }
 
-    public Task<bool> CheckStaffByEmailAsync(string emailAddress)
+    /// <summary>
+    /// Create Staff and save it to our database.
+    /// </summary>
+    /// <param name="departmentId"></param>
+    /// <param name="address"></param>
+    /// <param name="pIN"></param>
+    /// <param name="firstName"></param>
+    /// <param name="lastName"></param>
+    /// <param name="emailAddress"></param>
+    /// <param name="phoneNumbers"></param>
+    /// <returns></returns>
+    public async Task CreateStaffAsync(int departmentId,
+                                 AddressModel address,
+                                 string pIN,
+                                 string firstName,
+                                 string lastName,
+                                 string emailAddress,
+                                 List<PhoneNumberModel> phoneNumbers)
     {
-        throw new NotImplementedException();
+        int addressId = await _staffData.SaveAddressAsync(address);
+        int aliasId = await _staffData.CreateAliasAsync(pIN, firstName, lastName);
+        int staffId = await _staffData.SaveStaffAsync(departmentId,
+                                                      firstName,
+                                                      lastName,
+                                                      emailAddress,
+                                                      addressId,
+                                                      aliasId);
+        await _staffData.CreatePhoneNumbersAsync(staffId, phoneNumbers);
     }
 
-    public Task CreateStaffAsync(int departmentId, AddressModel address, string pIN, string firstName, string lastName, string emailAddress, List<PhoneNumberModel> phoneNumbers)
+
+
+    /// <summary>
+    /// Update Staff and save it to our database.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <param name="pIN"></param>
+    /// <param name="firstName"></param>
+    /// <param name="lastName"></param>
+    /// <param name="emailAddress"></param>
+    /// <param name="phoneNumbers"></param>
+    /// <returns></returns>
+    public async Task UpdateStaffAsync(AddressModel address,
+                                 string pIN,
+                                 string firstName,
+                                 string lastName,
+                                 string emailAddress,
+                                 List<PhoneNumberModel> phoneNumbers)
     {
-        throw new NotImplementedException();
+        StaffFullModel staff = await GetStaffByEmailAsync(emailAddress);
+        await _staffData.UpdateAddressAsync(address, staff.AddressId);
+        await _staffData.UpdateAliasAsync(pIN, staff.AliasId);
+        await _staffData.UpdateStaffAsync(firstName, lastName, staff.Id);
+
+        // Check if Updated Phone Numbers and Phone Numbers from Db are the same than we do nothing.
+        bool isSamePhoneNumber = staff.PhoneNumbers.All(phoneNumbers.Contains) && staff.PhoneNumbers.Count == phoneNumbers.Count;
+        if (isSamePhoneNumber == false)
+        {
+            // Update Phone Numbers, we simply delete old and insert new ones.
+            await _staffData.DeletePhoneNumbersAsync(staff.Id, staff.PhoneNumbers);
+            await _staffData.CreatePhoneNumbersAsync(staff.Id, phoneNumbers);
+        }
     }
 
-    public Task DeleteStaffAsync(int staffId)
+    /// <summary>
+    /// Verify if entered credentials are correct.
+    /// </summary>
+    /// <param name="alias">Staff's Alias.</param>
+    /// <param name="pIN">Staff's PIN.</param>
+    /// <returns>Correct: Alias info. False: null</returns>
+    public async Task<AliasModel> AliasVerificationAsync(string alias, string pIN)
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_GetByAliasAndPIN.sql");
+
+        List<AliasModel> output = await _db.LoadDataAsync<AliasModel, dynamic>(sql,
+                                                                               new { alias, pIN },
+                                                                               _connectionStringName);
+        return output.FirstOrDefault();
     }
 
-    public Task<List<StaffBasicModel>> GetAllBasicStaffAsync()
+    /// <summary>
+    /// Get all Basic Staff Info from Db. If DepartmentId is 0 than we get all Staffs.
+    /// If ApprovedType is All than we get all Staffs, otherwise only those with or without Approved status.
+    /// </summary>
+    /// <param name="departmentId">Departments Id.</param>
+    /// <param name="approvedType">Enum for Staff's Approved status.</param>
+    /// <returns>Collection of Basic Staff Info.</returns>
+    public async Task<List<StaffBasicModel>> GetAllBasicStaffFilteredAsync(int departmentId,
+                                                                      ApprovedType approvedType)
     {
-        throw new NotImplementedException();
+        if (approvedType == ApprovedType.All)
+            return await _staffData.GetAllBasicStaffByDepartmentAsync(departmentId);
+
+        else
+            return await _staffData.GetAllBasicStaffByDepartmentAndApprovedAsync(departmentId, approvedType);
     }
 
-    public Task<List<StaffBasicModel>> GetAllBasicStaffFilteredAsync(int departmentId, ApprovedType approvedType)
+    /// <summary>
+    /// Get all Basic Staff Info from Db.
+    /// </summary>
+    /// <returns>Collection of Basic Staff Info.</returns>
+    public async Task<List<StaffBasicModel>> GetAllBasicStaffAsync()
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllBasic.sql");
+
+        return await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
+                                                                 new { },
+                                                                 _connectionStringName);
     }
 
-    public Task<List<DepartmentModel>> GetAllDepartmentsAsync()
+    /// <summary>
+    /// Get Staff by Email from Db.
+    /// </summary>
+    /// <param name="emailAddress">Staff's email.</param>
+    /// <returns>Staff info.</returns>
+    public async Task<StaffFullModel> GetStaffByEmailAsync(string emailAddress)
     {
-        throw new NotImplementedException();
+        StaffFullModel staffModel = await _staffData.GetStaffByEmailAsync(emailAddress);
+        staffModel.Address = await _staffData.GetAddressByEmailAsync(emailAddress);
+        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffModel.Id);
+
+        return staffModel;
     }
 
-    public Task<StaffBasicModel> GetBasicStaffByAliasIdAsync(int aliasId)
+    /// <summary>
+    /// Get Staff by Id from Db.
+    /// </summary>
+    /// <param name="id">Staff's Id.</param>
+    /// <returns>Staff info.</returns>
+    public async Task<StaffFullModel> GetStaffByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        StaffFullModel staffModel = await _staffData.GetStaffByIdAsync(id);
+        staffModel.Address = await _staffData.GetAddressByIdAsync(id);
+        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffModel.Id);
+
+        return staffModel;
     }
 
-    public Task<StaffBasicModel> GetBasicStaffByIdAsync(int id)
+    /// <summary>
+    /// Get Basic Staff Model by Id from Db.
+    /// </summary>
+    /// <param name="id">Staff's id.</param>
+    /// <returns>Basic Staff info.</returns>
+    public async Task<StaffBasicModel> GetBasicStaffByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicById.sql");
+
+        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
+                                                                                         new { id },
+                                                                                         _connectionStringName);
+        return output.FirstOrDefault();
     }
 
-    public Task<StaffFullModel> GetStaffByEmailAsync(string emailAddress)
+    /// <summary>
+    /// Get Basic Staff Model by AliasId from Db.
+    /// </summary>
+    /// <param name="aliasId">Alias id.</param>
+    /// <returns>Basic Staff info.</returns>
+    public async Task<StaffBasicModel> GetBasicStaffByAliasIdAsync(int aliasId)
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicByAliasId.sql");
+
+        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
+                                                                                         new { aliasId },
+                                                                                         _connectionStringName);
+        return output.FirstOrDefault();
     }
 
-    public Task<StaffFullModel> GetStaffByIdAsync(int id)
+    /// <summary>
+    /// Retrieves the email address of a staff member based on their unique identifier.
+    /// </summary>
+    /// <remarks>This method queries the database asynchronously to fetch the email address associated with
+    /// the specified staff ID. If no matching record is found, the method returns <see langword="null"/>.</remarks>
+    /// <param name="id">The unique identifier of the staff member whose email address is to be retrieved. Must be a positive integer.</param>
+    /// <returns>A <see cref="string"/> containing the email address of the staff member if found; otherwise, <see
+    /// langword="null"/>.</returns>
+    public async Task<string> GetStaffEmailByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetEmailById.sql");
+
+        List<string> output = await _db.LoadDataAsync<string, dynamic>(sql,
+                                                                       new { id },
+                                                                       _connectionStringName);
+        return output.FirstOrDefault();
     }
 
-    public Task<string> GetStaffEmailByIdAsync(int id)
+    /// <summary>
+    /// Check if Staff exists by Email from Db.
+    /// </summary>
+    /// <param name="emailAddress">Staff's email.</param>
+    /// <returns>True if Staff exists.</returns>
+    public async Task<bool> CheckStaffByEmailAsync(string emailAddress)
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_CheckByEmail.sql");
+
+        List<bool> output = await _db.LoadDataAsync<bool, dynamic>(sql,
+                                                                   new { emailAddress },
+                                                                   _connectionStringName);
+        return output.FirstOrDefault();
     }
 
-    public Task UpdateStaffAsync(AddressModel address, string pIN, string firstName, string lastName, string emailAddress, List<PhoneNumberModel> phoneNumbers)
+    /// <summary>
+    /// Update type of Department and Approved status by Admin.
+    /// </summary>
+    /// <param name="id">Staff's id.</param>
+    /// <param name="departmentId">Department's id.</param>
+    /// <param name="isApproved">is Approved status</param>
+    public async Task UpdateStaffByAdminAsync(int id, int departmentId, bool isApproved)
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_UpdateByAdmin.sql");
+
+        await _db.SaveDataAsync(sql,
+                                new { id, departmentId, isApproved },
+                                _connectionStringName);
     }
 
-    public Task UpdateStaffByAdminAsync(int id, int departmentId, bool isApproved)
+    /// <summary>
+    /// Delete Staff from Db. Delete all related Phone Numbers, Addresses and Aliases.
+    /// First we delete Phone Numbers (can be shared) because they have Foreign Key into Staffs Table.
+    /// Than we must delete Staff because it has Foreign Keys into Addresses and Aliases Tables.
+    /// Finally we delete Address and Alias.
+    /// </summary>
+    /// <param name="staffId">Staff Id.</param>
+    /// <returns></returns>
+    public async Task DeleteStaffAsync(int staffId)
     {
-        throw new NotImplementedException();
+        StaffFullModel staffModel = await _staffData.GetStaffByIdAsync(staffId);
+        staffModel.PhoneNumbers = await _staffData.GetPhoneNumbersByStaffIdAsync(staffId);
+
+        await _checkInData.DeleteCheckInAsync(staffId);
+        await _staffData.DeletePhoneNumbersAsync(staffId, staffModel.PhoneNumbers);
+        await _staffData.DeleteStaffAsync(staffId);
+        await _staffData.DeleteAddressAsync(staffModel.AddressId);
+        await _staffData.DeleteAliasAsync(staffModel.AliasId);
     }
 }
