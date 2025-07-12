@@ -26,7 +26,6 @@ public class StaffSqliteService : IStaffService
         _db = db;
         _staffData = staffData;
         _checkInData = checkInData;
-        _connectionStringData = connectionStringData;
         _connectionStringName = _connectionStringData.SQLiteConnectionName;
     }
 

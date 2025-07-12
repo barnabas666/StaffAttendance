@@ -20,10 +20,10 @@ public class StaffDataProcessor : IStaffDataProcessor
     /// </summary>
     private readonly string _connectionStringName;
 
-    public StaffDataProcessor(ISqlDataAccess db, IConnectionStringData connectionString)
+    public StaffDataProcessor(ISqlDataAccess db, IConnectionStringData connectionStringData)
     {
         _db = db;
-        _connectionStringName = connectionString.SqlConnectionName;
+        _connectionStringName = connectionStringData.SqlConnectionName;
     }
 
     /// <summary>

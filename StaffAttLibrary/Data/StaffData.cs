@@ -23,11 +23,11 @@ public class StaffData : IStaffData
     /// </summary>
     private readonly string _connectionStringName;
 
-    public StaffData(ISqlDataAccess db, IStaffDataProcessor staffDataProcessor, IConnectionStringData connectionString)
+    public StaffData(ISqlDataAccess db, IStaffDataProcessor staffDataProcessor, IConnectionStringData connectionStringData)
     {
         _db = db;
         _staffDataProcessor = staffDataProcessor;
-        _connectionStringName = connectionString.SqlConnectionName;
+        _connectionStringName = connectionStringData.SqlConnectionName;
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public class StaffData : IStaffData
     /// <returns>Staff Basic Info.</returns>
     public async Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAsync(int departmentId)
     {
-        return await _db.LoadDataAsync<StaffBasicModel, dynamic>(storedProcedure: "spStaffs_GetAllBasicByDepartment",
+        return await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetAllBasicByDepartment",
                                                               new { departmentId },
                                                               _connectionStringName);
     }
