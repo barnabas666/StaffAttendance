@@ -4,5 +4,6 @@ AS
 BEGIN	
 	UPDATE dbo.CheckIns
 	SET CheckOutDate = GETDATE()
-	WHERE Id = @checkInId;
+	WHERE Id = @checkInId
+	SELECT SCOPE_IDENTITY();
 END

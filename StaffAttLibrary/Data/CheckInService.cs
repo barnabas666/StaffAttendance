@@ -29,11 +29,11 @@ public class CheckInService : ICheckInService
     /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
     /// </summary>
     /// <param name="db">Servicing SQL database connection.</param>
-    public CheckInService(ISqlDataAccess db, ICheckInData checkInData, IConnectionStringData connectionString)
+    public CheckInService(ISqlDataAccess db, ICheckInData checkInData, IConnectionStringData connectionStringData)
     {
         _db = db;
         _checkInData = checkInData;
-        _connectionStringName = connectionString.SqlConnectionName;
+        _connectionStringName = connectionStringData.SqlConnectionName;
     }
 
     /// <summary>

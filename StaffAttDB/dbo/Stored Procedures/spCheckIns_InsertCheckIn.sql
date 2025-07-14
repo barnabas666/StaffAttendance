@@ -3,5 +3,6 @@
 AS
 BEGIN	
 	INSERT INTO dbo.CheckIns (StaffId, CheckInDate)
-	VALUES (@StaffId, GETDATE());
+	VALUES (@StaffId, GETDATE())
+	SELECT SCOPE_IDENTITY();
 END

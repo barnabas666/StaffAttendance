@@ -1,4 +1,6 @@
-﻿using System;
+﻿using StaffAttLibrary.Db;
+using StaffAttLibrary.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,18 +9,54 @@ using System.Threading.Tasks;
 namespace StaffAttLibrary.Data;
 public class CheckInSqliteData : ICheckInData
 {
-    public Task<int> CheckInPerformAsync(int staffId)
+    private readonly ISqliteDataAccess _db;
+    /// <summary>
+    /// Holds default connection string name.
+    /// </summary>
+    private readonly string _connectionStringName;
+
+    public CheckInSqliteData(ISqliteDataAccess db, IConnectionStringData connectionStringData)
     {
-        throw new NotImplementedException();
+        _db = db;
+        _connectionStringName = connectionStringData.SqlConnectionName;
     }
 
-    public Task<int> CheckOutPerformAsync(int checkInId)
+    /// <summary>
+    /// Perform CheckIn for given Staff with current date.
+    /// </summary>
+    /// <param name="staffId">Staff's id.</param>
+    /// <returns>CheckIn id.</returns>
+    public async Task<int> CheckInPerformAsync(int staffId)
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_InsertCheckIn.sql");
+        return await _db.SaveDataGetIdAsync(sql,
+                                            new { staffId },
+                                            _connectionStringName);
     }
 
-    public Task DeleteCheckInAsync(int staffId)
+    /// <summary>
+    /// Perform CheckOut for given CheckIn record with current date.
+    /// </summary>
+    /// <param name="checkInId">CheckIn's id.</param>
+    /// <returns>CheckOut id.</returns>
+    public async Task<int> CheckOutPerformAsync(int checkInId)
     {
-        throw new NotImplementedException();
+        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_InsertCheckOut.sql");
+        return await _db.SaveDataGetIdAsync(sql,
+                                            new { checkInId },
+                                            _connectionStringName);
+    }
+
+    /// <summary>
+    /// Deletes a check-in record associated with the specified staff ID.
+    /// </summary>
+    /// <remarks>This method performs an asynchronous operation to delete a check-in record from the database.
+    /// Ensure that the provided <paramref name="staffId"/> corresponds to an existing record.</remarks>
+    /// <param name="staffId">The unique identifier of the staff whose check-in record is to be deleted.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task DeleteCheckInAsync(int staffId)
+    {
+        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_Delete.sql");
+        await _db.SaveDataAsync(sql, new { staffId }, _connectionStringName);
     }
 }

@@ -20,10 +20,10 @@ public class CheckInData : ICheckInData
     /// </summary>
     private readonly string _connectionStringName;
 
-    public CheckInData(ISqlDataAccess db, IConnectionStringData connectionString)
+    public CheckInData(ISqlDataAccess db, IConnectionStringData connectionStringData)
     {
         _db = db;
-        _connectionStringName = connectionString.SqlConnectionName;
+        _connectionStringName = connectionStringData.SqlConnectionName;
     }
 
     /// <summary>
