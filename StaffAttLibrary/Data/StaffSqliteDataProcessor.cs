@@ -11,7 +11,6 @@ namespace StaffAttLibrary.Data;
 public class StaffSqliteDataProcessor : IStaffDataProcessor
 {
     private readonly ISqliteDataAccess _db;
-    private readonly IConnectionStringData _connectionStringData;
     /// <summary>
     /// Holds default connection string name.
     /// </summary>

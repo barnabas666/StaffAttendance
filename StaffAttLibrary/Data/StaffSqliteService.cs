@@ -14,7 +14,6 @@ public class StaffSqliteService : IStaffService
     private readonly ISqliteDataAccess _db;
     private readonly IStaffData _staffData;
     private readonly ICheckInData _checkInData;
-    private readonly IConnectionStringData _connectionStringData;
 
     /// <summary>
     /// Holds default connection string name.
@@ -26,7 +25,7 @@ public class StaffSqliteService : IStaffService
         _db = db;
         _staffData = staffData;
         _checkInData = checkInData;
-        _connectionStringName = _connectionStringData.SQLiteConnectionName;
+        _connectionStringName = connectionStringData.SQLiteConnectionName;
     }
 
     /// <summary>

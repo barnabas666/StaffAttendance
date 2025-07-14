@@ -11,5 +11,5 @@ public class ConnectionStringData : IConnectionStringData
     /// Connection string name - key. In Appsettings.json file in our UI we have connection string with given name.
     /// </summary>
     public string SqlConnectionName { get; set; } = "Testing";
-    public string SQLiteConnectionName { get; set; } = "SQLite";
+    public string SQLiteConnectionName { get; set; } = "SQLiteDb";
 }

@@ -13,7 +13,6 @@ public class StaffSqliteData : IStaffData
 {
     private readonly ISqliteDataAccess _db;
     private readonly IStaffDataProcessor _staffDataProcessor;
-    private readonly IConnectionStringData _connectionStringData;
 
     /// <summary>
     /// Holds default connection string name.
