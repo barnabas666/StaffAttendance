@@ -15,12 +15,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// "Testing" is connectionString for our application - StaffAttTest Db.
-builder.Services.AddSingleton(new ConnectionStringData
-{
-    SqlConnectionName = "Testing"
-});
-
 // Register services for dependency injection according to the DbType specified in appsettings.json
 string dbType = builder.Configuration.GetValue<string>("DbType") ?? "SQLite";
 if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))

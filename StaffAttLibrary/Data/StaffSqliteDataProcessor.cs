@@ -19,7 +19,7 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     public StaffSqliteDataProcessor(ISqliteDataAccess db, IConnectionStringData connectionStringData)
     {
         _db = db;
-        _connectionStringName = connectionStringData.SqlConnectionName;
+        _connectionStringName = connectionStringData.SQLiteConnectionName;
     }
 
     /// <summary>

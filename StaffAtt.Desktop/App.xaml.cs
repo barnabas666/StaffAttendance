@@ -33,17 +33,11 @@ public static class ServiceCollectionExtensions
     public static void ConfigureServices(this IServiceCollection services)
     {
         IConfiguration configuration = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appSettings.json", false)
-        .Build();
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appSettings.json", false)
+                .Build();
 
         services.AddSingleton<IConfiguration>(configuration);
-
-        // "Testing" is connectionString for our application - StaffAttTest Db.
-        services.AddSingleton(new ConnectionStringData
-        {
-            SqlConnectionName = "Testing"
-        });
 
         // Register services for dependency injection according to the DbType specified in appsettings.json
         string dbType = configuration["DbType"] ?? "SQLite";

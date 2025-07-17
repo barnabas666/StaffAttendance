@@ -17,6 +17,13 @@
     <None Remove="SqliteQueries\Aliases_GetByAliasAndPIN.sql" />
     <None Remove="SqliteQueries\Aliases_Insert.sql" />
     <None Remove="SqliteQueries\Aliases_Update.sql" />
+    <None Remove="SqliteQueries\CheckIns_Delete.sql" />
+    <None Remove="SqliteQueries\CheckIns_GetAllByDate.sql" />
+    <None Remove="SqliteQueries\CheckIns_GetByDateAndEmail.sql" />
+    <None Remove="SqliteQueries\CheckIns_GetByDateAndId.sql" />
+    <None Remove="SqliteQueries\CheckIns_GetLastRecord.sql" />
+    <None Remove="SqliteQueries\CheckIns_InsertCheckIn.sql" />
+    <None Remove="SqliteQueries\CheckIns_InsertCheckOut.sql" />
     <None Remove="SqliteQueries\Departments_GetAll.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_CheckPhoneNumber.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_Delete.sql" />
@@ -70,6 +77,27 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\Aliases_Update.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqliteQueries\CheckIns_Delete.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqliteQueries\CheckIns_GetAllByDate.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqliteQueries\CheckIns_GetByDateAndEmail.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqliteQueries\CheckIns_GetByDateAndId.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqliteQueries\CheckIns_GetLastRecord.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqliteQueries\CheckIns_InsertCheckIn.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqliteQueries\CheckIns_InsertCheckOut.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\Departments_GetAll.sql">

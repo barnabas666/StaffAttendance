@@ -22,7 +22,7 @@ public class CheckInSqliteService : ICheckInService
     {
         _db = db;
         _checkInData = checkInData;
-        _connectionStringName = connectionStringData.SqlConnectionName;
+        _connectionStringName = connectionStringData.SQLiteConnectionName;
     }
 
     /// <summary>
@@ -48,9 +48,10 @@ public class CheckInSqliteService : ICheckInService
     /// <returns>Collection of CheckIn Info.</returns>
     public async Task<List<CheckInFullModel>> GetAllCheckInsByDateAsync(DateTime startDate, DateTime endDate)
     {
-        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetAllByDate",
-                                                                            new { startDate, endDate },
-                                                                            _connectionStringName);
+        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetAllByDate.sql");
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>(sql,
+                                                                  new { startDate, endDate },
+                                                                  _connectionStringName);
     }
 
     /// <summary>
@@ -64,9 +65,10 @@ public class CheckInSqliteService : ICheckInService
                                                                         DateTime startDate,
                                                                         DateTime endDate)
     {
-        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndEmail",
-                                                                            new { emailAddress, startDate, endDate },
-                                                                            _connectionStringName);
+        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetByDateAndEmail.sql");
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>(sql,
+                                                                  new { emailAddress, startDate, endDate },
+                                                                  _connectionStringName);
     }
 
     /// <summary>
@@ -80,9 +82,10 @@ public class CheckInSqliteService : ICheckInService
                                                                         DateTime startDate,
                                                                         DateTime endDate)
     {
-        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndId",
-                                                                            new { id, startDate, endDate },
-                                                                            _connectionStringName);
+        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetByDateAndId.sql");
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>(sql,
+                                                                  new { id, startDate, endDate },
+                                                                  _connectionStringName);
     }
 
     /// <summary>
