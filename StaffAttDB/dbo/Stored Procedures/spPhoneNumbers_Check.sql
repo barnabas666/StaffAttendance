@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[spPhoneNumbers_CheckPhoneNumber]
+﻿CREATE PROCEDURE [dbo].[spPhoneNumbers_Check]
 	@phoneNumber nvarchar(50)	
 AS
 BEGIN

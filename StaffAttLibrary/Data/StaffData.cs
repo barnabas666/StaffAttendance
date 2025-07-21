@@ -120,8 +120,8 @@ public class StaffData : IStaffData
             // If we found that Phone Number in Db we get Id and just store it inside relation StaffPhoneNumbers Table.
             if (isPhoneNumberExistingInDb)
             {
-                List<PhoneNumberModel> phoneNumberList = await _staffDataProcessor.GetPhoneNumberAsync(phoneNumber);
-                await _staffDataProcessor.SavePhoneNumberLinkAsync(staffId, phoneNumberList.First().Id);
+                int phoneNumberId = await _staffDataProcessor.GetPhoneNumberIdAsync(phoneNumber);
+                await _staffDataProcessor.SavePhoneNumberLinkAsync(staffId, phoneNumberId);
             }
             // If its new Phone Number we add it first to PhoneNumbers Table and after we create relation.
             else
@@ -188,7 +188,7 @@ public class StaffData : IStaffData
     public async Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAndApprovedAsync(int departmentId,
                                                                                  ApprovedType approvedType)
     {
-        return await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetAllBasicByDepartmentAndApproved",
+        return await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetAllByDepartmentAndApproved",
                                                               new { departmentId, isApproved = approvedType == ApprovedType.Approved ? true : false },
                                                               _connectionStringName);
     }
@@ -200,7 +200,7 @@ public class StaffData : IStaffData
     /// <returns>Staff Basic Info.</returns>
     public async Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAsync(int departmentId)
     {
-        return await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetAllBasicByDepartment",
+        return await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetAllByDepartment",
                                                               new { departmentId },
                                                               _connectionStringName);
     }
@@ -237,7 +237,7 @@ public class StaffData : IStaffData
     /// <returns>Staff Basic Info.</returns>
     public async Task<StaffFullModel> GetStaffByEmailAsync(string emailAddress)
     {
-        List<StaffFullModel> output = await _db.LoadDataAsync<StaffFullModel, dynamic>("spStaffs_GetBasicByEmail",
+        List<StaffFullModel> output = await _db.LoadDataAsync<StaffFullModel, dynamic>("spStaffs_GetByEmail",
                                                                             new { emailAddress },
                                                                             _connectionStringName);
         return output.FirstOrDefault();

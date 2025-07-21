@@ -8,7 +8,7 @@ public interface IStaffDataProcessor
     Task DeletePhoneNumberAsync(int phoneNumberId);
     Task DeletePhoneNumberLinkAsync(int staffId, int phoneNumberId);
     Task<bool> CheckPhoneNumberAsync(PhoneNumberModel phoneNumber);
-    Task<List<PhoneNumberModel>> GetPhoneNumberAsync(PhoneNumberModel phoneNumber);
+    Task<int> GetPhoneNumberIdAsync(PhoneNumberModel phoneNumber);
     Task<List<StaffPhoneNumberModel>> GetPhoneNumberLinksAsync(int phoneNumberId);
     Task<bool> CheckAliasAsync(string alias);
     Task<int> SaveAliasAsync(string alias, string pIN);

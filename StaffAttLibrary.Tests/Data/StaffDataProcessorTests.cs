@@ -60,7 +60,7 @@ public class StaffDataProcessorTests
         // Arrange
         var phoneNumber = new PhoneNumberModel { PhoneNumber = "123456789" };
         _dbMock.Setup(db => db.LoadDataAsync<bool, dynamic>(
-                "spPhoneNumbers_CheckPhoneNumber",
+                "spPhoneNumbers_Check",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(new List<bool> { true });
@@ -71,20 +71,21 @@ public class StaffDataProcessorTests
     }
 
     [Fact]
-    public async Task GetPhoneNumberAsync_ShouldReturnPhoneNumbers()
+    public async Task GetPhoneNumberIdAsync_ShouldReturnPhoneNumberIds()
     {
         // Arrange
         var phoneNumber = new PhoneNumberModel { PhoneNumber = "123456789" };
-        var expectedPhoneNumbers = new List<PhoneNumberModel> { phoneNumber };
-        _dbMock.Setup(db => db.LoadDataAsync<PhoneNumberModel, dynamic>(
-                "spPhoneNumbers_GetPhoneNumber",
+        var expectedPhoneNumberId = 1;
+        var PhoneNumberIds = new List<int> { expectedPhoneNumberId };
+        _dbMock.Setup(db => db.LoadDataAsync<int, dynamic>(
+                "spPhoneNumbers_GetIdByPhoneNumber",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
-            .ReturnsAsync(expectedPhoneNumbers);
+            .ReturnsAsync(PhoneNumberIds);
         // Act
-        var result = await _sut.GetPhoneNumberAsync(phoneNumber);
+        var result = await _sut.GetPhoneNumberIdAsync(phoneNumber);
         // Assert
-        result.Should().BeEquivalentTo(expectedPhoneNumbers);
+        result.Should().Be(expectedPhoneNumberId);
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[spStaffs_GetBasicByEmail]
+﻿CREATE PROCEDURE [dbo].[spStaffs_GetByEmail]
 	@emailAddress nvarchar(100)
 AS
 BEGIN

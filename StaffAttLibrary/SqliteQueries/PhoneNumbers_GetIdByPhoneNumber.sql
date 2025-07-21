@@ -1,3 +1,3 @@
-﻿SELECT Id, PhoneNumber
+﻿SELECT Id
 FROM PhoneNumbers
 WHERE PhoneNumber = @phoneNumber;

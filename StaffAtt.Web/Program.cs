@@ -8,9 +8,9 @@ using StaffAttLibrary.Db;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// "DefaultConnection" is connectionString for Identity framework.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// "IdentityDb" is connectionString for Identity framework.
+var connectionString = builder.Configuration.GetConnectionString("IdentityDb") ?? 
+    throw new InvalidOperationException("Connection string 'IdentityDb' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -57,8 +57,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // Block for 15 minutes
     options.Lockout.MaxFailedAccessAttempts = 3; // Lock after 3 failed attempts
     options.Lockout.AllowedForNewUsers = true;   // Enable lockout for new users
-    // Disable 2FA at framework level
-    options.SignIn.RequireConfirmedAccount = false;
+    // Disable 2FA at framework level    
     options.SignIn.RequireConfirmedPhoneNumber = false;
 });
 

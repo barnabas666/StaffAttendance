@@ -118,8 +118,8 @@ public class StaffSqliteData : IStaffData
             // If we found that Phone Number in Db we get Id and just store it inside relation StaffPhoneNumbers Table.
             if (isPhoneNumberExistingInDb)
             {
-                List<PhoneNumberModel> phoneNumberList = await _staffDataProcessor.GetPhoneNumberAsync(phoneNumber);
-                await _staffDataProcessor.SavePhoneNumberLinkAsync(staffId, phoneNumberList.First().Id);
+                int phoneNumberId = await _staffDataProcessor.GetPhoneNumberIdAsync(phoneNumber);
+                await _staffDataProcessor.SavePhoneNumberLinkAsync(staffId, phoneNumberId);
             }
             // If its new Phone Number we add it first to PhoneNumbers Table and after we create relation.
             else
@@ -189,7 +189,7 @@ public class StaffSqliteData : IStaffData
     public async Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAndApprovedAsync(int departmentId,
                                                                                  ApprovedType approvedType)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllBasicByDepartmentAndApproved.sql");
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllByDepartmentAndApproved.sql");
         return await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
                                                                  new { departmentId, isApproved = approvedType == ApprovedType.Approved ? true : false },
                                                                  _connectionStringName);
@@ -202,7 +202,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Staff Basic Info.</returns>
     public async Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAsync(int departmentId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllBasicByDepartment.sql");
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllByDepartment.sql");
         return await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
                                                                  new { departmentId },
                                                                  _connectionStringName);
@@ -242,7 +242,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Staff Basic Info.</returns>
     public async Task<StaffFullModel> GetStaffByEmailAsync(string emailAddress)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicByEmail.sql");
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetByEmail.sql");
         List<StaffFullModel> output = await _db.LoadDataAsync<StaffFullModel, dynamic>(sql,
                                                                                        new { emailAddress },
                                                                                        _connectionStringName);

@@ -57,7 +57,7 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns></returns>
     public async Task<bool> CheckPhoneNumberAsync(PhoneNumberModel phoneNumber)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_CheckPhoneNumber.sql");
+        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_Check.sql");
         List<bool> output = await _db.LoadDataAsync<bool, dynamic>(
             sql,
             new { phoneNumber = phoneNumber.PhoneNumber },
@@ -71,13 +71,14 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// </summary>
     /// <param name="phoneNumber"></param>
     /// <returns></returns>
-    public async Task<List<PhoneNumberModel>> GetPhoneNumberAsync(PhoneNumberModel phoneNumber)
+    public async Task<int> GetPhoneNumberIdAsync(PhoneNumberModel phoneNumber)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_GetPhoneNumber.sql");
-        return await _db.LoadDataAsync<PhoneNumberModel, dynamic>(
+        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_GetIdByPhoneNumber.sql");
+        List<int> output = await _db.LoadDataAsync<int, dynamic>(
             sql,
             new { phoneNumber = phoneNumber.PhoneNumber },
             _connectionStringName);
+        return output.FirstOrDefault();
     }
 
     /// <summary>

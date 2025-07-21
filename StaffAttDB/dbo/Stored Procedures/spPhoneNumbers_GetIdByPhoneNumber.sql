@@ -1,10 +1,10 @@
-﻿CREATE PROCEDURE [dbo].[spPhoneNumbers_GetPhoneNumber]
+﻿CREATE PROCEDURE [dbo].[spPhoneNumbers_GetIdByPhoneNumber]
 	@phoneNumber nvarchar(50)	
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT Id, PhoneNumber 
+	SELECT Id
 	FROM dbo.PhoneNumbers 
 	WHERE PhoneNumber = @phoneNumber;
 END

@@ -60,7 +60,7 @@ public class StaffDataProcessor : IStaffDataProcessor
     public async Task<bool> CheckPhoneNumberAsync(PhoneNumberModel phoneNumber)
     {
         List<bool> output = await _db.LoadDataAsync<bool, dynamic>(
-            "spPhoneNumbers_CheckPhoneNumber",
+            "spPhoneNumbers_Check",
             new { phoneNumber = phoneNumber.PhoneNumber },
             _connectionStringName);
 
@@ -68,16 +68,17 @@ public class StaffDataProcessor : IStaffDataProcessor
     }
 
     /// <summary>
-    /// Get PhoneNumber from DB.
+    /// Get PhoneNumber Id from DB by Phone Number.
     /// </summary>
     /// <param name="phoneNumber"></param>
     /// <returns></returns>
-    public async Task<List<PhoneNumberModel>> GetPhoneNumberAsync(PhoneNumberModel phoneNumber)
+    public async Task<int> GetPhoneNumberIdAsync(PhoneNumberModel phoneNumber)
     {
-        return await _db.LoadDataAsync<PhoneNumberModel, dynamic>(
-            "spPhoneNumbers_GetPhoneNumber",
+        List<int> output = await _db.LoadDataAsync<int, dynamic>(
+            "spPhoneNumbers_GetIdByPhoneNumber",
             new { phoneNumber = phoneNumber.PhoneNumber },
             _connectionStringName);
+        return output.FirstOrDefault();
     }
 
     /// <summary>

@@ -146,7 +146,7 @@ public class StaffDataTests
             }
         };
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
-                "spStaffs_GetAllBasicByDepartmentAndApproved",
+                "spStaffs_GetAllByDepartmentAndApproved",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(expectedStaffList);
@@ -176,7 +176,7 @@ public class StaffDataTests
             }
         };
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
-                "spStaffs_GetAllBasicByDepartment",
+                "spStaffs_GetAllByDepartment",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(expectedStaffList);
@@ -246,7 +246,7 @@ public class StaffDataTests
             Title = "IT"
         };
         _dbMock.Setup(db => db.LoadDataAsync<StaffFullModel, dynamic>(
-                "spStaffs_GetBasicByEmail",
+                "spStaffs_GetByEmail",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(new List<StaffFullModel> { expectedStaff });

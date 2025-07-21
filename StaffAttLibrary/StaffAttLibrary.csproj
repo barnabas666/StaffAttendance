@@ -25,7 +25,7 @@
     <None Remove="SqliteQueries\CheckIns_InsertCheckIn.sql" />
     <None Remove="SqliteQueries\CheckIns_InsertCheckOut.sql" />
     <None Remove="SqliteQueries\Departments_GetAll.sql" />
-    <None Remove="SqliteQueries\PhoneNumbers_CheckPhoneNumber.sql" />
+    <None Remove="SqliteQueries\PhoneNumbers_Check.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_Delete.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_GetByStaffId.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_GetPhoneNumber.sql" />
@@ -36,10 +36,7 @@
     <None Remove="SqliteQueries\Staffs_CheckByEmail.sql" />
     <None Remove="SqliteQueries\Staffs_Delete.sql" />
     <None Remove="SqliteQueries\Staffs_GetAllBasic.sql" />
-    <None Remove="SqliteQueries\Staffs_GetAllBasicByDepartment.sql" />
-    <None Remove="SqliteQueries\Staffs_GetAllBasicByDepartmentAndApproved.sql" />
     <None Remove="SqliteQueries\Staffs_GetBasicByAliasId.sql" />
-    <None Remove="SqliteQueries\Staffs_GetBasicByEmail.sql" />
     <None Remove="SqliteQueries\Staffs_GetBasicById.sql" />
     <None Remove="SqliteQueries\Staffs_GetById.sql" />
     <None Remove="SqliteQueries\Staffs_GetEmailById.sql" />
@@ -103,16 +100,13 @@
     <Content Include="SqliteQueries\Departments_GetAll.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\PhoneNumbers_CheckPhoneNumber.sql">
+    <Content Include="SqliteQueries\PhoneNumbers_Check.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\PhoneNumbers_Delete.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\PhoneNumbers_GetByStaffId.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqliteQueries\PhoneNumbers_GetPhoneNumber.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\PhoneNumbers_Insert.sql">
@@ -136,16 +130,16 @@
     <Content Include="SqliteQueries\Staffs_GetAllBasic.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetAllBasicByDepartment.sql">
+    <Content Include="SqliteQueries\Staffs_GetAllByDepartment.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetAllBasicByDepartmentAndApproved.sql">
+    <Content Include="SqliteQueries\Staffs_GetAllByDepartmentAndApproved.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\Staffs_GetBasicByAliasId.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetBasicByEmail.sql">
+    <Content Include="SqliteQueries\Staffs_GetByEmail.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\Staffs_GetBasicById.sql">
