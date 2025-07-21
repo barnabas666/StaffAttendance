@@ -11,8 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 // "IdentityDb" is connectionString for Identity framework.
 var connectionString = builder.Configuration.GetConnectionString("IdentityDb") ?? 
     throw new InvalidOperationException("Connection string 'IdentityDb' not found.");
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(connectionString));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Register services for dependency injection according to the DbType specified in appsettings.json
@@ -87,13 +89,12 @@ app.MapControllerRoute(
     pattern: "{controller=Staff}/{action=Details}/{id?}");
 app.MapRazorPages();
 
-// scope is used to access Services which we configured above.
-// Seed the Identity Db with roles and accounts
-using (var scope = app.Services.CreateScope())
+async Task SeedRolesAndAdminAsync(IServiceProvider services)
 {
+    using var scope = services.CreateScope();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-    // Add roles if they don't exist
     var roles = new[] { "Administrator", "Member" };
 
     foreach (var role in roles)
@@ -103,22 +104,26 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
         }
     }
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
     string email = "admin@admin.com";
     string password = "Pwd.1111";
 
-    // Create admin user if it doesn't exist and assign it to the Administrator role
     if (await userManager.FindByEmailAsync(email) == null)
     {
         var adminUser = new IdentityUser
         {
             UserName = email,
-            Email = email
+            Email = email,
+            EmailConfirmed = true // Optional: Skip email confirmation for seeded user
         };
-        await userManager.CreateAsync(adminUser, password);
-        await userManager.AddToRoleAsync(adminUser, "Administrator");
+        var result = await userManager.CreateAsync(adminUser, password);
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "Administrator");
+        }
     }
 }
+
+await SeedRolesAndAdminAsync(app.Services);
 
 app.Run();
