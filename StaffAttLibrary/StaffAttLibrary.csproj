@@ -28,6 +28,7 @@
     <None Remove="SqliteQueries\PhoneNumbers_Check.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_Delete.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_GetByStaffId.sql" />
+    <None Remove="SqliteQueries\PhoneNumbers_GetIdByPhoneNumber.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_GetPhoneNumber.sql" />
     <None Remove="SqliteQueries\PhoneNumbers_Insert.sql" />
     <None Remove="SqliteQueries\StaffPhoneNumbers_Delete.sql" />
@@ -107,6 +108,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\PhoneNumbers_GetByStaffId.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqliteQueries\PhoneNumbers_GetIdByPhoneNumber.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqliteQueries\PhoneNumbers_Insert.sql">

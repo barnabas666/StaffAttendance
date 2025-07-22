@@ -89,6 +89,7 @@ app.MapControllerRoute(
     pattern: "{controller=Staff}/{action=Details}/{id?}");
 app.MapRazorPages();
 
+// Seed roles and admin user
 async Task SeedRolesAndAdminAsync(IServiceProvider services)
 {
     using var scope = services.CreateScope();

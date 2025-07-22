@@ -3,6 +3,7 @@ using Moq;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Db;
 using StaffAttLibrary.Enums;
+using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
 using System;
 using System.Collections.Generic;
@@ -11,17 +12,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Tests.Data;
-public class StaffServiceTests
+public class StaffSqliteServiceTests
 {
-    private readonly StaffService _sut;
-    private readonly Mock<ISqlDataAccess> _dbMock = new();
+    private readonly StaffSqliteService _sut;
+    private readonly Mock<ISqliteDataAccess> _dbMock = new();
     private readonly Mock<IStaffData> _staffDataMock = new();
     private readonly Mock<ICheckInData> _checkInDataMock = new();
     private readonly Mock<IConnectionStringData> _connectionStringMock = new();
 
-    public StaffServiceTests()
+    public StaffSqliteServiceTests()
     {
-        _sut = new StaffService(_dbMock.Object, _staffDataMock.Object, _checkInDataMock.Object, _connectionStringMock.Object);
+        _sut = new StaffSqliteService(_dbMock.Object, _staffDataMock.Object, _checkInDataMock.Object, _connectionStringMock.Object);
     }
 
     [Fact]
@@ -33,8 +34,9 @@ public class StaffServiceTests
             new DepartmentModel { Id = 1, Title = "IT", Description = "IT department." },
             new DepartmentModel { Id = 2, Title = "HR", Description = "Human resources department." }
         };
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Departments_GetAll.sql");
         _dbMock.Setup(db => db.LoadDataAsync<DepartmentModel, dynamic>(
-                "spDepartments_GetAll", It.IsAny<object>(), It.IsAny<string>()))
+                sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(expectedDepartments);
         // Act
         var result = await _sut.GetAllDepartmentsAsync();
@@ -49,8 +51,9 @@ public class StaffServiceTests
         string alias = "JDO1";
         string pIN = "1234";
         var expectedAlias = new AliasModel { Id = 1, Alias = alias };
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_GetByAliasAndPIN.sql");
         _dbMock.Setup(db => db.LoadDataAsync<AliasModel, dynamic>(
-                "spAliases_GetByAliasAndPIN", It.IsAny<object>(), It.IsAny<string>()))
+                sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<AliasModel> { expectedAlias });
         // Act
         var result = await _sut.AliasVerificationAsync(alias, pIN);
@@ -106,8 +109,9 @@ public class StaffServiceTests
                 Title = "IT"
             }
         };
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllBasic.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
-                "spStaffs_GetAllBasic", It.IsAny<object>(), It.IsAny<string>()))
+                sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(expectedStaffList);
         // Act
         var result = await _sut.GetAllBasicStaffAsync();
@@ -131,8 +135,9 @@ public class StaffServiceTests
             DepartmentId = 1,
             Title = "IT"
         };
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicById.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
-                "spStaffs_GetBasicById", It.IsAny<object>(), It.IsAny<string>()))
+                sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<StaffBasicModel> { expectedStaff });
         // Act
         var result = await _sut.GetBasicStaffByIdAsync(staffId);
@@ -155,8 +160,9 @@ public class StaffServiceTests
             DepartmentId = 1,
             Title = "IT"
         };
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicByAliasId.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
-                "spStaffs_GetBasicByAliasId", It.IsAny<object>(), It.IsAny<string>()))
+                sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<StaffBasicModel> { expectedStaff });
         // Act
         var result = await _sut.GetBasicStaffByAliasIdAsync(aliasId);
@@ -170,8 +176,9 @@ public class StaffServiceTests
         // Arrange
         int staffId = 1;
         string expectedEmail = "john.doe@johndoe.com";
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetEmailById.sql");
         _dbMock.Setup(db => db.LoadDataAsync<string, dynamic>(
-                "spStaffs_GetEmailById", It.IsAny<object>(), It.IsAny<string>()))
+                sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<string> { expectedEmail });
         // Act
         var result = await _sut.GetStaffEmailByIdAsync(staffId);
@@ -185,8 +192,9 @@ public class StaffServiceTests
         // Arrange
         string emailAddress = "john.doe@johndoe.com";
         bool expectedResult = true;
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_CheckByEmail.sql");
         _dbMock.Setup(db => db.LoadDataAsync<bool, dynamic>(
-                "spStaffs_CheckByEmail", It.IsAny<object>(), It.IsAny<string>()))
+                sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<bool> { expectedResult });
         // Act
         var result = await _sut.CheckStaffByEmailAsync(emailAddress);
@@ -200,12 +208,13 @@ public class StaffServiceTests
         int staffId = 1;
         int departmentId = 1;
         bool isApproved = true;
-        _dbMock.Setup(db => db.SaveDataAsync("spStaffs_UpdateByAdmin",
+        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_UpdateByAdmin.sql");
+        _dbMock.Setup(db => db.SaveDataAsync(sql,
                 It.IsAny<object>(), It.IsAny<string>()));
         // Act
         await _sut.UpdateStaffByAdminAsync(staffId, departmentId, isApproved);
         // Assert
-        _dbMock.Verify(db => db.SaveDataAsync("spStaffs_UpdateByAdmin",
+        _dbMock.Verify(db => db.SaveDataAsync(sql,
                 It.IsAny<object>(), It.IsAny<string>()), Times.Once);
     }
 }
