@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using StaffAtt.Web.Models;
 using StaffAtt.Web.Helpers;
+using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
-using System.Security.Claims;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -27,7 +25,7 @@ public class StaffController : Controller
     public StaffController(IStaffService staffService,
                            IUserService userService,
                            IUserContext userContext,
-                           IMapper mapper, 
+                           IMapper mapper,
                            IPhoneNumberParser phoneNumberParser,
                            IDepartmentSelectListService departmentService)
     {
@@ -48,7 +46,7 @@ public class StaffController : Controller
     public async Task<IActionResult> Create()
     {
         // Model to send to our View, populate it there and send model back.
-        StaffCreateViewModel model = new StaffCreateViewModel();        
+        StaffCreateViewModel model = new StaffCreateViewModel();
         model.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync(String.Empty);
 
         return View("Create", model);

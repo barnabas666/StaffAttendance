@@ -1,11 +1,6 @@
 ﻿using StaffAttLibrary.Db;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Data;
 public class StaffSqliteDataProcessor : IStaffDataProcessor

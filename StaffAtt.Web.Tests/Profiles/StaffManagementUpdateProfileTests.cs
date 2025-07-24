@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using StaffAtt.Web.Models;
-using StaffAttLibrary.Models;
 using FluentAssertions;
+using StaffAtt.Web.Models;
 using StaffAtt.Web.Profiles;
+using StaffAttLibrary.Models;
 
 namespace StaffAtt.Web.Tests.Profiles;
 public class StaffManagementUpdateProfileTests
@@ -13,7 +13,7 @@ public class StaffManagementUpdateProfileTests
         // Arrange
         var config = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<StaffManagementUpdateProfile>();            
+            cfg.AddProfile<StaffManagementUpdateProfile>();
         });
         var mapper = config.CreateMapper();
         var staffBasicModel = new StaffBasicModel

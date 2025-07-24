@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using StaffAttLibrary.Models;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace StaffAtt.Web.Models;

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using StaffAttLibrary.Models;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,7 +12,7 @@ public class CheckInDisplayAdminViewModel
     /// <summary>
     /// List of CheckIns.
     /// </summary>
-    public List<CheckInFullViewModel> CheckIns {  get; set; } = new List<CheckInFullViewModel>();
+    public List<CheckInFullViewModel> CheckIns { get; set; } = new List<CheckInFullViewModel>();
 
     /// <summary>
     /// List of Staff.

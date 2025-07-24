@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace StaffAttLibrary.Models;
+﻿namespace StaffAttLibrary.Models;
 
 /// <summary>
 /// Hold PhoneNumber data. Properties Matchup with PhoneNumbers Table from our database.
@@ -31,7 +25,7 @@ public class PhoneNumberModel
     }
 
     public override int GetHashCode()
-    {        
+    {
         return PhoneNumber.GetHashCode();
     }
 }

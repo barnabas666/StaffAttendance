@@ -6,6 +6,7 @@
 # App secrets
 StaffAtt.Web/appsettings.Development.json
 StaffAttSQLiteDB/StaffAttSQLite.db
+StaffAtt.Web/app.db
 
 # User-specific files
 *.rsuser

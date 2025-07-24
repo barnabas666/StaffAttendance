@@ -6,7 +6,7 @@ namespace StaffAtt.Web.Models;
 /// <summary>
 /// Staff Model for Details Action View.
 /// </summary>
-public class StaffDetailsViewModel 
+public class StaffDetailsViewModel
 {
     /// <summary>
     /// Staff's Basic Info. 

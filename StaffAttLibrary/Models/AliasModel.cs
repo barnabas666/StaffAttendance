@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace StaffAttLibrary.Models;
+﻿namespace StaffAttLibrary.Models;
 
 /// <summary>
 /// Hold Alias data. Properties Matchup with Aliases Table from our database, not showing PIN.

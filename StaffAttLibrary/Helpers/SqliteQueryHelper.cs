@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace StaffAttLibrary.Helpers;
+﻿namespace StaffAttLibrary.Helpers;
 public static class SqliteQueryHelper
 {
     /// <summary>

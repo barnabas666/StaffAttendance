@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using StaffAtt.Web.Models;
-using StaffAttLibrary.Models;
 using FluentAssertions;
+using StaffAtt.Web.Models;
 using StaffAtt.Web.Profiles;
+using StaffAttLibrary.Models;
 
 namespace StaffAtt.Web.Tests.Profiles;
 public class StaffBasicProfileTests

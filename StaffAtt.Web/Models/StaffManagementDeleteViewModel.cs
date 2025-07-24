@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace StaffAtt.Web.Models;
+﻿namespace StaffAtt.Web.Models;
 
 /// <summary>
 /// View Model for Delete Action in Staff Management Controller.

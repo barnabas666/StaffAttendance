@@ -1,14 +1,6 @@
 ﻿using StaffAttLibrary.Db;
 using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Data;
 
@@ -71,7 +63,7 @@ public class StaffService : IStaffService
                                  string lastName,
                                  string emailAddress,
                                  List<PhoneNumberModel> phoneNumbers)
-    {        
+    {
         int addressId = await _staffData.SaveAddressAsync(address);
         int aliasId = await _staffData.CreateAliasAsync(pIN, firstName, lastName);
         int staffId = await _staffData.SaveStaffAsync(departmentId,
@@ -79,7 +71,7 @@ public class StaffService : IStaffService
                                                       lastName,
                                                       emailAddress,
                                                       addressId,
-                                                      aliasId);                
+                                                      aliasId);
         await _staffData.CreatePhoneNumbersAsync(staffId, phoneNumbers);
     }
 

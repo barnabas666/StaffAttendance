@@ -1,5 +1,4 @@
-﻿using StaffAttLibrary.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace StaffAtt.Web.Models;
 

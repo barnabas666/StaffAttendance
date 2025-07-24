@@ -34,7 +34,7 @@ public class StaffCreateViewModel
     /// <summary>
     /// Department data for our DropDown control - Get action
     /// </summary>
-    [Display(Name = "Your Department: ")]    
+    [Display(Name = "Your Department: ")]
     public SelectList? DepartmentItems { get; set; }
 
     /// <summary>

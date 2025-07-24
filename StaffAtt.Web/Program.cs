@@ -9,7 +9,7 @@ using StaffAttLibrary.Db;
 var builder = WebApplication.CreateBuilder(args);
 
 // "IdentityDb" is connectionString for Identity framework.
-var connectionString = builder.Configuration.GetConnectionString("IdentityDb") ?? 
+var connectionString = builder.Configuration.GetConnectionString("IdentityDb") ??
     throw new InvalidOperationException("Connection string 'IdentityDb' not found.");
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //    options.UseSqlServer(connectionString));

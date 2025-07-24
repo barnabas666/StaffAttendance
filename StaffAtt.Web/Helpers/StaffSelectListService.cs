@@ -33,7 +33,7 @@ public class StaffSelectListService : IStaffSelectListService
             dateDisplayModel.StaffList.Insert(0, new StaffBasicViewModel()
             {
                 Id = 0,
-                FirstName = defaultValue                
+                FirstName = defaultValue
             });
         }
 

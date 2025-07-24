@@ -1,6 +1,4 @@
-﻿using StaffAttLibrary.Models;
-
-namespace StaffAttLibrary.Data;
+﻿namespace StaffAttLibrary.Data;
 
 public interface ICheckInData
 {

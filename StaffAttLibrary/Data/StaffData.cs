@@ -1,11 +1,6 @@
 ﻿using StaffAttLibrary.Db;
 using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Data;
 
@@ -46,7 +41,7 @@ public class StaffData : IStaffData
                                       string emailAddress,
                                       int addressId,
                                       int aliasId)
-    {        
+    {
         return await _db.SaveDataGetIdAsync("spStaffs_Insert",
                                               new
                                               {
@@ -111,7 +106,7 @@ public class StaffData : IStaffData
     /// <param name="phoneNumbers">Phone Numbers.</param>
     /// <returns></returns>
     public async Task CreatePhoneNumbersAsync(int staffId, List<PhoneNumberModel> phoneNumbers)
-    {        
+    {
         foreach (PhoneNumberModel phoneNumber in phoneNumbers)
         {
             // Check if given Phone Number is already in Db (some Staff can share it because they live together).
@@ -140,7 +135,7 @@ public class StaffData : IStaffData
     /// <param name="staff"></param>
     /// <returns></returns>
     public async Task UpdateStaffAsync(string firstName, string lastName, int staffId)
-    {        
+    {
         await _db.SaveDataAsync("spStaffs_Update",
                            new { id = staffId, firstName, lastName, isApproved = false },
                            _connectionStringName);
@@ -153,7 +148,7 @@ public class StaffData : IStaffData
     /// <param name="staff"></param>
     /// <returns></returns>
     public async Task UpdateAliasAsync(string pIN, int aliasId)
-    {        
+    {
         await _db.SaveDataAsync("spAliases_Update",
                            new { id = aliasId, pIN },
                            _connectionStringName);
@@ -166,7 +161,7 @@ public class StaffData : IStaffData
     /// <param name="staff"></param>
     /// <returns></returns>
     public async Task UpdateAddressAsync(AddressModel address, int addressId)
-    {        
+    {
         await _db.SaveDataAsync("spAddresses_Update",
                            new
                            {

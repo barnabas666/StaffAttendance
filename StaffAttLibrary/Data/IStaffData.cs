@@ -5,7 +5,7 @@ using StaffAttLibrary.Models;
 namespace StaffAttLibrary.Data;
 
 public interface IStaffData
-{    
+{
     Task<int> CreateAliasAsync(string pIN, string firstName, string lastName);
     Task CreatePhoneNumbersAsync(int staffId, List<PhoneNumberModel> phoneNumbers);
     Task DeleteAddressAsync(int addressId);

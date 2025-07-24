@@ -1,7 +1,7 @@
-﻿using Moq;
-using FluentAssertions;
-using StaffAtt.Web.Helpers;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Moq;
+using StaffAtt.Web.Helpers;
 using System.Security.Claims;
 
 namespace StaffAtt.Web.Tests.Helpers;

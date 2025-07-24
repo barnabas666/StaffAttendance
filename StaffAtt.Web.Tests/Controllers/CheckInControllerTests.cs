@@ -1,17 +1,12 @@
 ﻿using AutoMapper;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using StaffAtt.Web.Controllers;
 using StaffAtt.Web.Helpers;
-using StaffAttLibrary.Data;
 using StaffAtt.Web.Models;
+using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
 namespace StaffAtt.Web.Tests.Controllers;
 public class CheckInControllerTests

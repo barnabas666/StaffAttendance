@@ -1,15 +1,10 @@
-﻿using StaffAttLibrary.Models;
-using Moq;
-using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StaffAttLibrary.Data;
-using StaffAtt.Web.Helpers;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Moq;
+using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
+using StaffAttLibrary.Data;
+using StaffAttLibrary.Models;
 
 namespace StaffAtt.Web.Tests.Helpers;
 public class StaffSelectListServiceTests

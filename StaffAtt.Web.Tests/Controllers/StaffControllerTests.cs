@@ -1,14 +1,14 @@
-﻿using FluentAssertions;
-using AutoMapper;
+﻿using AutoMapper;
+using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
 using StaffAtt.Web.Controllers;
+using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
-using StaffAtt.Web.Helpers;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace StaffAtt.Web.Tests.Controllers;
 public class StaffControllerTests

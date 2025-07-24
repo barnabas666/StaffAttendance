@@ -23,4 +23,14 @@
   <ItemGroup>
     <ProjectReference Include="..\StaffAttLibrary\StaffAttLibrary.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\downloads\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\downloads\DesktopApp.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

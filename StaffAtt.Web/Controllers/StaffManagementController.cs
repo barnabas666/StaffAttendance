@@ -2,12 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
 
 namespace StaffAtt.Web.Controllers;
@@ -46,7 +43,7 @@ public class StaffManagementController : Controller
         StaffManagementListViewModel staffModel = new StaffManagementListViewModel();
         List<StaffBasicModel> staffs = await _staffService.GetAllBasicStaffAsync();
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
-        
+
         staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
 
         return View("List", staffModel);

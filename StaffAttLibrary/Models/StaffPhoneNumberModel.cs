@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace StaffAttLibrary.Models;
+﻿namespace StaffAttLibrary.Models;
 
 /// <summary>
 /// Hold Staff-PhoneNumber's data. Properties Matchup with StaffPhoneNumbers Table from our database.

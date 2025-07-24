@@ -1,13 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Db;
 public class SqliteDataAccess : ISqliteDataAccess
@@ -36,12 +30,12 @@ public class SqliteDataAccess : ISqliteDataAccess
     public async Task<List<T>> LoadDataAsync<T, U>(string sqlStatement, U parameters, string connectionStringName)
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
-        
+
         //// Debug logging
         //string dbPath = new SQLiteConnectionStringBuilder(connectionString).DataSource;
         //System.Diagnostics.Debug.WriteLine($"Attempting to connect to SQLite DB at: {dbPath}");
         //System.Diagnostics.Debug.WriteLine($"Full connection string: {connectionString}");
-        
+
         //// Verify file exists
         //if (!File.Exists(dbPath))
         //{

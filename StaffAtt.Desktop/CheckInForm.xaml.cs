@@ -1,18 +1,6 @@
 ﻿using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace StaffAtt.Desktop;
 
@@ -71,7 +59,7 @@ public partial class CheckInForm : Window
             return;
         }
 
-        checkInButton.Content = IsNextCheckIn() ? "Check-In" : "Check-Out";  
+        checkInButton.Content = IsNextCheckIn() ? "Check-In" : "Check-Out";
     }
 
     /// <summary>

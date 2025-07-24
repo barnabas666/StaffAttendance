@@ -2,13 +2,6 @@
 using Moq;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Db;
-using StaffAttLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Formats.Asn1;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Tests.Data;
 public class CheckInDataTests
@@ -61,7 +54,7 @@ public class CheckInDataTests
         int staffId = 1;
         _dbMock.Setup(db => db.SaveDataAsync("spCheckIns_Delete",
                                               It.IsAny<object>(),
-                                              It.IsAny<string>()));            
+                                              It.IsAny<string>()));
         // Act
         await _sut.DeleteCheckInAsync(staffId);
         // Assert

@@ -1,8 +1,7 @@
-﻿using MimeKit;
-using MimeKit.Text;
-using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
+﻿using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using MimeKit;
+using MimeKit.Text;
 
 namespace StaffAtt.Web.Helpers;
 
@@ -40,7 +39,7 @@ public class EmailSender : IEmailSender
         {
             await smtp.ConnectAsync("smtp.gmail.com", 465, true);
             await smtp.AuthenticateAsync(senderEmail, password);
-            await smtp.SendAsync(message);            
+            await smtp.SendAsync(message);
         }
         catch { }
         finally

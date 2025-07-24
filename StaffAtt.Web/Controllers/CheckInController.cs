@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
-using System.Security.Claims;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -73,7 +71,7 @@ public class CheckInController : Controller
     [Authorize(Roles = "Administrator")]
     [HttpPost]
     public async Task<IActionResult> List(CheckInDisplayAdminViewModel dateDisplayModel)
-    {        
+    {
         List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
 
         if (dateDisplayModel.SelectedStaffId == "0")
@@ -92,7 +90,7 @@ public class CheckInController : Controller
 
         List<StaffBasicModel> basicStaff = await _staffService.GetAllBasicStaffAsync();
         dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
-                
+
         dateDisplayModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(dateDisplayModel,
                                                                                   "All Staff");
 
@@ -132,7 +130,7 @@ public class CheckInController : Controller
         List<CheckInFullModel> checkIns = await _checkInService.GetCheckInsByDateAndEmailAsync(userEmail,
                                                                              dateDisplayModel.StartDate,
                                                                              dateDisplayModel.EndDate);
-        dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns); 
+        dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
 
         return View("Display", dateDisplayModel);
     }

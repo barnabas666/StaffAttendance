@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace StaffAttLibrary.Enums
+﻿namespace StaffAttLibrary.Enums
 {
     /// <summary>
     /// Enum for Staff's Approved status.
