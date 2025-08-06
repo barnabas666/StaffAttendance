@@ -6,4 +6,5 @@ public class ConnectionStringData : IConnectionStringData
     /// </summary>
     public string SqlConnectionName { get; set; } = "Testing";
     public string SQLiteConnectionName { get; set; } = "SQLiteDb";
+    public string PostgresConnectionName { get; set; } = "PostgresDb";
 }

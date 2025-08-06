@@ -5,6 +5,7 @@
 
 # App secrets
 StaffAtt.Web/appsettings.Development.json
+StaffAtt.Desktop/appsettings.Development.json
 StaffAttSQLiteDB/StaffAttSQLite.db
 StaffAtt.Web/app.db
 

@@ -28,6 +28,12 @@ if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
     builder.Services.AddTransient<ICheckInData, CheckInSqliteData>();
     builder.Services.AddTransient<IStaffDataProcessor, StaffSqliteDataProcessor>();
 }
+else if (dbType.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddTransient<IPostgresDataAccess, PostgresDataAccess>();
+    // Register your Postgres-specific services here
+    // e.g. builder.Services.AddTransient<IStaffService, StaffPostgresService>();
+}
 else
 {
     builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();

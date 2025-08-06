@@ -31,23 +31,6 @@ public class SqliteDataAccess : ISqliteDataAccess
     {
         string connectionString = _config.GetConnectionString(connectionStringName);
 
-        //// Debug logging
-        //string dbPath = new SQLiteConnectionStringBuilder(connectionString).DataSource;
-        //System.Diagnostics.Debug.WriteLine($"Attempting to connect to SQLite DB at: {dbPath}");
-        //System.Diagnostics.Debug.WriteLine($"Full connection string: {connectionString}");
-
-        //// Verify file exists
-        //if (!File.Exists(dbPath))
-        //{
-        //    string absolutePath = Path.GetFullPath(dbPath);
-        //    throw new FileNotFoundException(
-        //        $"SQLite database file not found. Tried paths:\n" +
-        //        $"Relative: {dbPath}\n" +
-        //        $"Absolute: {absolutePath}\n" +
-        //        $"Current Directory: {Directory.GetCurrentDirectory()}"
-        //    );
-        //}
-
         using (IDbConnection connection = new SQLiteConnection(connectionString))
         {
             var rows = await connection.QueryAsync<T>(sqlStatement, parameters);

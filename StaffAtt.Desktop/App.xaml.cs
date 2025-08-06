@@ -30,14 +30,17 @@ public static class ServiceCollectionExtensions
 {
     public static void ConfigureServices(this IServiceCollection services)
     {
+        var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
+
         IConfiguration configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appSettings.json", false)
-                .Build();
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+            .Build();
 
         services.AddSingleton<IConfiguration>(configuration);
 
-        // Register services for dependency injection according to the DbType specified in appsettings.json
+        // Register services for dependency injection according to the DbType specified in config
         string dbType = configuration["DbType"] ?? "SQLite";
         if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
         {
@@ -47,6 +50,12 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<IStaffData, StaffSqliteData>();
             services.AddSingleton<ICheckInData, CheckInSqliteData>();
             services.AddSingleton<IStaffDataProcessor, StaffSqliteDataProcessor>();
+        }
+        else if (dbType.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddSingleton<IPostgresDataAccess, PostgresDataAccess>();
+            // Register your Postgres-specific services here
+            // e.g. services.AddSingleton<IStaffService, StaffPostgresService>();
         }
         else
         {
@@ -60,7 +69,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IConnectionStringData, ConnectionStringData>();
         services.AddTransient<MainWindow>();
-        services.AddTransient<CheckInForm>(); // cant be AddSingleton or after attempt to reopen this Window app crash
+        services.AddTransient<CheckInForm>();
     }
 }
 
