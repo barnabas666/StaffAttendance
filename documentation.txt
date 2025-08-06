@@ -1,0 +1,14 @@
+This solution is a staff management and attendance system built with .NET 8.0. It consists of:
+
+•	StaffAtt.Web: An ASP.NET Core MVC web application for staff registration, profile management, and administration. The web app uses two SQLite databases:
+•	Identity database for authentication and user management, located at StaffAtt.Web/appsettings.json (connection string).
+•	StaffAttSQLite database for attendance and staff data, located at StaffAttSQLiteDB/StaffAttSQLite.db (relative to solution root).
+The web app also provides a downloadable desktop application in StaffAtt.Web/wwwroot/downloads/DesktopApp.zip.
+•	StaffAtt.Desktop: A WPF desktop application for recording staff check-ins and check-outs. It shares the same StaffAttSQLite database (StaffAttSQLiteDB/StaffAttSQLite.db) with the web app, ensuring consistent attendance data across both platforms.
+•	StaffAttLibrary: A shared .NET 8.0 class library containing business logic and data access.
+•	For SQLite, it uses raw SQL queries stored in the SqliteQueries folder (StaffAttLibrary/SqliteQueries/).
+•	For SQL Server, it uses stored procedures and can connect to a prepared SQL database located in the StaffAttDB folder (StaffAttDB/), allowing easy migration from SQLite to SQL Server if needed.
+•	Unit Tests: The solution includes automated tests to verify business logic and data operations.
+
+Summary:
+The system enables staff registration, profile updates, and attendance tracking, with administrative features for managing staff and access rights. Both web and desktop apps share the same attendance database (hosted on cloud), and the solution is designed for flexibility in database backend and easy deployment to Azure.

@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.1" />
@@ -20,16 +24,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\StaffAttSQLiteDB\StaffAttSQLite.db">
+    <Content Include="..\StaffAttSQLiteDB\StaffAttSQLite.db">
       <Link>StaffAttSQLiteDB\StaffAttSQLite.db</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="appsettings.json">
+    </Content>
+    <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
+    <None Include="App.xaml" />
   </ItemGroup>
 
 </Project>

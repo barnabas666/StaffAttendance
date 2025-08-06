@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using StaffAtt.Web.Helpers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -124,8 +125,7 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email", EmailMessages.GetConfirmLinkMessage(callbackUrl));
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -146,6 +146,23 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
             // If we got this far, something failed, redisplay form
             return Page();
         }
+
+        //private string GetConfirmLinkMessage(string callbackUrl)
+        //{
+        //    string encodedUrl = HtmlEncoder.Default.Encode(callbackUrl);
+
+        //    string output = "<html>" +
+        //    "<head><style>p { margin-bottom: 16px; }</style></head>" +
+        //    "<body>" +
+        //    "<p>Thank you for registering for <strong>Polaris Staff Attendance system</strong>! We're excited to have you join us.</p>" +
+        //    "<p>Please confirm your account by <a href='" + encodedUrl + "'>clicking here</a>.</p>" +
+        //    "<p>We look forward to seeing you!</p>" +
+        //    "<p>Sincerely,<br/>Ginevra<br/>Staff Attendance Success Manager, Polaris</p>" +
+        //    "</body>" +
+        //    "</html>";
+
+        //    return output;
+        //}
 
         private IdentityUser CreateUser()
         {
