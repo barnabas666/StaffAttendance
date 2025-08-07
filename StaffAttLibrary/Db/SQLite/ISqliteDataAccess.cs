@@ -1,5 +1,4 @@
-﻿
-namespace StaffAttLibrary.Db;
+﻿namespace StaffAttLibrary.Db.SQLite;
 
 public interface ISqliteDataAccess
 {

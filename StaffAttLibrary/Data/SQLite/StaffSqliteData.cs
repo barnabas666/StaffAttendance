@@ -1,9 +1,9 @@
-﻿using StaffAttLibrary.Db;
+﻿using StaffAttLibrary.Db.SQLite;
 using StaffAttLibrary.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Data;
+namespace StaffAttLibrary.Data.SQLite;
 public class StaffSqliteData : IStaffData
 {
     private readonly ISqliteDataAccess _db;
@@ -38,7 +38,7 @@ public class StaffSqliteData : IStaffData
                                       int addressId,
                                       int aliasId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_Insert.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_Insert.sql");
         return await _db.SaveDataGetIdAsync(sql,
                                             new
                                             {
@@ -85,7 +85,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Address Id.</returns>
     public async Task<int> SaveAddressAsync(AddressModel address)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_Insert.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_Insert.sql");
         return await _db.SaveDataGetIdAsync(sql,
                                             new
                                             {
@@ -134,7 +134,7 @@ public class StaffSqliteData : IStaffData
     /// <returns></returns>
     public async Task UpdateStaffAsync(string firstName, string lastName, int staffId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_Update.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_Update.sql");
         await _db.SaveDataAsync(sql,
                                 new { id = staffId, firstName, lastName, isApproved = false },
                                 _connectionStringName);
@@ -148,7 +148,7 @@ public class StaffSqliteData : IStaffData
     /// <returns></returns>
     public async Task UpdateAliasAsync(string pIN, int aliasId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Update.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Aliases_Update.sql");
         await _db.SaveDataAsync(sql,
                                 new { id = aliasId, pIN },
                                 _connectionStringName);
@@ -162,7 +162,7 @@ public class StaffSqliteData : IStaffData
     /// <returns></returns>
     public async Task UpdateAddressAsync(AddressModel address, int addressId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_Update.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_Update.sql");
         await _db.SaveDataAsync(sql,
                                 new
                                 {
@@ -184,7 +184,7 @@ public class StaffSqliteData : IStaffData
     public async Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAndApprovedAsync(int departmentId,
                                                                                  ApprovedType approvedType)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllByDepartmentAndApproved.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetAllByDepartmentAndApproved.sql");
         return await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
                                                                  new { departmentId, isApproved = approvedType == ApprovedType.Approved ? true : false },
                                                                  _connectionStringName);
@@ -197,7 +197,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Staff Basic Info.</returns>
     public async Task<List<StaffBasicModel>> GetAllBasicStaffByDepartmentAsync(int departmentId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllByDepartment.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetAllByDepartment.sql");
         return await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
                                                                  new { departmentId },
                                                                  _connectionStringName);
@@ -210,7 +210,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Collection of Phone Number Info.</returns>
     public async Task<List<PhoneNumberModel>> GetPhoneNumbersByStaffIdAsync(int staffId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_GetByStaffId.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("PhoneNumbers_GetByStaffId.sql");
         return await _db.LoadDataAsync<PhoneNumberModel, dynamic>(sql,
                                                                   new { staffId },
                                                                   _connectionStringName);
@@ -223,7 +223,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Email Address Info.</returns>
     public async Task<AddressModel> GetAddressByEmailAsync(string emailAddress)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_GetByEmail.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_GetByEmail.sql");
         List<AddressModel> output = await _db.LoadDataAsync<AddressModel, dynamic>(sql,
                                                                                    new { emailAddress },
                                                                                    _connectionStringName);
@@ -237,7 +237,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Staff Basic Info.</returns>
     public async Task<StaffFullModel> GetStaffByEmailAsync(string emailAddress)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetByEmail.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetByEmail.sql");
         List<StaffFullModel> output = await _db.LoadDataAsync<StaffFullModel, dynamic>(sql,
                                                                                        new { emailAddress },
                                                                                        _connectionStringName);
@@ -251,7 +251,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Address Info.</returns>
     public async Task<AddressModel> GetAddressByIdAsync(int id)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_GetById.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_GetById.sql");
         List<AddressModel> output = await _db.LoadDataAsync<AddressModel, dynamic>(sql,
                                                                                    new { id },
                                                                                    _connectionStringName);
@@ -265,7 +265,7 @@ public class StaffSqliteData : IStaffData
     /// <returns>Staff Info.</returns>
     public async Task<StaffFullModel> GetStaffByIdAsync(int id)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetById.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetById.sql");
         List<StaffFullModel> output = await _db.LoadDataAsync<StaffFullModel, dynamic>(sql,
                                                                                        new { id },
                                                                                        _connectionStringName);
@@ -279,7 +279,7 @@ public class StaffSqliteData : IStaffData
     /// <returns></returns>
     public async Task DeleteAliasAsync(int aliasId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Delete.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Aliases_Delete.sql");
         await _db.SaveDataAsync(sql, new { id = aliasId }, _connectionStringName);
     }
 
@@ -290,7 +290,7 @@ public class StaffSqliteData : IStaffData
     /// <returns></returns>
     public async Task DeleteAddressAsync(int addressId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_Delete.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_Delete.sql");
         await _db.SaveDataAsync(sql, new { id = addressId }, _connectionStringName);
     }
 
@@ -301,7 +301,7 @@ public class StaffSqliteData : IStaffData
     /// <returns></returns>
     public async Task DeleteStaffAsync(int staffId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_Delete.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_Delete.sql");
         await _db.SaveDataAsync(sql, new { staffId }, _connectionStringName);
     }
 

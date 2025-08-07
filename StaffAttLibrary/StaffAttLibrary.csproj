@@ -7,161 +7,161 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="SqliteQueries\Addresses_Delete.sql" />
-    <None Remove="SqliteQueries\Addresses_GetByEmail.sql" />
-    <None Remove="SqliteQueries\Addresses_GetById.sql" />
-    <None Remove="SqliteQueries\Addresses_Insert.sql" />
-    <None Remove="SqliteQueries\Addresses_Update.sql" />
-    <None Remove="SqliteQueries\Aliases_Check.sql" />
-    <None Remove="SqliteQueries\Aliases_Delete.sql" />
-    <None Remove="SqliteQueries\Aliases_GetByAliasAndPIN.sql" />
-    <None Remove="SqliteQueries\Aliases_Insert.sql" />
-    <None Remove="SqliteQueries\Aliases_Update.sql" />
-    <None Remove="SqliteQueries\CheckIns_Delete.sql" />
-    <None Remove="SqliteQueries\CheckIns_GetAllByDate.sql" />
-    <None Remove="SqliteQueries\CheckIns_GetByDateAndEmail.sql" />
-    <None Remove="SqliteQueries\CheckIns_GetByDateAndId.sql" />
-    <None Remove="SqliteQueries\CheckIns_GetLastRecord.sql" />
-    <None Remove="SqliteQueries\CheckIns_InsertCheckIn.sql" />
-    <None Remove="SqliteQueries\CheckIns_InsertCheckOut.sql" />
-    <None Remove="SqliteQueries\Departments_GetAll.sql" />
-    <None Remove="SqliteQueries\PhoneNumbers_Check.sql" />
-    <None Remove="SqliteQueries\PhoneNumbers_Delete.sql" />
-    <None Remove="SqliteQueries\PhoneNumbers_GetByStaffId.sql" />
-    <None Remove="SqliteQueries\PhoneNumbers_GetIdByPhoneNumber.sql" />
-    <None Remove="SqliteQueries\PhoneNumbers_GetPhoneNumber.sql" />
-    <None Remove="SqliteQueries\PhoneNumbers_Insert.sql" />
-    <None Remove="SqliteQueries\StaffPhoneNumbers_Delete.sql" />
-    <None Remove="SqliteQueries\StaffPhoneNumbers_GetByPhoneNumber.sql" />
-    <None Remove="SqliteQueries\StaffPhoneNumbers_Insert.sql" />
-    <None Remove="SqliteQueries\Staffs_CheckByEmail.sql" />
-    <None Remove="SqliteQueries\Staffs_Delete.sql" />
-    <None Remove="SqliteQueries\Staffs_GetAllBasic.sql" />
-    <None Remove="SqliteQueries\Staffs_GetBasicByAliasId.sql" />
-    <None Remove="SqliteQueries\Staffs_GetBasicById.sql" />
-    <None Remove="SqliteQueries\Staffs_GetById.sql" />
-    <None Remove="SqliteQueries\Staffs_GetEmailById.sql" />
-    <None Remove="SqliteQueries\Staffs_Insert.sql" />
-    <None Remove="SqliteQueries\Staffs_Update.sql" />
-    <None Remove="SqliteQueries\Staffs_UpdateByAdmin.sql" />
+    <None Remove="Queries\SQLite\Addresses_Delete.sql" />
+    <None Remove="Queries\SQLite\Addresses_GetByEmail.sql" />
+    <None Remove="Queries\SQLite\Addresses_GetById.sql" />
+    <None Remove="Queries\SQLite\Addresses_Insert.sql" />
+    <None Remove="Queries\SQLite\Addresses_Update.sql" />
+    <None Remove="Queries\SQLite\Aliases_Check.sql" />
+    <None Remove="Queries\SQLite\Aliases_Delete.sql" />
+    <None Remove="Queries\SQLite\Aliases_GetByAliasAndPIN.sql" />
+    <None Remove="Queries\SQLite\Aliases_Insert.sql" />
+    <None Remove="Queries\SQLite\Aliases_Update.sql" />
+    <None Remove="Queries\SQLite\CheckIns_Delete.sql" />
+    <None Remove="Queries\SQLite\CheckIns_GetAllByDate.sql" />
+    <None Remove="Queries\SQLite\CheckIns_GetByDateAndEmail.sql" />
+    <None Remove="Queries\SQLite\CheckIns_GetByDateAndId.sql" />
+    <None Remove="Queries\SQLite\CheckIns_GetLastRecord.sql" />
+    <None Remove="Queries\SQLite\CheckIns_InsertCheckIn.sql" />
+    <None Remove="Queries\SQLite\CheckIns_InsertCheckOut.sql" />
+    <None Remove="Queries\SQLite\Departments_GetAll.sql" />
+    <None Remove="Queries\SQLite\PhoneNumbers_Check.sql" />
+    <None Remove="Queries\SQLite\PhoneNumbers_Delete.sql" />
+    <None Remove="Queries\SQLite\PhoneNumbers_GetByStaffId.sql" />
+    <None Remove="Queries\SQLite\PhoneNumbers_GetIdByPhoneNumber.sql" />
+    <None Remove="Queries\SQLite\PhoneNumbers_GetPhoneNumber.sql" />
+    <None Remove="Queries\SQLite\PhoneNumbers_Insert.sql" />
+    <None Remove="Queries\SQLite\StaffPhoneNumbers_Delete.sql" />
+    <None Remove="Queries\SQLite\StaffPhoneNumbers_GetByPhoneNumber.sql" />
+    <None Remove="Queries\SQLite\StaffPhoneNumbers_Insert.sql" />
+    <None Remove="Queries\SQLite\Staffs_CheckByEmail.sql" />
+    <None Remove="Queries\SQLite\Staffs_Delete.sql" />
+    <None Remove="Queries\SQLite\Staffs_GetAllBasic.sql" />
+    <None Remove="Queries\SQLite\Staffs_GetBasicByAliasId.sql" />
+    <None Remove="Queries\SQLite\Staffs_GetBasicById.sql" />
+    <None Remove="Queries\SQLite\Staffs_GetById.sql" />
+    <None Remove="Queries\SQLite\Staffs_GetEmailById.sql" />
+    <None Remove="Queries\SQLite\Staffs_Insert.sql" />
+    <None Remove="Queries\SQLite\Staffs_Update.sql" />
+    <None Remove="Queries\SQLite\Staffs_UpdateByAdmin.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="SqliteQueries\Addresses_Delete.sql">
+    <Content Include="Queries\SQLite\Addresses_Delete.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Addresses_GetByEmail.sql">
+    <Content Include="Queries\SQLite\Addresses_GetByEmail.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Addresses_GetById.sql">
+    <Content Include="Queries\SQLite\Addresses_GetById.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Addresses_Insert.sql">
+    <Content Include="Queries\SQLite\Addresses_Insert.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Addresses_Update.sql">
+    <Content Include="Queries\SQLite\Addresses_Update.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Aliases_Check.sql">
+    <Content Include="Queries\SQLite\Aliases_Check.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Aliases_Delete.sql">
+    <Content Include="Queries\SQLite\Aliases_Delete.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Aliases_GetByAliasAndPIN.sql">
+    <Content Include="Queries\SQLite\Aliases_GetByAliasAndPIN.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Aliases_Insert.sql">
+    <Content Include="Queries\SQLite\Aliases_Insert.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Aliases_Update.sql">
+    <Content Include="Queries\SQLite\Aliases_Update.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\CheckIns_Delete.sql">
+    <Content Include="Queries\SQLite\CheckIns_Delete.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\CheckIns_GetAllByDate.sql">
+    <Content Include="Queries\SQLite\CheckIns_GetAllByDate.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\CheckIns_GetByDateAndEmail.sql">
+    <Content Include="Queries\SQLite\CheckIns_GetByDateAndEmail.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\CheckIns_GetByDateAndId.sql">
+    <Content Include="Queries\SQLite\CheckIns_GetByDateAndId.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\CheckIns_GetLastRecord.sql">
+    <Content Include="Queries\SQLite\CheckIns_GetLastRecord.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\CheckIns_InsertCheckIn.sql">
+    <Content Include="Queries\SQLite\CheckIns_InsertCheckIn.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\CheckIns_InsertCheckOut.sql">
+    <Content Include="Queries\SQLite\CheckIns_InsertCheckOut.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Departments_GetAll.sql">
+    <Content Include="Queries\SQLite\Departments_GetAll.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\PhoneNumbers_Check.sql">
+    <Content Include="Queries\SQLite\PhoneNumbers_Check.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\PhoneNumbers_Delete.sql">
+    <Content Include="Queries\SQLite\PhoneNumbers_Delete.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\PhoneNumbers_GetByStaffId.sql">
+    <Content Include="Queries\SQLite\PhoneNumbers_GetByStaffId.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\PhoneNumbers_GetIdByPhoneNumber.sql">
+    <Content Include="Queries\SQLite\PhoneNumbers_GetIdByPhoneNumber.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\PhoneNumbers_Insert.sql">
+    <Content Include="Queries\SQLite\PhoneNumbers_Insert.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\StaffPhoneNumbers_Delete.sql">
+    <Content Include="Queries\SQLite\StaffPhoneNumbers_Delete.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\StaffPhoneNumbers_GetByPhoneNumber.sql">
+    <Content Include="Queries\SQLite\StaffPhoneNumbers_GetByPhoneNumber.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\StaffPhoneNumbers_Insert.sql">
+    <Content Include="Queries\SQLite\StaffPhoneNumbers_Insert.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_CheckByEmail.sql">
+    <Content Include="Queries\SQLite\Staffs_CheckByEmail.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_Delete.sql">
+    <Content Include="Queries\SQLite\Staffs_Delete.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetAllBasic.sql">
+    <Content Include="Queries\SQLite\Staffs_GetAllBasic.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetAllByDepartment.sql">
+    <Content Include="Queries\SQLite\Staffs_GetAllByDepartment.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetAllByDepartmentAndApproved.sql">
+    <Content Include="Queries\SQLite\Staffs_GetAllByDepartmentAndApproved.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetBasicByAliasId.sql">
+    <Content Include="Queries\SQLite\Staffs_GetBasicByAliasId.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetByEmail.sql">
+    <Content Include="Queries\SQLite\Staffs_GetByEmail.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetBasicById.sql">
+    <Content Include="Queries\SQLite\Staffs_GetBasicById.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetById.sql">
+    <Content Include="Queries\SQLite\Staffs_GetById.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_GetEmailById.sql">
+    <Content Include="Queries\SQLite\Staffs_GetEmailById.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_Insert.sql">
+    <Content Include="Queries\SQLite\Staffs_Insert.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_Update.sql">
+    <Content Include="Queries\SQLite\Staffs_Update.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SqliteQueries\Staffs_UpdateByAdmin.sql">
+    <Content Include="Queries\SQLite\Staffs_UpdateByAdmin.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -173,6 +173,10 @@
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\PostgreSQL\" />
   </ItemGroup>
 
 </Project>

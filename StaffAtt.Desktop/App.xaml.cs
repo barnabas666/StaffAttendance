@@ -1,7 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
+using StaffAttLibrary.Data.SQL;
+using StaffAttLibrary.Data.SQLite;
+using StaffAttLibrary.Db.PostgreSQL;
+using StaffAttLibrary.Db.SQL;
+using StaffAttLibrary.Db.SQLite;
 using System.IO;
 using System.Windows;
 

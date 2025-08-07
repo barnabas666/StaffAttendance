@@ -1,11 +1,12 @@
 ﻿using FluentAssertions;
 using Moq;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
+using StaffAttLibrary.Data.SQL;
+using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Tests.Data;
+namespace StaffAttLibrary.Tests.Data.SQL;
 public class StaffDataTests
 {
     private readonly StaffData _sut;

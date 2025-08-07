@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Moq;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
+using StaffAttLibrary.Data.SQLite;
+using StaffAttLibrary.Db.SQLite;
 using StaffAttLibrary.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
@@ -30,7 +31,7 @@ public class StaffSqliteDataTests
         int addressId = 1;
         int aliasId = 1;
         int expectedId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_Insert.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_Insert.sql");
         _dbMock.Setup(db => db.SaveDataGetIdAsync(sql,
                                                   It.IsAny<object>(),
                                                   It.IsAny<string>()))
@@ -53,7 +54,7 @@ public class StaffSqliteDataTests
             State = "CA"
         };
         int expectedId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_Insert.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_Insert.sql");
         _dbMock.Setup(db => db.SaveDataGetIdAsync(sql,
                                                   It.IsAny<object>(),
                                                   It.IsAny<string>()))
@@ -71,7 +72,7 @@ public class StaffSqliteDataTests
         string firstName = "John";
         string lastName = "Doe";
         int staffId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_Update.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_Update.sql");
         _dbMock.Setup(db => db.SaveDataAsync(sql,
                                               It.IsAny<object>(),
                                               It.IsAny<string>()));
@@ -89,7 +90,7 @@ public class StaffSqliteDataTests
         // Arrange
         string pIN = "1234";
         int aliasId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Update.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Aliases_Update.sql");
         _dbMock.Setup(db => db.SaveDataAsync(sql,
                                               It.IsAny<object>(),
                                               It.IsAny<string>()));
@@ -113,7 +114,7 @@ public class StaffSqliteDataTests
             State = "CA"
         };
         int addressId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_Update.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_Update.sql");
         _dbMock.Setup(db => db.SaveDataAsync(sql,
                                               It.IsAny<object>(),
                                               It.IsAny<string>()));
@@ -145,7 +146,7 @@ public class StaffSqliteDataTests
                 Title = "IT"
             }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllByDepartmentAndApproved.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetAllByDepartmentAndApproved.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
                 sql,
                 It.IsAny<object>(),
@@ -176,7 +177,7 @@ public class StaffSqliteDataTests
                 Title = "IT"
             }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllByDepartment.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetAllByDepartment.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
                 sql,
                 It.IsAny<object>(),
@@ -197,7 +198,7 @@ public class StaffSqliteDataTests
         {
             new PhoneNumberModel { PhoneNumber = "1234567890" }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_GetByStaffId.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("PhoneNumbers_GetByStaffId.sql");
         _dbMock.Setup(db => db.LoadDataAsync<PhoneNumberModel, dynamic>(
                 sql,
                 It.IsAny<object>(),
@@ -221,7 +222,7 @@ public class StaffSqliteDataTests
             Zip = "12345",
             State = "CA"
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_GetByEmail.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_GetByEmail.sql");
         _dbMock.Setup(db => db.LoadDataAsync<AddressModel, dynamic>(
                 sql,
                 It.IsAny<object>(),
@@ -249,7 +250,7 @@ public class StaffSqliteDataTests
             DepartmentId = 1,
             Title = "IT"
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetByEmail.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetByEmail.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffFullModel, dynamic>(
                 sql,
                 It.IsAny<object>(),
@@ -273,7 +274,7 @@ public class StaffSqliteDataTests
             Zip = "12345",
             State = "CA"
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_GetById.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_GetById.sql");
         _dbMock.Setup(db => db.LoadDataAsync<AddressModel, dynamic>(
                 sql,
                 It.IsAny<object>(),
@@ -301,7 +302,7 @@ public class StaffSqliteDataTests
             DepartmentId = 1,
             Title = "IT"
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetById.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetById.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffFullModel, dynamic>(
                 sql,
                 It.IsAny<object>(),
@@ -318,7 +319,7 @@ public class StaffSqliteDataTests
     {
         // Arrange
         int aliasId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Delete.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Aliases_Delete.sql");
         _dbMock.Setup(db => db.SaveDataAsync(sql,
                                               It.IsAny<object>(),
                                               It.IsAny<string>()));
@@ -335,7 +336,7 @@ public class StaffSqliteDataTests
     {
         // Arrange
         int addressId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Addresses_Delete.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Addresses_Delete.sql");
         _dbMock.Setup(db => db.SaveDataAsync(sql,
                                               It.IsAny<object>(),
                                               It.IsAny<string>()));
@@ -352,7 +353,7 @@ public class StaffSqliteDataTests
     {
         // Arrange
         int staffId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_Delete.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_Delete.sql");
         _dbMock.Setup(db => db.SaveDataAsync(sql,
                                               It.IsAny<object>(),
                                               It.IsAny<string>()));

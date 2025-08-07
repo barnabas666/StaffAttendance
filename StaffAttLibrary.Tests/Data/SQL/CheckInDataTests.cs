@@ -1,18 +1,19 @@
 ﻿using FluentAssertions;
 using Moq;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
-using StaffAttLibrary.Helpers;
+using StaffAttLibrary.Data.SQL;
+using StaffAttLibrary.Db.SQL;
 
-namespace StaffAttLibrary.Tests.Data;
-public class CheckInSqliteDataTests
+namespace StaffAttLibrary.Tests.Data.SQL;
+public class CheckInDataTests
 {
-    private readonly CheckInSqliteData _sut;
-    private readonly Mock<ISqliteDataAccess> _dbMock = new();
+    private readonly CheckInData _sut;
+    private readonly Mock<ISqlDataAccess> _dbMock = new();
     private readonly Mock<IConnectionStringData> _connectionStringMock = new();
-    public CheckInSqliteDataTests()
+
+    public CheckInDataTests()
     {
-        _sut = new CheckInSqliteData(_dbMock.Object, _connectionStringMock.Object);
+        _sut = new CheckInData(_dbMock.Object, _connectionStringMock.Object);
     }
 
     [Fact]
@@ -21,8 +22,7 @@ public class CheckInSqliteDataTests
         // Arrange
         int staffId = 1;
         int expectedId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_InsertCheckIn.sql");
-        _dbMock.Setup(db => db.SaveDataGetIdAsync(sql,
+        _dbMock.Setup(db => db.SaveDataGetIdAsync("spCheckIns_InsertCheckIn",
                                                   It.IsAny<object>(),
                                                   It.IsAny<string>()))
             .ReturnsAsync(expectedId);
@@ -38,8 +38,7 @@ public class CheckInSqliteDataTests
         // Arrange
         int checkInId = 1;
         int expectedId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_InsertCheckOut.sql");
-        _dbMock.Setup(db => db.SaveDataGetIdAsync(sql,
+        _dbMock.Setup(db => db.SaveDataGetIdAsync("spCheckIns_InsertCheckOut",
                                                   It.IsAny<object>(),
                                                   It.IsAny<string>()))
             .ReturnsAsync(expectedId);
@@ -54,15 +53,14 @@ public class CheckInSqliteDataTests
     {
         // Arrange
         int staffId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_Delete.sql");
-        _dbMock.Setup(db => db.SaveDataAsync(sql,
-                                             It.IsAny<object>(),
-                                             It.IsAny<string>()));
+        _dbMock.Setup(db => db.SaveDataAsync("spCheckIns_Delete",
+                                              It.IsAny<object>(),
+                                              It.IsAny<string>()));
         // Act
         await _sut.DeleteCheckInAsync(staffId);
         // Assert
-        _dbMock.Verify(db => db.SaveDataAsync(sql,
-                                              It.IsAny<object>(),
-                                              It.IsAny<string>()), Times.Once);
+        _dbMock.Verify(db => db.SaveDataAsync("spCheckIns_Delete",
+                                               It.IsAny<object>(),
+                                               It.IsAny<string>()), Times.Once);
     }
 }

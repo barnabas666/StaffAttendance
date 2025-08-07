@@ -1,5 +1,4 @@
-﻿
-namespace StaffAttLibrary.Db;
+﻿namespace StaffAttLibrary.Db.PostgreSQL;
 
 public interface IPostgresDataAccess
 {

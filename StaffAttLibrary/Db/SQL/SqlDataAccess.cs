@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace StaffAttLibrary.Db;
+namespace StaffAttLibrary.Db.SQL;
 
 /// <summary>
 /// Class servicing SQL database connection, using Dapper.

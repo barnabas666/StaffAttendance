@@ -1,23 +1,19 @@
-﻿using StaffAttLibrary.Db;
+﻿using StaffAttLibrary.Db.SQLite;
+using StaffAttLibrary.Helpers;
 
-namespace StaffAttLibrary.Data;
-
-/// <summary>
-/// Class servicing Check-Ins - CRUD actions.
-/// CheckInService talks to this class. This class calls SqlDataAccess methods.
-/// </summary>
-public class CheckInData : ICheckInData
+namespace StaffAttLibrary.Data.SQLite;
+public class CheckInSqliteData : ICheckInData
 {
-    private readonly ISqlDataAccess _db;
+    private readonly ISqliteDataAccess _db;
     /// <summary>
     /// Holds default connection string name.
     /// </summary>
     private readonly string _connectionStringName;
 
-    public CheckInData(ISqlDataAccess db, IConnectionStringData connectionStringData)
+    public CheckInSqliteData(ISqliteDataAccess db, IConnectionStringData connectionStringData)
     {
         _db = db;
-        _connectionStringName = connectionStringData.SqlConnectionName;
+        _connectionStringName = connectionStringData.SQLiteConnectionName;
     }
 
     /// <summary>
@@ -27,9 +23,10 @@ public class CheckInData : ICheckInData
     /// <returns>CheckIn id.</returns>
     public async Task<int> CheckInPerformAsync(int staffId)
     {
-        return await _db.SaveDataGetIdAsync("spCheckIns_InsertCheckIn",
-                           new { staffId },
-                           _connectionStringName);
+        string sql = await QueryHelper.LoadSqliteQueryAsync("CheckIns_InsertCheckIn.sql");
+        return await _db.SaveDataGetIdAsync(sql,
+                                            new { staffId },
+                                            _connectionStringName);
     }
 
     /// <summary>
@@ -39,9 +36,10 @@ public class CheckInData : ICheckInData
     /// <returns>CheckOut id.</returns>
     public async Task<int> CheckOutPerformAsync(int checkInId)
     {
-        return await _db.SaveDataGetIdAsync("spCheckIns_InsertCheckOut",
-                           new { checkInId },
-                           _connectionStringName);
+        string sql = await QueryHelper.LoadSqliteQueryAsync("CheckIns_InsertCheckOut.sql");
+        return await _db.SaveDataGetIdAsync(sql,
+                                            new { checkInId },
+                                            _connectionStringName);
     }
 
     /// <summary>
@@ -53,6 +51,7 @@ public class CheckInData : ICheckInData
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task DeleteCheckInAsync(int staffId)
     {
-        await _db.SaveDataAsync("spCheckIns_Delete", new { staffId }, _connectionStringName);
+        string sql = await QueryHelper.LoadSqliteQueryAsync("CheckIns_Delete.sql");
+        await _db.SaveDataAsync(sql, new { staffId }, _connectionStringName);
     }
 }

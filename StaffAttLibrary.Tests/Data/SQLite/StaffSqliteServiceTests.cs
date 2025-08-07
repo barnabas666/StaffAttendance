@@ -1,12 +1,13 @@
 ﻿using FluentAssertions;
 using Moq;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
+using StaffAttLibrary.Data.SQLite;
+using StaffAttLibrary.Db.SQLite;
 using StaffAttLibrary.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Tests.Data;
+namespace StaffAttLibrary.Tests.Data.SQLite;
 public class StaffSqliteServiceTests
 {
     private readonly StaffSqliteService _sut;
@@ -29,7 +30,7 @@ public class StaffSqliteServiceTests
             new DepartmentModel { Id = 1, Title = "IT", Description = "IT department." },
             new DepartmentModel { Id = 2, Title = "HR", Description = "Human resources department." }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Departments_GetAll.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Departments_GetAll.sql");
         _dbMock.Setup(db => db.LoadDataAsync<DepartmentModel, dynamic>(
                 sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(expectedDepartments);
@@ -46,7 +47,7 @@ public class StaffSqliteServiceTests
         string alias = "JDO1";
         string pIN = "1234";
         var expectedAlias = new AliasModel { Id = 1, Alias = alias };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_GetByAliasAndPIN.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Aliases_GetByAliasAndPIN.sql");
         _dbMock.Setup(db => db.LoadDataAsync<AliasModel, dynamic>(
                 sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<AliasModel> { expectedAlias });
@@ -104,7 +105,7 @@ public class StaffSqliteServiceTests
                 Title = "IT"
             }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllBasic.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetAllBasic.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
                 sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(expectedStaffList);
@@ -130,7 +131,7 @@ public class StaffSqliteServiceTests
             DepartmentId = 1,
             Title = "IT"
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicById.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetBasicById.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
                 sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<StaffBasicModel> { expectedStaff });
@@ -155,7 +156,7 @@ public class StaffSqliteServiceTests
             DepartmentId = 1,
             Title = "IT"
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicByAliasId.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetBasicByAliasId.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffBasicModel, dynamic>(
                 sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<StaffBasicModel> { expectedStaff });
@@ -171,7 +172,7 @@ public class StaffSqliteServiceTests
         // Arrange
         int staffId = 1;
         string expectedEmail = "john.doe@johndoe.com";
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetEmailById.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_GetEmailById.sql");
         _dbMock.Setup(db => db.LoadDataAsync<string, dynamic>(
                 sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<string> { expectedEmail });
@@ -187,7 +188,7 @@ public class StaffSqliteServiceTests
         // Arrange
         string emailAddress = "john.doe@johndoe.com";
         bool expectedResult = true;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_CheckByEmail.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_CheckByEmail.sql");
         _dbMock.Setup(db => db.LoadDataAsync<bool, dynamic>(
                 sql, It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<bool> { expectedResult });
@@ -203,7 +204,7 @@ public class StaffSqliteServiceTests
         int staffId = 1;
         int departmentId = 1;
         bool isApproved = true;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_UpdateByAdmin.sql");
+        string sql = await QueryHelper.LoadSqliteQueryAsync("Staffs_UpdateByAdmin.sql");
         _dbMock.Setup(db => db.SaveDataAsync(sql,
                 It.IsAny<object>(), It.IsAny<string>()));
         // Act

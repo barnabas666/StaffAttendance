@@ -1,12 +1,19 @@
-﻿using StaffAttLibrary.Db;
+﻿using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Enums;
-using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Data;
-public class StaffSqliteService : IStaffService
+namespace StaffAttLibrary.Data.SQL;
+
+/// <summary>
+/// Class servicing Staffs - CRUD actions.
+/// UIs (MVC, WPF) talk to this class. This class calls StaffData class and SqlDataAccess methods.
+/// </summary>
+public class StaffService : IStaffService
 {
-    private readonly ISqliteDataAccess _db;
+    /// <summary>
+    /// Servicing SQL database connection.
+    /// </summary>
+    private readonly ISqlDataAccess _db;
     private readonly IStaffData _staffData;
     private readonly ICheckInData _checkInData;
 
@@ -15,12 +22,16 @@ public class StaffSqliteService : IStaffService
     /// </summary>
     private readonly string _connectionStringName;
 
-    public StaffSqliteService(ISqliteDataAccess db, IStaffData staffData, ICheckInData checkInData, IConnectionStringData connectionStringData)
+    /// <summary>
+    /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
+    /// </summary>
+    /// <param name="db">Servicing SQL database connection.</param>
+    public StaffService(ISqlDataAccess db, IStaffData staffData, ICheckInData checkInData, IConnectionStringData connectionStringData)
     {
         _db = db;
         _staffData = staffData;
         _checkInData = checkInData;
-        _connectionStringName = connectionStringData.SQLiteConnectionName;
+        _connectionStringName = connectionStringData.SqlConnectionName;
     }
 
     /// <summary>
@@ -29,11 +40,9 @@ public class StaffSqliteService : IStaffService
     /// <returns>Collection of DepartmentModel.</returns>
     public async Task<List<DepartmentModel>> GetAllDepartmentsAsync()
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Departments_GetAll.sql");
-
-        return await _db.LoadDataAsync<DepartmentModel, dynamic>(sql,
-                                                                 new { },
-                                                                 _connectionStringName);
+        return await _db.LoadDataAsync<DepartmentModel, dynamic>("spDepartments_GetAll",
+                                                            new { },
+                                                            _connectionStringName);
     }
 
     /// <summary>
@@ -108,11 +117,10 @@ public class StaffSqliteService : IStaffService
     /// <returns>Correct: Alias info. False: null</returns>
     public async Task<AliasModel> AliasVerificationAsync(string alias, string pIN)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_GetByAliasAndPIN.sql");
+        List<AliasModel> output = await _db.LoadDataAsync<AliasModel, dynamic>("spAliases_GetByAliasAndPIN",
+                                                                          new { alias, pIN },
+                                                                          _connectionStringName);
 
-        List<AliasModel> output = await _db.LoadDataAsync<AliasModel, dynamic>(sql,
-                                                                               new { alias, pIN },
-                                                                               _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -139,11 +147,9 @@ public class StaffSqliteService : IStaffService
     /// <returns>Collection of Basic Staff Info.</returns>
     public async Task<List<StaffBasicModel>> GetAllBasicStaffAsync()
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetAllBasic.sql");
-
-        return await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
-                                                                 new { },
-                                                                 _connectionStringName);
+        return await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetAllBasic",
+                                                                                    new { },
+                                                                                    _connectionStringName);
     }
 
     /// <summary>
@@ -181,11 +187,9 @@ public class StaffSqliteService : IStaffService
     /// <returns>Basic Staff info.</returns>
     public async Task<StaffBasicModel> GetBasicStaffByIdAsync(int id)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicById.sql");
-
-        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
-                                                                                         new { id },
-                                                                                         _connectionStringName);
+        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetBasicById",
+                                                                            new { id },
+                                                                            _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -196,11 +200,9 @@ public class StaffSqliteService : IStaffService
     /// <returns>Basic Staff info.</returns>
     public async Task<StaffBasicModel> GetBasicStaffByAliasIdAsync(int aliasId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetBasicByAliasId.sql");
-
-        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>(sql,
-                                                                                         new { aliasId },
-                                                                                         _connectionStringName);
+        List<StaffBasicModel> output = await _db.LoadDataAsync<StaffBasicModel, dynamic>("spStaffs_GetBasicByAliasId",
+                                                                            new { aliasId },
+                                                                            _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -214,11 +216,9 @@ public class StaffSqliteService : IStaffService
     /// langword="null"/>.</returns>
     public async Task<string> GetStaffEmailByIdAsync(int id)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_GetEmailById.sql");
-
-        List<string> output = await _db.LoadDataAsync<string, dynamic>(sql,
-                                                                       new { id },
-                                                                       _connectionStringName);
+        List<string> output = await _db.LoadDataAsync<string, dynamic>("spStaffs_GetEmailById",
+                                                                            new { id },
+                                                                            _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -229,11 +229,9 @@ public class StaffSqliteService : IStaffService
     /// <returns>True if Staff exists.</returns>
     public async Task<bool> CheckStaffByEmailAsync(string emailAddress)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_CheckByEmail.sql");
-
-        List<bool> output = await _db.LoadDataAsync<bool, dynamic>(sql,
-                                                                   new { emailAddress },
-                                                                   _connectionStringName);
+        List<bool> output = await _db.LoadDataAsync<bool, dynamic>("spStaffs_CheckByEmail",
+                                                                            new { emailAddress },
+                                                                            _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -245,11 +243,9 @@ public class StaffSqliteService : IStaffService
     /// <param name="isApproved">is Approved status</param>
     public async Task UpdateStaffByAdminAsync(int id, int departmentId, bool isApproved)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Staffs_UpdateByAdmin.sql");
-
-        await _db.SaveDataAsync(sql,
-                                new { id, departmentId, isApproved },
-                                _connectionStringName);
+        await _db.SaveDataAsync("spStaffs_UpdateByAdmin",
+                           new { id, departmentId, isApproved },
+                           _connectionStringName);
     }
 
     /// <summary>

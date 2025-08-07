@@ -1,20 +1,24 @@
-﻿using StaffAttLibrary.Db;
-using StaffAttLibrary.Helpers;
+﻿using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Data;
-public class StaffSqliteDataProcessor : IStaffDataProcessor
+namespace StaffAttLibrary.Data.SQL;
+
+/// <summary>
+/// Class servicing Staffs - CRUD actions.
+/// StaffData talks to this class. This class calls SqlDataAccess methods.
+/// </summary>
+public class StaffDataProcessor : IStaffDataProcessor
 {
-    private readonly ISqliteDataAccess _db;
+    private readonly ISqlDataAccess _db;
     /// <summary>
     /// Holds default connection string name.
     /// </summary>
     private readonly string _connectionStringName;
 
-    public StaffSqliteDataProcessor(ISqliteDataAccess db, IConnectionStringData connectionStringData)
+    public StaffDataProcessor(ISqlDataAccess db, IConnectionStringData connectionStringData)
     {
         _db = db;
-        _connectionStringName = connectionStringData.SQLiteConnectionName;
+        _connectionStringName = connectionStringData.SqlConnectionName;
     }
 
     /// <summary>
@@ -24,10 +28,9 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns></returns>
     public async Task<int> SavePhoneNumberAsync(PhoneNumberModel phoneNumber)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_Insert.sql");
-        int phoneNumberId = await _db.SaveDataGetIdAsync(sql,
-                                                         new { phoneNumber = phoneNumber.PhoneNumber },
-                                                         _connectionStringName);
+        int phoneNumberId = await _db.SaveDataGetIdAsync("spPhoneNumbers_Insert",
+                                                new { phoneNumber = phoneNumber.PhoneNumber },
+                                                _connectionStringName);
         return phoneNumberId;
     }
 
@@ -39,10 +42,9 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns></returns>
     public async Task SavePhoneNumberLinkAsync(int staffId, int phoneNumberId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("StaffPhoneNumbers_Insert.sql");
-        await _db.SaveDataAsync(sql,
-                                new { staffId, phoneNumberId },
-                                _connectionStringName);
+        await _db.SaveDataAsync("spStaffPhoneNumbers_Insert",
+                           new { staffId, phoneNumberId },
+                           _connectionStringName);
     }
 
     /// <summary>
@@ -52,9 +54,8 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns></returns>
     public async Task<bool> CheckPhoneNumberAsync(PhoneNumberModel phoneNumber)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_Check.sql");
         List<bool> output = await _db.LoadDataAsync<bool, dynamic>(
-            sql,
+            "spPhoneNumbers_Check",
             new { phoneNumber = phoneNumber.PhoneNumber },
             _connectionStringName);
 
@@ -62,15 +63,14 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     }
 
     /// <summary>
-    /// Get PhoneNumber from DB.
+    /// Get PhoneNumber Id from DB by Phone Number.
     /// </summary>
     /// <param name="phoneNumber"></param>
     /// <returns></returns>
     public async Task<int> GetPhoneNumberIdAsync(PhoneNumberModel phoneNumber)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_GetIdByPhoneNumber.sql");
         List<int> output = await _db.LoadDataAsync<int, dynamic>(
-            sql,
+            "spPhoneNumbers_GetIdByPhoneNumber",
             new { phoneNumber = phoneNumber.PhoneNumber },
             _connectionStringName);
         return output.FirstOrDefault();
@@ -83,10 +83,9 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns></returns>
     public async Task DeletePhoneNumberAsync(int phoneNumberId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_Delete.sql");
-        await _db.SaveDataAsync(sql,
-                                new { phoneNumberId },
-                                _connectionStringName);
+        await _db.SaveDataAsync("spPhoneNumbers_Delete",
+                           new { phoneNumberId },
+                           _connectionStringName);
     }
 
     /// <summary>
@@ -97,10 +96,9 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns></returns>
     public async Task DeletePhoneNumberLinkAsync(int staffId, int phoneNumberId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("StaffPhoneNumbers_Delete.sql");
-        await _db.SaveDataAsync(sql,
-                                new { staffId, phoneNumberId },
-                                _connectionStringName);
+        await _db.SaveDataAsync("spStaffPhoneNumbers_Delete",
+                           new { staffId, phoneNumberId },
+                           _connectionStringName);
     }
 
     /// <summary>
@@ -110,10 +108,10 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns></returns>
     public async Task<List<StaffPhoneNumberModel>> GetPhoneNumberLinksAsync(int phoneNumberId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("StaffPhoneNumbers_GetByPhoneNumber.sql");
-        return await _db.LoadDataAsync<StaffPhoneNumberModel, dynamic>(sql,
-                                                                       new { phoneNumberId },
-                                                                       _connectionStringName);
+        return await _db.LoadDataAsync<StaffPhoneNumberModel, dynamic>(
+            "spStaffPhoneNumbers_GetByPhoneNumber",
+            new { phoneNumberId },
+            _connectionStringName);
     }
 
     /// <summary>
@@ -123,10 +121,9 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns>True if Alias already exists.</returns>
     public async Task<bool> CheckAliasAsync(string alias)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Check.sql");
-        List<bool> output = await _db.LoadDataAsync<bool, dynamic>(sql,
-                                                                   new { alias },
-                                                                   _connectionStringName);
+        List<bool> output = await _db.LoadDataAsync<bool, dynamic>("spAliases_Check",
+                                                      new { alias },
+                                                      _connectionStringName);
         return output.FirstOrDefault();
     }
 
@@ -138,10 +135,9 @@ public class StaffSqliteDataProcessor : IStaffDataProcessor
     /// <returns></returns>
     public async Task<int> SaveAliasAsync(string alias, string pIN)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Insert.sql");
-        return await _db.SaveDataGetIdAsync(sql,
-                                            new { alias, pIN },
-                                            _connectionStringName);
+        return await _db.SaveDataGetIdAsync("spAliases_Insert",
+                                          new { alias, pIN },
+                                          _connectionStringName);
     }
 
     /// <summary>

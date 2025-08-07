@@ -4,7 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using StaffAtt.Web.Data;
 using StaffAtt.Web.Helpers;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
+using StaffAttLibrary.Data.SQL;
+using StaffAttLibrary.Data.SQLite;
+using StaffAttLibrary.Db.PostgreSQL;
+using StaffAttLibrary.Db.SQL;
+using StaffAttLibrary.Db.SQLite;
 
 var builder = WebApplication.CreateBuilder(args);
 

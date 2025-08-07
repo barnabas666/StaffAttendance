@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StaffAttLibrary.Db;
+namespace StaffAttLibrary.Db.PostgreSQL;
 
 public class PostgresDataAccess : IPostgresDataAccess
 {

@@ -1,20 +1,20 @@
 ﻿using FluentAssertions;
 using Moq;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
-using StaffAttLibrary.Helpers;
+using StaffAttLibrary.Data.SQL;
+using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Tests.Data;
-public class StaffSqliteDataProcessorTests
+namespace StaffAttLibrary.Tests.Data.SQL;
+public class StaffDataProcessorTests
 {
-    private readonly StaffSqliteDataProcessor _sut;
-    private readonly Mock<ISqliteDataAccess> _dbMock = new();
+    private readonly StaffDataProcessor _sut;
+    private readonly Mock<ISqlDataAccess> _dbMock = new();
     private readonly Mock<IConnectionStringData> _connectionStringMock = new();
 
-    public StaffSqliteDataProcessorTests()
+    public StaffDataProcessorTests()
     {
-        _sut = new StaffSqliteDataProcessor(_dbMock.Object, _connectionStringMock.Object);
+        _sut = new StaffDataProcessor(_dbMock.Object, _connectionStringMock.Object);
     }
 
     [Fact]
@@ -23,8 +23,7 @@ public class StaffSqliteDataProcessorTests
         // Arrange
         var phoneNumber = new PhoneNumberModel { PhoneNumber = "1234567890" };
         int expectedId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_Insert.sql");
-        _dbMock.Setup(db => db.SaveDataGetIdAsync(sql,
+        _dbMock.Setup(db => db.SaveDataGetIdAsync("spPhoneNumbers_Insert",
                                                   It.IsAny<object>(),
                                                   It.IsAny<string>()))
             .ReturnsAsync(expectedId);
@@ -40,16 +39,15 @@ public class StaffSqliteDataProcessorTests
         // Arrange
         int staffId = 1;
         int phoneNumberId = 2;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("StaffPhoneNumbers_Insert.sql");
-        _dbMock.Setup(db => db.SaveDataAsync(sql,
-                                             It.IsAny<object>(),
-                                             It.IsAny<string>()));
+        _dbMock.Setup(db => db.SaveDataAsync("spStaffPhoneNumbers_Insert",
+                                              It.IsAny<object>(),
+                                              It.IsAny<string>()));
         // Act
         await _sut.SavePhoneNumberLinkAsync(staffId, phoneNumberId);
         // Assert
-        _dbMock.Verify(db => db.SaveDataAsync(sql,
-                                              It.IsAny<object>(),
-                                              It.IsAny<string>()), Times.Once);
+        _dbMock.Verify(db => db.SaveDataAsync("spStaffPhoneNumbers_Insert",
+                                               It.IsAny<object>(),
+                                               It.IsAny<string>()), Times.Once);
     }
 
     [Fact]
@@ -57,9 +55,8 @@ public class StaffSqliteDataProcessorTests
     {
         // Arrange
         var phoneNumber = new PhoneNumberModel { PhoneNumber = "123456789" };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_Check.sql");
         _dbMock.Setup(db => db.LoadDataAsync<bool, dynamic>(
-                sql,
+                "spPhoneNumbers_Check",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(new List<bool> { true });
@@ -76,9 +73,8 @@ public class StaffSqliteDataProcessorTests
         var phoneNumber = new PhoneNumberModel { PhoneNumber = "123456789" };
         var expectedPhoneNumberId = 1;
         var PhoneNumberIds = new List<int> { expectedPhoneNumberId };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_GetIdByPhoneNumber.sql");
         _dbMock.Setup(db => db.LoadDataAsync<int, dynamic>(
-                sql,
+                "spPhoneNumbers_GetIdByPhoneNumber",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(PhoneNumberIds);
@@ -93,16 +89,15 @@ public class StaffSqliteDataProcessorTests
     {
         // Arrange
         int phoneNumberId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("PhoneNumbers_Delete.sql");
-        _dbMock.Setup(db => db.SaveDataAsync(sql,
-                                             It.IsAny<object>(),
-                                             It.IsAny<string>()));
+        _dbMock.Setup(db => db.SaveDataAsync("spPhoneNumbers_Delete",
+                                              It.IsAny<object>(),
+                                              It.IsAny<string>()));
         // Act
         await _sut.DeletePhoneNumberAsync(phoneNumberId);
         // Assert
-        _dbMock.Verify(db => db.SaveDataAsync(sql,
-                                              It.IsAny<object>(),
-                                              It.IsAny<string>()), Times.Once);
+        _dbMock.Verify(db => db.SaveDataAsync("spPhoneNumbers_Delete",
+                                               It.IsAny<object>(),
+                                               It.IsAny<string>()), Times.Once);
     }
 
     [Fact]
@@ -111,16 +106,15 @@ public class StaffSqliteDataProcessorTests
         // Arrange
         int staffId = 1;
         int phoneNumberId = 2;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("StaffPhoneNumbers_Delete.sql");
-        _dbMock.Setup(db => db.SaveDataAsync(sql,
-                                             It.IsAny<object>(),
-                                             It.IsAny<string>()));
+        _dbMock.Setup(db => db.SaveDataAsync("spStaffPhoneNumbers_Delete",
+                                              It.IsAny<object>(),
+                                              It.IsAny<string>()));
         // Act
         await _sut.DeletePhoneNumberLinkAsync(staffId, phoneNumberId);
         // Assert
-        _dbMock.Verify(db => db.SaveDataAsync(sql,
-                                              It.IsAny<object>(),
-                                              It.IsAny<string>()), Times.Once);
+        _dbMock.Verify(db => db.SaveDataAsync("spStaffPhoneNumbers_Delete",
+                                               It.IsAny<object>(),
+                                               It.IsAny<string>()), Times.Once);
     }
 
     [Fact]
@@ -132,9 +126,8 @@ public class StaffSqliteDataProcessorTests
         {
             new StaffPhoneNumberModel { PhoneNumberId = phoneNumberId, StaffId = 1 }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("StaffPhoneNumbers_GetByPhoneNumber.sql");
         _dbMock.Setup(db => db.LoadDataAsync<StaffPhoneNumberModel, dynamic>(
-                sql,
+                "spStaffPhoneNumbers_GetByPhoneNumber",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(expectedLinks);
@@ -150,9 +143,8 @@ public class StaffSqliteDataProcessorTests
         // Arrange
         string alias = "AAD1";
         List<bool> expectedResult = new List<bool> { true };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Check.sql");
         _dbMock.Setup(db => db.LoadDataAsync<bool, dynamic>(
-                sql,
+                "spAliases_Check",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(expectedResult);
@@ -168,9 +160,8 @@ public class StaffSqliteDataProcessorTests
         // Arrange
         string alias = "AAD1";
         List<bool> expectedResult = new List<bool> { false };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Check.sql");
         _dbMock.Setup(db => db.LoadDataAsync<bool, dynamic>(
-                sql,
+                "spAliases_Check",
                 It.IsAny<object>(),
                 It.IsAny<string>()))
             .ReturnsAsync(expectedResult);
@@ -187,8 +178,7 @@ public class StaffSqliteDataProcessorTests
         string pIN = "1234";
         string alias = "AAD1";
         int expectedId = 1;
-        string sql = await SqliteQueryHelper.LoadQueryAsync("Aliases_Insert.sql");
-        _dbMock.Setup(db => db.SaveDataGetIdAsync(sql,
+        _dbMock.Setup(db => db.SaveDataGetIdAsync("spAliases_Insert",
                                                   It.IsAny<object>(),
                                                   It.IsAny<string>()))
             .ReturnsAsync(expectedId);
@@ -212,5 +202,3 @@ public class StaffSqliteDataProcessorTests
         result.Should().Be(expectedAlias);
     }
 }
-
-

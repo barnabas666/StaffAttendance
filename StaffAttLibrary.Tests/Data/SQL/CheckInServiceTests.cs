@@ -1,20 +1,21 @@
 ﻿using FluentAssertions;
 using Moq;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Db;
-using StaffAttLibrary.Helpers;
+using StaffAttLibrary.Data.SQL;
+using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Tests.Data;
-public class CheckInSqliteServiceTests
+namespace StaffAttLibrary.Tests.Data.SQL;
+public class CheckInServiceTests
 {
-    private readonly CheckInSqliteService _sut;
-    private readonly Mock<ISqliteDataAccess> _dbMock = new();
+    private readonly CheckInService _sut;
+    private readonly Mock<ISqlDataAccess> _dbMock = new();
     private readonly Mock<ICheckInData> _checkInDataMock = new();
     private readonly Mock<IConnectionStringData> _connectionStringMock = new();
-    public CheckInSqliteServiceTests()
+
+    public CheckInServiceTests()
     {
-        _sut = new CheckInSqliteService(_dbMock.Object, _checkInDataMock.Object, _connectionStringMock.Object);
+        _sut = new CheckInService(_dbMock.Object, _checkInDataMock.Object, _connectionStringMock.Object);
     }
 
     [Fact]
@@ -29,9 +30,8 @@ public class CheckInSqliteServiceTests
             CheckInDate = DateTime.Now,
             CheckOutDate = null
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetLastRecord.sql");
         _dbMock.Setup(db => db.LoadDataAsync<CheckInModel, dynamic>(
-                sql, It.IsAny<object>(), It.IsAny<string>()))
+                "spCheckIns_GetLastRecord", It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(new List<CheckInModel> { expectedCheckIn });
         // Act
         var result = await _sut.GetLastCheckInAsync(staffId);
@@ -55,9 +55,8 @@ public class CheckInSqliteServiceTests
                 CheckOutDate = null
             }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetAllByDate.sql");
         _dbMock.Setup(db => db.LoadDataAsync<CheckInFullModel, dynamic>(
-                sql, It.IsAny<object>(), It.IsAny<string>()))
+                "spCheckIns_GetAllByDate", It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(expectedCheckIns);
         // Act
         var result = await _sut.GetAllCheckInsByDateAsync(startDate, endDate);
@@ -82,9 +81,8 @@ public class CheckInSqliteServiceTests
                 CheckOutDate = null
             }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetByDateAndEmail.sql");
         _dbMock.Setup(db => db.LoadDataAsync<CheckInFullModel, dynamic>(
-                sql, It.IsAny<object>(), It.IsAny<string>()))
+                "spCheckIns_GetByDateAndEmail", It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(expectedCheckIns);
         // Act
         var result = await _sut.GetCheckInsByDateAndEmailAsync(emailAddrress, startDate, endDate);
@@ -109,9 +107,8 @@ public class CheckInSqliteServiceTests
                 CheckOutDate = null
             }
         };
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetByDateAndId.sql");
         _dbMock.Setup(db => db.LoadDataAsync<CheckInFullModel, dynamic>(
-                sql, It.IsAny<object>(), It.IsAny<string>()))
+                "spCheckIns_GetByDateAndId", It.IsAny<object>(), It.IsAny<string>()))
             .ReturnsAsync(expectedCheckIns);
         // Act
         var result = await _sut.GetCheckInsByDateAndIdAsync(staffId, startDate, endDate);

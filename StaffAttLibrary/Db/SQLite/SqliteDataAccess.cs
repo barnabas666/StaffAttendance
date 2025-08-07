@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SQLite;
 
-namespace StaffAttLibrary.Db;
+namespace StaffAttLibrary.Db.SQLite;
 public class SqliteDataAccess : ISqliteDataAccess
 {
     private readonly IConfiguration _config;

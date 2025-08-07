@@ -1,11 +1,18 @@
-﻿using StaffAttLibrary.Db;
-using StaffAttLibrary.Helpers;
+﻿using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Data;
-public class CheckInSqliteService : ICheckInService
+namespace StaffAttLibrary.Data.SQL;
+
+/// <summary>
+/// Class servicing Check-Ins - CRUD actions.
+/// UIs (MVC, WPF) talk to this class. This class calls CheckInData class and SqlDataAccess methods.
+/// </summary>
+public class CheckInService : ICheckInService
 {
-    private readonly ISqliteDataAccess _db;
+    /// <summary>
+    /// Servicing SQL database connection.
+    /// </summary>
+    private readonly ISqlDataAccess _db;
     private readonly ICheckInData _checkInData;
 
     /// <summary>
@@ -13,11 +20,15 @@ public class CheckInSqliteService : ICheckInService
     /// </summary>
     private readonly string _connectionStringName;
 
-    public CheckInSqliteService(ISqliteDataAccess db, ICheckInData checkInData, IConnectionStringData connectionStringData)
+    /// <summary>
+    /// Constructor, ISqlDataAccess comes from Dependency Injection from our frontend (UI).
+    /// </summary>
+    /// <param name="db">Servicing SQL database connection.</param>
+    public CheckInService(ISqlDataAccess db, ICheckInData checkInData, IConnectionStringData connectionStringData)
     {
         _db = db;
         _checkInData = checkInData;
-        _connectionStringName = connectionStringData.SQLiteConnectionName;
+        _connectionStringName = connectionStringData.SqlConnectionName;
     }
 
     /// <summary>
@@ -27,10 +38,9 @@ public class CheckInSqliteService : ICheckInService
     /// <returns>Last CheckIn (CheckOut prop can be null) info or null for invalid staffId.</returns>
     public async Task<CheckInModel> GetLastCheckInAsync(int staffId)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetLastRecord.sql");
-        List<CheckInModel> output = await _db.LoadDataAsync<CheckInModel, dynamic>(sql,
-                                                                                   new { staffId },
-                                                                                   _connectionStringName);
+        List<CheckInModel> output = await _db.LoadDataAsync<CheckInModel, dynamic>("spCheckIns_GetLastRecord",
+                                                                  new { staffId },
+                                                                  _connectionStringName);
 
         return output.FirstOrDefault();
     }
@@ -43,10 +53,9 @@ public class CheckInSqliteService : ICheckInService
     /// <returns>Collection of CheckIn Info.</returns>
     public async Task<List<CheckInFullModel>> GetAllCheckInsByDateAsync(DateTime startDate, DateTime endDate)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetAllByDate.sql");
-        return await _db.LoadDataAsync<CheckInFullModel, dynamic>(sql,
-                                                                  new { startDate, endDate },
-                                                                  _connectionStringName);
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetAllByDate",
+                                                                            new { startDate, endDate },
+                                                                            _connectionStringName);
     }
 
     /// <summary>
@@ -60,10 +69,9 @@ public class CheckInSqliteService : ICheckInService
                                                                         DateTime startDate,
                                                                         DateTime endDate)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetByDateAndEmail.sql");
-        return await _db.LoadDataAsync<CheckInFullModel, dynamic>(sql,
-                                                                  new { emailAddress, startDate, endDate },
-                                                                  _connectionStringName);
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndEmail",
+                                                                            new { emailAddress, startDate, endDate },
+                                                                            _connectionStringName);
     }
 
     /// <summary>
@@ -77,10 +85,9 @@ public class CheckInSqliteService : ICheckInService
                                                                         DateTime startDate,
                                                                         DateTime endDate)
     {
-        string sql = await SqliteQueryHelper.LoadQueryAsync("CheckIns_GetByDateAndId.sql");
-        return await _db.LoadDataAsync<CheckInFullModel, dynamic>(sql,
-                                                                  new { id, startDate, endDate },
-                                                                  _connectionStringName);
+        return await _db.LoadDataAsync<CheckInFullModel, dynamic>("spCheckIns_GetByDateAndId",
+                                                                            new { id, startDate, endDate },
+                                                                            _connectionStringName);
     }
 
     /// <summary>

@@ -1,5 +1,4 @@
-﻿
-namespace StaffAttLibrary.Db;
+﻿namespace StaffAttLibrary.Db.SQL;
 
 /// <summary>
 /// Interface for class servicing SQL database connection

@@ -1,8 +1,8 @@
-﻿using StaffAttLibrary.Db;
+﻿using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
 
-namespace StaffAttLibrary.Data;
+namespace StaffAttLibrary.Data.SQL;
 
 /// <summary>
 /// Class servicing Staffs - CRUD actions.
