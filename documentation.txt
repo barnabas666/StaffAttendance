@@ -1,14 +1,18 @@
-This solution is a staff management and attendance system built with .NET 8.0. It consists of:
+This solution is a staff management and attendance system built with .NET 8.0, designed for flexibility and multi-database support. It consists of:
 
-•	StaffAtt.Web: An ASP.NET Core MVC web application for staff registration, profile management, and administration. The web app uses two SQLite databases:
-•	Identity database for authentication and user management, located at StaffAtt.Web/appsettings.json (connection string).
-•	StaffAttSQLite database for attendance and staff data, located at StaffAttSQLiteDB/StaffAttSQLite.db (relative to solution root).
-The web app also provides a downloadable desktop application in StaffAtt.Web/wwwroot/downloads/DesktopApp.zip.
-•	StaffAtt.Desktop: A WPF desktop application for recording staff check-ins and check-outs. It shares the same StaffAttSQLite database (StaffAttSQLiteDB/StaffAttSQLite.db) with the web app, ensuring consistent attendance data across both platforms.
-•	StaffAttLibrary: A shared .NET 8.0 class library containing business logic and data access.
-•	For SQLite, it uses raw SQL queries stored in the SqliteQueries folder (StaffAttLibrary/SqliteQueries/).
-•	For SQL Server, it uses stored procedures and can connect to a prepared SQL database located in the StaffAttDB folder (StaffAttDB/), allowing easy migration from SQLite to SQL Server if needed.
+•	StaffAtt.Web: An ASP.NET Core MVC web application for staff registration, profile management, and administration. It uses:
+•	An Identity database (SQLite, configured in StaffAtt.Web/appsettings.json) for authentication and user management.
+•	A downloadable desktop application available at StaffAtt.Web/wwwroot/downloads/DesktopApp.zip.
+•	StaffAtt.Desktop: A WPF desktop application for recording staff check-ins and check-outs. It is distributed as a portable app for end users to run locally.
+•	StaffAttLibrary: A shared .NET 8.0 class library containing all business logic and data access.
+•	Both the web and desktop applications interact exclusively with this library, which abstracts all database operations.
+•	The library supports three types of main StaffAtt databases:
+•	SQL Server (using stored procedures, with scripts and schema in the StaffAttDB/ folder)
+•	SQLite (using raw SQL queries stored in StaffAttLibrary/SqliteQueries/)
+•	PostgreSQL (planned as the main type for deployment, with support in progress)
+•	The main StaffAtt database (regardless of backend) is shared by both the web and desktop applications via the library.
+•	Database Diagram: The structure of the main StaffAtt database is documented in StaffAttDbDiagram.png at the solution root.
 •	Unit Tests: The solution includes automated tests to verify business logic and data operations.
 
 Summary:
-The system enables staff registration, profile updates, and attendance tracking, with administrative features for managing staff and access rights. Both web and desktop apps share the same attendance database (hosted on cloud), and the solution is designed for flexibility in database backend and easy deployment to Azure.
+The system enables staff registration, profile updates, and attendance tracking, with administrative features for managing staff and access rights. Both the web and desktop apps interact with the main StaffAtt database only through the shared library, ensuring a consistent and flexible data layer. The solution is designed for easy deployment to Azure and supports switching between SQL Server, SQLite, and PostgreSQL as the main database backend. Key file locations and database options are clearly organized for maintainability and cloud deployment.
