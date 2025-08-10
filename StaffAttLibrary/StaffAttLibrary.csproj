@@ -7,6 +7,45 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Queries\PostgreSQL\Addresses_Delete.sql" />
+    <None Remove="Queries\PostgreSQL\Addresses_GetByEmail.sql" />
+    <None Remove="Queries\PostgreSQL\Addresses_GetById.sql" />
+    <None Remove="Queries\PostgreSQL\Addresses_Insert.sql" />
+    <None Remove="Queries\PostgreSQL\Addresses_Update.sql" />
+    <None Remove="Queries\PostgreSQL\Aliases_Check.sql" />
+    <None Remove="Queries\PostgreSQL\Aliases_Delete.sql" />
+    <None Remove="Queries\PostgreSQL\Aliases_GetByAliasAndPIN.sql" />
+    <None Remove="Queries\PostgreSQL\Aliases_Insert.sql" />
+    <None Remove="Queries\PostgreSQL\Aliases_Update.sql" />
+    <None Remove="Queries\PostgreSQL\CheckIns_Delete.sql" />
+    <None Remove="Queries\PostgreSQL\CheckIns_GetAllByDate.sql" />
+    <None Remove="Queries\PostgreSQL\CheckIns_GetByDateAndEmail.sql" />
+    <None Remove="Queries\PostgreSQL\CheckIns_GetByDateAndId.sql" />
+    <None Remove="Queries\PostgreSQL\CheckIns_GetLastRecord.sql" />
+    <None Remove="Queries\PostgreSQL\CheckIns_InsertCheckIn.sql" />
+    <None Remove="Queries\PostgreSQL\CheckIns_InsertCheckOut.sql" />
+    <None Remove="Queries\PostgreSQL\Departments_GetAll.sql" />
+    <None Remove="Queries\PostgreSQL\PhoneNumbers_Check.sql" />
+    <None Remove="Queries\PostgreSQL\PhoneNumbers_Delete.sql" />
+    <None Remove="Queries\PostgreSQL\PhoneNumbers_GetByStaffId.sql" />
+    <None Remove="Queries\PostgreSQL\PhoneNumbers_GetIdByPhoneNumber.sql" />
+    <None Remove="Queries\PostgreSQL\PhoneNumbers_Insert.sql" />
+    <None Remove="Queries\PostgreSQL\StaffPhoneNumbers_Delete.sql" />
+    <None Remove="Queries\PostgreSQL\StaffPhoneNumbers_GetByPhoneNumber.sql" />
+    <None Remove="Queries\PostgreSQL\StaffPhoneNumbers_Insert.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_CheckByEmail.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_Delete.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_GetAllBasic.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_GetAllByDepartment.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_GetAllByDepartmentAndApproved.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_GetBasicByAliasId.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_GetBasicById.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_GetByEmail.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_GetById.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_GetEmailById.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_Insert.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_Update.sql" />
+    <None Remove="Queries\PostgreSQL\Staffs_UpdateByAdmin.sql" />
     <None Remove="Queries\SQLite\Addresses_Delete.sql" />
     <None Remove="Queries\SQLite\Addresses_GetByEmail.sql" />
     <None Remove="Queries\SQLite\Addresses_GetById.sql" />
@@ -47,6 +86,123 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Queries\PostgreSQL\Addresses_Delete.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Addresses_GetByEmail.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Addresses_GetById.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Addresses_Insert.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Addresses_Update.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Aliases_Check.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Aliases_Delete.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Aliases_GetByAliasAndPIN.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Aliases_Insert.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Aliases_Update.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\CheckIns_Delete.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\CheckIns_GetAllByDate.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\CheckIns_GetByDateAndEmail.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\CheckIns_GetByDateAndId.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\CheckIns_GetLastRecord.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\CheckIns_InsertCheckIn.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\CheckIns_InsertCheckOut.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Departments_GetAll.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\PhoneNumbers_Check.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\PhoneNumbers_Delete.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\PhoneNumbers_GetByStaffId.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\PhoneNumbers_GetIdByPhoneNumber.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\PhoneNumbers_Insert.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\StaffPhoneNumbers_Delete.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\StaffPhoneNumbers_GetByPhoneNumber.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\StaffPhoneNumbers_Insert.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_CheckByEmail.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_Delete.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_GetAllBasic.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_GetAllByDepartment.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_GetAllByDepartmentAndApproved.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_GetBasicByAliasId.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_GetBasicById.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_GetByEmail.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_GetById.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_GetEmailById.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_Insert.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_Update.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\Staffs_UpdateByAdmin.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Queries\SQLite\Addresses_Delete.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -173,10 +329,6 @@
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\PostgreSQL\" />
   </ItemGroup>
 
 </Project>

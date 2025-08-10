@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StaffAttLibrary.Data;
+using StaffAttLibrary.Data.PostgreSQL;
 using StaffAttLibrary.Data.SQL;
 using StaffAttLibrary.Data.SQLite;
 using StaffAttLibrary.Db.PostgreSQL;
@@ -58,8 +59,11 @@ public static class ServiceCollectionExtensions
         else if (dbType.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
         {
             services.AddSingleton<IPostgresDataAccess, PostgresDataAccess>();
-            // Register your Postgres-specific services here
-            // e.g. services.AddSingleton<IStaffService, StaffPostgresService>();
+            services.AddSingleton<IStaffService, StaffPostgresService>();
+            services.AddSingleton<ICheckInService, CheckInPostgresService>();
+            services.AddSingleton<IStaffData, StaffPostgresData>();
+            services.AddSingleton<ICheckInData, CheckInPostgresData>();
+            services.AddSingleton<IStaffDataProcessor, StaffPostgresDataProcessor>();
         }
         else
         {

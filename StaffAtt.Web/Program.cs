@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using StaffAtt.Web.Data;
 using StaffAtt.Web.Helpers;
 using StaffAttLibrary.Data;
+using StaffAttLibrary.Data.PostgreSQL;
 using StaffAttLibrary.Data.SQL;
 using StaffAttLibrary.Data.SQLite;
 using StaffAttLibrary.Db.PostgreSQL;
@@ -35,8 +36,11 @@ if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
 else if (dbType.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
 {
     builder.Services.AddTransient<IPostgresDataAccess, PostgresDataAccess>();
-    // Register your Postgres-specific services here
-    // e.g. builder.Services.AddTransient<IStaffService, StaffPostgresService>();
+    builder.Services.AddTransient<IStaffService, StaffPostgresService>();
+    builder.Services.AddTransient<ICheckInService, CheckInPostgresService>();
+    builder.Services.AddTransient<IStaffData, StaffPostgresData>();
+    builder.Services.AddTransient<ICheckInData, CheckInPostgresData>();
+    builder.Services.AddTransient<IStaffDataProcessor, StaffPostgresDataProcessor>();
 }
 else
 {

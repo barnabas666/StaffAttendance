@@ -4,4 +4,5 @@ public interface IConnectionStringData
 {
     string SqlConnectionName { get; set; }
     string SQLiteConnectionName { get; set; }
+    string PostgresConnectionName { get; set; }
 }
