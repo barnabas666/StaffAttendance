@@ -58,7 +58,7 @@ public class AuthenticationDesktopController : ControllerBase
             _config.GetValue<string>("Authentication:Audience"),
             claims,
             DateTime.UtcNow,
-            DateTime.UtcNow.AddMinutes(1),
+            DateTime.UtcNow.AddMinutes(10),
             signingCredentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
