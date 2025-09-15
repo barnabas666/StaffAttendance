@@ -11,7 +11,7 @@ public static class EmailMessages
         return $"""
         <html>
         <body>
-            <p>Thank you for registering for <strong>Polaris Staff Attendance</strong>system! We're excited to have you join us.</p> <br/>
+            <p>Thank you for registering for <strong>Polaris Staff Attendance</strong> system! We're excited to have you join us.</p> <br/>
 
             <p>Please confirm your account by 
             <a href='{encodedUrl}'>clicking here</a>.</p> <br/>

@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		StaffAttDbDiagram.png = StaffAttDbDiagram.png
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaffAttApi", "StaffAttApi\StaffAttApi.csproj", "{43C05F99-FD90-4C57-9BBB-79D699C95E1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{F55A2EC1-8DCB-4B2C-836E-9AD668F6F101}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F55A2EC1-8DCB-4B2C-836E-9AD668F6F101}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F55A2EC1-8DCB-4B2C-836E-9AD668F6F101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43C05F99-FD90-4C57-9BBB-79D699C95E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43C05F99-FD90-4C57-9BBB-79D699C95E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43C05F99-FD90-4C57-9BBB-79D699C95E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43C05F99-FD90-4C57-9BBB-79D699C95E1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

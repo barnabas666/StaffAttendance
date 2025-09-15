@@ -9,7 +9,7 @@ This solution is a staff management and attendance system built with .NET 8.0, d
 •	The library supports three types of main StaffAtt databases:
 •	SQL Server (using stored procedures, with scripts and schema in the StaffAttDB/ folder)
 •	SQLite (using raw SQL queries stored in StaffAttLibrary/SqliteQueries/)
-•	PostgreSQL (planned as the main type for deployment, with support in progress)
+•	PostgreSQL (using raw SQL queries stored in StaffAttLibrary/PostgreSQL/, planned as the main type for deployment)
 •	The main StaffAtt database (regardless of backend) is shared by both the web and desktop applications via the library.
 •	Database Diagram: The structure of the main StaffAtt database is documented in StaffAttDbDiagram.png at the solution root.
 •	Unit Tests: The solution includes automated tests to verify business logic and data operations.
