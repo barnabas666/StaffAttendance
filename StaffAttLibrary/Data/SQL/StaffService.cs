@@ -110,7 +110,7 @@ public class StaffService : IStaffService
     }
 
     /// <summary>
-    /// Verify if entered credentials are correct.
+    /// Verify if entered credentials are correct. Both Alias and PIN are stored in uppercase.
     /// </summary>
     /// <param name="alias">Staff's Alias.</param>
     /// <param name="pIN">Staff's PIN.</param>
@@ -118,7 +118,7 @@ public class StaffService : IStaffService
     public async Task<AliasModel> AliasVerificationAsync(string alias, string pIN)
     {
         List<AliasModel> output = await _db.LoadDataAsync<AliasModel, dynamic>("spAliases_GetByAliasAndPIN",
-                                                                          new { alias, pIN },
+                                                                          new { alias = alias.ToUpper(), pIN = pIN.ToUpper() },
                                                                           _connectionStringName);
 
         return output.FirstOrDefault();

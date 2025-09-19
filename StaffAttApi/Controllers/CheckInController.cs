@@ -11,16 +11,20 @@ namespace StaffAttApi.Controllers;
 public class CheckInController : ControllerBase
 {
     private readonly ICheckInService _checkInService;
+    private readonly ILogger<CheckInController> _logger;
 
-    public CheckInController(ICheckInService checkInService)
+    public CheckInController(ICheckInService checkInService, ILogger<CheckInController> logger)
     {
         _checkInService = checkInService;
+        _logger = logger;
     }
 
     // GET: api/checkin/last/{staffId}
     [HttpGet("last/{staffId}")]
     public async Task<ActionResult<CheckInModel>> GetLastCheckIn(int staffId)
     {
+        _logger.LogInformation("GET: api/CheckIn/last (StaffId: {staffId})", staffId);
+
         var checkIn = await _checkInService.GetLastCheckInAsync(staffId);
         if (checkIn == null)
             return NotFound();

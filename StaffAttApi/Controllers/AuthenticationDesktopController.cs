@@ -15,11 +15,15 @@ public class AuthenticationDesktopController : ControllerBase
 {
     private readonly IStaffService _staffService;
     private readonly IConfiguration _config;
+    private readonly ILogger<AuthenticationDesktopController> _logger;
 
-    public AuthenticationDesktopController(IStaffService staffService, IConfiguration config)
+    public AuthenticationDesktopController(IStaffService staffService,
+                                           IConfiguration config,
+                                           ILogger<AuthenticationDesktopController> logger)
     {
         _staffService = staffService;
         _config = config;
+        _logger = logger;
     }
 
     public record AuthenticationData(string? Alias, string? PIN);
@@ -29,6 +33,8 @@ public class AuthenticationDesktopController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticationData data)
     {
+        _logger.LogInformation("POST: api/AuthenticationDesktop/token (Alias: {data.Alias})", data.Alias);
+
         var aliasData = await ValidateCredentials(data);
 
         if (aliasData is null)

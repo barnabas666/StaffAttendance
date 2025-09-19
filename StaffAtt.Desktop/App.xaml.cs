@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http; // Add this using directive
+using StaffAtt.Desktop.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.PostgreSQL;
 using StaffAttLibrary.Data.SQL;
@@ -8,6 +10,7 @@ using StaffAttLibrary.Db.PostgreSQL;
 using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Db.SQLite;
 using System.IO;
+using System.Net.Http; // Optionally add this if not present
 using System.Windows;
 
 namespace StaffAtt.Desktop;
@@ -35,7 +38,7 @@ public static class ServiceCollectionExtensions
 {
     public static void ConfigureServices(this IServiceCollection services)
     {
-        var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
+        var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Development";
 
         IConfiguration configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -44,6 +47,14 @@ public static class ServiceCollectionExtensions
             .Build();
 
         services.AddSingleton<IConfiguration>(configuration);
+        // Register TokenModel as scoped, so we have one instance per user session (circuit). 
+        services.AddScoped<TokenModel>();
+
+        // Register HttpClient with base address from config        
+        services.AddHttpClient("api", opts =>
+        {
+            opts.BaseAddress = new Uri(configuration.GetValue<string>("ApiUrl"));
+        });
 
         // Register services for dependency injection according to the DbType specified in config
         string dbType = configuration["DbType"] ?? "SQLite";
@@ -78,6 +89,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConnectionStringData, ConnectionStringData>();
         services.AddTransient<MainWindow>();
         services.AddTransient<CheckInForm>();
+
     }
 }
 

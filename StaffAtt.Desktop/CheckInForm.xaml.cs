@@ -1,5 +1,8 @@
-﻿using StaffAttLibrary.Data;
+﻿using StaffAtt.Desktop.Models;
 using StaffAttLibrary.Models;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Windows;
 
 namespace StaffAtt.Desktop;
@@ -10,16 +13,18 @@ namespace StaffAtt.Desktop;
 public partial class CheckInForm : Window
 {
     /// <summary>
-    /// Instance of class servicing Staffs - CRUD actions.
+    /// Instance of class which holds JWT token.
     /// </summary>
-    private readonly IStaffService _staffService;
-    private readonly ICheckInService _checkInService;
+    private readonly TokenModel _tokenModel;
+    /// <summary>
+    /// Instance of HttpClient to call our API.
+    /// </summary>
+    private HttpClient httpClient;
 
     /// <summary>
     /// Instance of class which holds Basic Staff data.
     /// </summary>
     private StaffBasicModel _basicStaffModel = null;
-
     /// <summary>
     /// Instance of class which holds CheckIn data.
     /// </summary>
@@ -28,12 +33,13 @@ public partial class CheckInForm : Window
     /// <summary>
     /// Constructor, initialize instance of this class.
     /// </summary>
-    /// <param name="staffService">Instance of class servicing Staffs - CRUD actions.</param>
-    public CheckInForm(IStaffService staffService, ICheckInService checkInService)
+    /// <param name="httpClientFactory"></param>
+    /// <param name="tokenModel"></param>
+    public CheckInForm(IHttpClientFactory httpClientFactory, TokenModel tokenModel)
     {
         InitializeComponent();
-        _staffService = staffService;
-        _checkInService = checkInService;
+        _tokenModel = tokenModel;
+        httpClient = httpClientFactory.CreateClient("api");
     }
 
     /// <summary>
@@ -50,13 +56,31 @@ public partial class CheckInForm : Window
         departmentTitleText.Text = _basicStaffModel.Title;
 
         try
+        {            
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenModel.Token);
+
+            var lastCheckInResponse = await httpClient.GetAsync($"checkin/last/{_basicStaffModel.Id}");
+            if(!lastCheckInResponse.IsSuccessStatusCode)
+            {
+                var errorContent = await lastCheckInResponse.Content.ReadAsStringAsync();
+                string message = $"Getting last CheckIn failed ({(int)lastCheckInResponse.StatusCode} {lastCheckInResponse.ReasonPhrase})";
+                // Try to extract more info if the error is JSON
+                if (lastCheckInResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
+                {
+                    message += $"\nDetails: {errorContent}";
+                }
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            _checkInModel = await lastCheckInResponse.Content.ReadFromJsonAsync<CheckInModel>();
+        }
+        catch (HttpRequestException ex)
         {
-            _checkInModel = await _checkInService.GetLastCheckInAsync(_basicStaffModel.Id);
+            MessageBox.Show("Network error: " + ex.Message);
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message);
-            return;
+            MessageBox.Show("Unexpected error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         checkInButton.Content = IsNextCheckIn() ? "Check-In" : "Check-Out";
@@ -82,11 +106,27 @@ public partial class CheckInForm : Window
     {
         try
         {
-            await _checkInService.DoCheckInOrCheckOutAsync(_basicStaffModel.Id);
+            var doCheckInResponse = await httpClient.PostAsync($"checkin/do/{_basicStaffModel.Id}", null);
+            if (!doCheckInResponse.IsSuccessStatusCode)
+            {
+                var errorContent = await doCheckInResponse.Content.ReadAsStringAsync();
+                string message = $"CheckIn/Out failed ({(int)doCheckInResponse.StatusCode} {doCheckInResponse.ReasonPhrase})";
+                // Try to extract more info if the error is JSON
+                if (doCheckInResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
+                {
+                    message += $"\nDetails: {errorContent}";
+                }
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }            
+        }
+        catch (HttpRequestException ex)
+        {
+            MessageBox.Show("Network error: " + ex.Message);
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message);
+            MessageBox.Show("Unexpected error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         this.Close();
