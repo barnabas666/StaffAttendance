@@ -12,12 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="app.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="MailKit" Version="4.12.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.12" />
@@ -31,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StaffAtt.Identity\StaffAtt.Identity.csproj" />
     <ProjectReference Include="..\StaffAttLibrary\StaffAttLibrary.csproj" />
   </ItemGroup>
 

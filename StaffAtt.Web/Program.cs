@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using StaffAtt.Web.Data;
+using StaffAtt.Identity;
 using StaffAtt.Web.Helpers;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.PostgreSQL;

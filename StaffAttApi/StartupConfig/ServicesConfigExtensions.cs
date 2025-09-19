@@ -8,6 +8,9 @@ using StaffAttLibrary.Db.PostgreSQL;
 using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Db.SQLite;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using StaffAtt.Identity; // Use the same ApplicationDbContext as your web app
 
 namespace StaffAttApi.StartupConfig;
 
@@ -79,5 +82,26 @@ public static class ServicesConfigExtensions
                         builder.Configuration.GetValue<string>("Authentication:SecretKey")))
                 };
             });
+    }
+
+    public static void AddIdentityServices(this WebApplicationBuilder builder)
+    {
+        var connectionString = builder.Configuration.GetConnectionString("IdentityDb")
+            ?? throw new InvalidOperationException("Connection string 'IdentityDb' not found.");
+
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlite(connectionString)); // Or UseSqlServer, etc.
+
+        builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = true;
+            // Lockout settings (optional, match your web app)
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            options.Lockout.MaxFailedAccessAttempts = 3;
+            options.Lockout.AllowedForNewUsers = true;
+            options.SignIn.RequireConfirmedPhoneNumber = false;
+        })
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<ApplicationDbContext>();
     }
 }
