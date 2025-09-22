@@ -35,6 +35,8 @@ public class CheckInController : ControllerBase
     [HttpPost("do/{staffId}")]
     public async Task<IActionResult> DoCheckInOrCheckOut(int staffId)
     {
+        _logger.LogInformation("POST: api/CheckIn/do (StaffId: {staffId})", staffId);
+
         await _checkInService.DoCheckInOrCheckOutAsync(staffId);
         return NoContent();
     }

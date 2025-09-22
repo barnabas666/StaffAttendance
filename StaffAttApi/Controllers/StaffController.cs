@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StaffAttApi.DTOs;
 using StaffAttLibrary.Data;
+using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
 
 namespace StaffAttApi.Controllers;
@@ -11,19 +13,313 @@ namespace StaffAttApi.Controllers;
 public class StaffController : ControllerBase
 {
     private readonly IStaffService _staffService;
+    private readonly ILogger<StaffController> _logger;
 
-    public StaffController(IStaffService staffService)
+    public StaffController(IStaffService staffService, ILogger<StaffController> logger)
     {
         _staffService = staffService;
+        _logger = logger;
     }
 
-    // GET: api/staff/basic/{aliasId}
-    [HttpGet("basic/{aliasId}")]
+    // GET: api/staff/departments
+    [HttpGet("departments")]
+    public async Task<ActionResult<List<DepartmentModel>>> GetAllDepartments()
+    {
+        _logger.LogInformation("GET: api/Staff/departments");
+
+        try
+        {
+            var departments = await _staffService.GetAllDepartmentsAsync();
+            return Ok(departments);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/departments failed.");
+            return BadRequest();
+        }
+    }
+
+    // POST: api/staff
+    [HttpPost]
+    public async Task<IActionResult> CreateStaff([FromBody] CreateStaffRequest request)
+    {
+        _logger.LogInformation("POST: api/Staff (Email: {Email})", request.EmailAddress);
+
+        try
+        {
+            await _staffService.CreateStaffAsync(
+                request.DepartmentId,
+                request.Address,
+                request.PIN,
+                request.FirstName,
+                request.LastName,
+                request.EmailAddress,
+                request.PhoneNumbers);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The POST call to api/Staff failed. Email: {Email}", request.EmailAddress);
+            return BadRequest();
+        }
+    }
+
+    // PUT: api/staff
+    [HttpPut]
+    public async Task<IActionResult> UpdateStaff([FromBody] UpdateStaffRequest request)
+    {
+        _logger.LogInformation("PUT: api/Staff (Email: {Email})", request.EmailAddress);
+
+        try
+        {
+            await _staffService.UpdateStaffAsync(
+                request.Address,
+                request.PIN,
+                request.FirstName,
+                request.LastName,
+                request.EmailAddress,
+                request.PhoneNumbers);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The PUT call to api/Staff failed. Email: {Email}", request.EmailAddress);
+            return BadRequest();
+        }
+    }
+
+    // Example request: GET /api/staff/basic/filter?departmentId=5&approvedType=Approved    
+    // GET: api/staff/basic/filter?departmentId={departmentId}&approvedType={approvedType}
+    [HttpGet("basic/filter")]
+    public async Task<ActionResult<List<StaffBasicModel>>> GetAllBasicStaffFiltered(
+        [FromQuery] int departmentId,
+        [FromQuery] ApprovedType approvedType)
+    {
+        _logger.LogInformation("GET: api/Staff/basic/filter (DepartmentId: {departmentId}, ApprovedType: {approvedType})",
+            departmentId, approvedType);
+
+        try
+        {
+            var staffList = await _staffService.GetAllBasicStaffFilteredAsync(departmentId, approvedType);
+
+            if (staffList == null || staffList.Count == 0)
+            {
+                _logger.LogWarning("No staff found for DepartmentId: {departmentId}, ApprovedType: {approvedType}",
+                    departmentId, approvedType);
+                return NotFound();
+            }
+            return Ok(staffList);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/basic/filter failed. DepartmentId: {departmentId}, ApprovedType: {approvedType}",
+                departmentId, approvedType);
+            return BadRequest();
+        }
+    }
+
+    // GET: api/staff/basic
+    [HttpGet("basic")]
+    public async Task<ActionResult<List<StaffBasicModel>>> GetAllBasicStaff()
+    {
+        _logger.LogInformation("GET: api/Staff/basic");
+
+        try
+        {
+            var staffList = await _staffService.GetAllBasicStaffAsync();
+
+            if (staffList == null || staffList.Count == 0)
+            {
+                _logger.LogWarning("No staff found in GetAllBasicStaff");
+                return NotFound();
+            }
+            return Ok(staffList);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/basic failed.");
+            return BadRequest();
+        }
+    }
+
+    // Example request: GET /api/staff/email?emailAddress=someone%40example.com
+    // remember to URL-encode @ in email address as %40
+    // GET: api/staff/email?emailAddress={emailAddress}    
+    [HttpGet("email")]
+    public async Task<ActionResult<StaffFullModel>> GetStaffByEmail([FromQuery] string emailAddress)
+    {
+        _logger.LogInformation("GET: api/Staff/email (Email: {Email})", emailAddress);
+
+        try
+        {
+            var staff = await _staffService.GetStaffByEmailAsync(emailAddress);
+            if (staff == null)
+            {
+                _logger.LogWarning("Staff not found for Email: {Email}", emailAddress);
+                return NotFound();
+            }
+            return Ok(staff);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/email failed. Email: {Email}", emailAddress);
+            return BadRequest();
+        }
+    }
+
+    // Example request: GET /api/staff/123
+    // GET: api/staff/{id}    
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<StaffFullModel>> GetStaffById(int id)
+    {
+        _logger.LogInformation("GET: api/Staff (Get by Id) (Id: {Id})", id);
+
+        try
+        {
+            var staff = await _staffService.GetStaffByIdAsync(id);
+            if (staff == null)
+            {
+                _logger.LogWarning("Staff not found for Id: {Id}", id);
+                return NotFound();
+            }
+            return Ok(staff);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/{id} failed. Id: {Id}", id);
+            return BadRequest();
+        }
+    }
+
+    // Example request: GET /api/staff/basic/123
+    // GET: api/staff/basic/{id}    
+    [HttpGet("basic/{id:int}")]
+    public async Task<ActionResult<StaffBasicModel>> GetBasicStaffById(int id)
+    {
+        _logger.LogInformation("GET: api/Staff/basic/{id} (Id: {Id})", id);
+
+        try
+        {
+            var staff = await _staffService.GetBasicStaffByIdAsync(id);
+            if (staff == null)
+            {
+                _logger.LogWarning("Basic staff not found for Id: {Id}", id);
+                return NotFound();
+            }
+            return Ok(staff);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/basic/{id} failed. Id: {Id}", id);
+            return BadRequest();
+        }
+    }
+
+    // Example request: GET /api/staff/basic/alias/456
+    // GET: api/staff/basic/alias/{aliasId}    
+    [HttpGet("basic/alias/{aliasId:int}")]
     public async Task<ActionResult<StaffBasicModel>> GetBasicStaffByAliasId(int aliasId)
     {
-        var staff = await _staffService.GetBasicStaffByAliasIdAsync(aliasId);
-        if (staff == null)
-            return NotFound();
-        return Ok(staff);
+        _logger.LogInformation("GET: api/Staff/basic (AliasId: {aliasId})", aliasId);
+
+        try
+        {
+            var staff = await _staffService.GetBasicStaffByAliasIdAsync(aliasId);
+            if (staff == null)
+            {
+                _logger.LogWarning("Staff not found for AliasId: {aliasId}", aliasId);
+                return NotFound();
+            }
+            return Ok(staff);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/basic/{AliasId} failed.", aliasId);
+            return BadRequest();
+        }
+    }
+
+    // Example request: GET /api/staff/email/123
+    // GET: api/staff/email/{id}    
+    [HttpGet("email/{id:int}")]
+    public async Task<ActionResult<string>> GetStaffEmailById(int id)
+    {
+        _logger.LogInformation("GET: api/Staff/email/{id} (Id: {Id})", id);
+
+        try
+        {
+            var email = await _staffService.GetStaffEmailByIdAsync(id);
+            if (string.IsNullOrEmpty(email))
+            {
+                _logger.LogWarning("Email not found for staff Id: {Id}", id);
+                return NotFound();
+            }
+            return Ok(email);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/email/{id} failed. Id: {Id}", id);
+            return BadRequest();
+        }
+    }
+
+    // Example request: GET /api/staff/check-email?emailAddress=someone%40example.com
+    // remember to URL-encode @ in email address as %40
+    // GET: api/staff/check-email?emailAddress={emailAddress}    
+    [HttpGet("check-email")]
+    public async Task<ActionResult<bool>> CheckStaffByEmail([FromQuery] string emailAddress)
+    {
+        _logger.LogInformation("GET: api/Staff/check-email (Email: {Email})", emailAddress);
+
+        try
+        {
+            var exists = await _staffService.CheckStaffByEmailAsync(emailAddress);
+            return Ok(exists);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The GET call to api/Staff/check-email failed. Email: {Email}", emailAddress);
+            return BadRequest();
+        }
+    }
+
+    // PUT: api/staff/admin
+    [HttpPut("admin")]
+    public async Task<IActionResult> UpdateStaffByAdmin([FromBody] UpdateStaffByAdminRequest request)
+    {
+        _logger.LogInformation("PUT: api/Staff/admin (Id: {Id}, DepartmentId: {DepartmentId}, IsApproved: {IsApproved})",
+            request.Id, request.DepartmentId, request.IsApproved);
+
+        try
+        {
+            await _staffService.UpdateStaffByAdminAsync(request.Id, request.DepartmentId, request.IsApproved);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The PUT call to api/Staff/admin failed. Id: {Id}", request.Id);
+            return BadRequest();
+        }
+    }
+
+    // Example request: DELETE /api/staff/123
+    // DELETE: api/staff/{staffId}
+    [HttpDelete("{staffId:int}")]
+    public async Task<IActionResult> DeleteStaff(int staffId)
+    {
+        _logger.LogInformation("DELETE: api/Staff/{staffId} (StaffId: {StaffId})", staffId);
+
+        try
+        {
+            await _staffService.DeleteStaffAsync(staffId);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The DELETE call to api/Staff/{staffId} failed. StaffId: {StaffId}", staffId);
+            return BadRequest();
+        }
     }
 }
