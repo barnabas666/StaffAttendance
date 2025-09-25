@@ -6,6 +6,7 @@ using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
+using System.Net.Http.Headers;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -15,6 +16,8 @@ namespace StaffAtt.Web.Controllers;
 [Authorize]
 public class StaffController : Controller
 {
+    private HttpClient httpClient;
+    private readonly TokenModel _tokenModel;
     private readonly IStaffService _staffService;
     private readonly IUserService _userService;
     private readonly IUserContext _userContext;
@@ -22,13 +25,18 @@ public class StaffController : Controller
     private readonly IPhoneNumberParser _phoneNumberParser;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffController(IStaffService staffService,
+    public StaffController(IHttpClientFactory httpClientFactory,
+                           TokenModel tokenModel,
+                           IStaffService staffService,
                            IUserService userService,
                            IUserContext userContext,
                            IMapper mapper,
                            IPhoneNumberParser phoneNumberParser,
-                           IDepartmentSelectListService departmentService)
+                           IDepartmentSelectListService departmentService
+                           )
     {
+        httpClient = httpClientFactory.CreateClient("api");
+        _tokenModel = tokenModel;
         _staffService = staffService;
         _userService = userService;
         _userContext = userContext;
@@ -100,6 +108,8 @@ public class StaffController : Controller
     /// <returns>View with populated StaffDetailsModel inside.</returns>
     public async Task<IActionResult> Details(string message = "")
     {
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenModel.Token);
+
         string userEmail = _userContext.GetUserEmail();
 
         // check if user has already created Staff account

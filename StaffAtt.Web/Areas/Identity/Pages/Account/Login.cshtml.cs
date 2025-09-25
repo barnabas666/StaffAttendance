@@ -6,17 +6,22 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using StaffAtt.Web.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace StaffAtt.Web.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
+        private HttpClient httpClient;
+        private readonly TokenModel _tokenModel;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(IHttpClientFactory httpClientFactory, TokenModel tokenModel, SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
         {
+            httpClient = httpClientFactory.CreateClient("api");
+            _tokenModel = tokenModel;
             _signInManager = signInManager;
             _logger = logger;
         }
@@ -106,6 +111,22 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    // new code
+                    var loginModel = new AuthenticationModel { Email = Input.Email, Password = Input.Password };
+                    var response = await httpClient.PostAsJsonAsync<AuthenticationModel>("AuthenticationWeb/token", loginModel);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        _tokenModel.Token = await response.Content.ReadAsStringAsync();                        
+                        // Now TokenModel is populated for the current user session
+                    }
+                    else
+                    {
+                        // Handle error (add ModelState error, etc.)
+                    }
+                    // end of new code
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

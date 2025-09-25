@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using StaffAtt.Identity;
 using StaffAtt.Web.Helpers;
+using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.PostgreSQL;
 using StaffAttLibrary.Data.SQL;
@@ -10,6 +11,7 @@ using StaffAttLibrary.Data.SQLite;
 using StaffAttLibrary.Db.PostgreSQL;
 using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Db.SQLite;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,12 @@ var connectionString = builder.Configuration.GetConnectionString("IdentityDb") ?
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+// Register HttpClient with base address from config        
+builder.Services.AddHttpClient("api", opts =>
+{
+    opts.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ApiUrl"));
+});
 
 // Register services for dependency injection according to the DbType specified in appsettings.json
 string dbType = builder.Configuration.GetValue<string>("DbType") ?? "SQLite";
@@ -61,6 +69,9 @@ builder.Services.AddTransient<IStaffSelectListService, StaffSelectListService>()
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Register TokenModel as scoped, so we have one instance per user session (circuit). 
+builder.Services.AddScoped<TokenModel>();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
