@@ -132,7 +132,7 @@ public class StaffController : ControllerBase
 
             if (staffList == null || staffList.Count == 0)
             {
-                _logger.LogWarning("No staff found in GetAllBasicStaff");
+                _logger.LogWarning("No staff found.");
                 return NotFound();
             }
             return Ok(staffList);
@@ -174,7 +174,7 @@ public class StaffController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<StaffFullModel>> GetStaffById(int id)
     {
-        _logger.LogInformation("GET: api/Staff (Get by Id) (Id: {Id})", id);
+        _logger.LogInformation("GET: api/Staff/{id} (Staff's Id: {Id})", id, id);
 
         try
         {
@@ -188,7 +188,7 @@ public class StaffController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "The GET call to api/Staff/{id} failed. Id: {Id}", id);
+            _logger.LogError(ex, "The GET call to api/Staff/{id} failed. Staff's Id: {Id}", id, id);
             return BadRequest();
         }
     }
@@ -198,7 +198,7 @@ public class StaffController : ControllerBase
     [HttpGet("basic/{id:int}")]
     public async Task<ActionResult<StaffBasicModel>> GetBasicStaffById(int id)
     {
-        _logger.LogInformation("GET: api/Staff/basic/{id} (Id: {Id})", id);
+        _logger.LogInformation("GET: api/Staff/basic/{id} (Staff's Id: {Id})", id, id);
 
         try
         {
@@ -212,7 +212,7 @@ public class StaffController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "The GET call to api/Staff/basic/{id} failed. Id: {Id}", id);
+            _logger.LogError(ex, "The GET call to api/Staff/basic/{id} failed. Staff's Id: {Id}", id, id);
             return BadRequest();
         }
     }
@@ -222,21 +222,21 @@ public class StaffController : ControllerBase
     [HttpGet("basic/alias/{aliasId:int}")]
     public async Task<ActionResult<StaffBasicModel>> GetBasicStaffByAliasId(int aliasId)
     {
-        _logger.LogInformation("GET: api/Staff/basic (AliasId: {aliasId})", aliasId);
+        _logger.LogInformation("GET: api/Staff/basic/alias/{aliasId} (AliasId: {AliasId})", aliasId, aliasId);
 
         try
         {
             var staff = await _staffService.GetBasicStaffByAliasIdAsync(aliasId);
             if (staff == null)
             {
-                _logger.LogWarning("Staff not found for AliasId: {aliasId}", aliasId);
+                _logger.LogWarning("Staff not found for AliasId: {AliasId}", aliasId);
                 return NotFound();
             }
             return Ok(staff);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "The GET call to api/Staff/basic/{AliasId} failed.", aliasId);
+            _logger.LogError(ex, "The GET call to api/Staff/basic/alias/{AliasId} failed.", aliasId);
             return BadRequest();
         }
     }
@@ -246,7 +246,7 @@ public class StaffController : ControllerBase
     [HttpGet("email/{id:int}")]
     public async Task<ActionResult<string>> GetStaffEmailById(int id)
     {
-        _logger.LogInformation("GET: api/Staff/email/{id} (Id: {Id})", id);
+        _logger.LogInformation("GET: api/Staff/email/{id} (Staff's Id: {Id})", id, id);
 
         try
         {
@@ -260,7 +260,7 @@ public class StaffController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "The GET call to api/Staff/email/{id} failed. Id: {Id}", id);
+            _logger.LogError(ex, "The GET call to api/Staff/email/{id} failed. Staff's Id: {Id}", id, id);
             return BadRequest();
         }
     }
@@ -289,7 +289,7 @@ public class StaffController : ControllerBase
     [HttpPut("admin")]
     public async Task<IActionResult> UpdateStaffByAdmin([FromBody] UpdateStaffByAdminRequest request)
     {
-        _logger.LogInformation("PUT: api/Staff/admin (Id: {Id}, DepartmentId: {DepartmentId}, IsApproved: {IsApproved})",
+        _logger.LogInformation("PUT: api/Staff/admin (Staff's Id: {Id}, DepartmentId: {DepartmentId}, IsApproved: {IsApproved})",
             request.Id, request.DepartmentId, request.IsApproved);
 
         try
@@ -299,7 +299,7 @@ public class StaffController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "The PUT call to api/Staff/admin failed. Id: {Id}", request.Id);
+            _logger.LogError(ex, "The PUT call to api/Staff/admin failed. Staff's Id: {Id}", request.Id);
             return BadRequest();
         }
     }
@@ -309,7 +309,7 @@ public class StaffController : ControllerBase
     [HttpDelete("{staffId:int}")]
     public async Task<IActionResult> DeleteStaff(int staffId)
     {
-        _logger.LogInformation("DELETE: api/Staff/{staffId} (StaffId: {StaffId})", staffId);
+        _logger.LogInformation("DELETE: api/Staff/{staffId} (StaffId: {StaffId})", staffId, staffId);
 
         try
         {
@@ -318,7 +318,7 @@ public class StaffController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "The DELETE call to api/Staff/{staffId} failed. StaffId: {StaffId}", staffId);
+            _logger.LogError(ex, "The DELETE call to api/Staff/{staffId} failed. StaffId: {StaffId}", staffId, staffId);
             return BadRequest();
         }
     }

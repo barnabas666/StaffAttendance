@@ -118,6 +118,7 @@ public class StaffPostgresData : IStaffData
             // If we found that Phone Number in Db we get Id and just store it inside relation StaffPhoneNumbers Table.
             if (isPhoneNumberExistingInDb)
             {
+                // Todo: add check for existing link Staff-PhoneNumber to avoid duplicates
                 int phoneNumberId = await _staffDataProcessor.GetPhoneNumberIdAsync(phoneNumber);
                 await _staffDataProcessor.SavePhoneNumberLinkAsync(staffId, phoneNumberId);
             }
