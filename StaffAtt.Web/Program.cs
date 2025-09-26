@@ -70,13 +70,12 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// Register TokenModel as scoped, so we have one instance per user session (circuit). 
-builder.Services.AddScoped<TokenModel>();
-
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+// Enable session state for storing JWT token
+builder.Services.AddSession();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -106,6 +105,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthorization();
 

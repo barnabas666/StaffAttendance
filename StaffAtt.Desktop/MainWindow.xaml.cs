@@ -83,7 +83,7 @@ public partial class MainWindow : Window
             var aliasId = token.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
 
             // 2. Get StaffBasicModel from API
-            var staffResponse = await httpClient.GetAsync($"staff/basic/{aliasId}");
+            var staffResponse = await httpClient.GetAsync($"staff/basic/alias/{aliasId}");
             if (!staffResponse.IsSuccessStatusCode)
             {
                 var errorContent = await staffResponse.Content.ReadAsStringAsync();

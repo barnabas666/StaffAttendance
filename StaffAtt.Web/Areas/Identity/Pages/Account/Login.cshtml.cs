@@ -14,14 +14,12 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private HttpClient httpClient;
-        private readonly TokenModel _tokenModel;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(IHttpClientFactory httpClientFactory, TokenModel tokenModel, SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(IHttpClientFactory httpClientFactory, SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
         {
-            httpClient = httpClientFactory.CreateClient("api");
-            _tokenModel = tokenModel;
+            httpClient = httpClientFactory.CreateClient("api");           
             _signInManager = signInManager;
             _logger = logger;
         }
@@ -118,12 +116,20 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
 
                     if (response.IsSuccessStatusCode)
                     {
-                        _tokenModel.Token = await response.Content.ReadAsStringAsync();                        
-                        // Now TokenModel is populated for the current user session
+                        var token = await response.Content.ReadAsStringAsync();
+                        // HttpContext is from PageModel, here we store the token in session
+                        HttpContext.Session.SetString("JwtToken", token);
                     }
                     else
                     {
-                        // Handle error (add ModelState error, etc.)
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        string message = $"Token request failed ({(int)response.StatusCode} {response.ReasonPhrase})";
+                        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+                        {
+                            message += $"\nDetails: {errorContent}";
+                        }
+                        ModelState.AddModelError(string.Empty, message);
+                        return Page();
                     }
                     // end of new code
 

@@ -17,7 +17,6 @@ namespace StaffAtt.Web.Controllers;
 public class StaffController : Controller
 {
     private HttpClient httpClient;
-    private readonly TokenModel _tokenModel;
     private readonly IStaffService _staffService;
     private readonly IUserService _userService;
     private readonly IUserContext _userContext;
@@ -25,18 +24,15 @@ public class StaffController : Controller
     private readonly IPhoneNumberParser _phoneNumberParser;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffController(IHttpClientFactory httpClientFactory,
-                           TokenModel tokenModel,
+    public StaffController(IHttpClientFactory httpClientFactory,                           
                            IStaffService staffService,
                            IUserService userService,
                            IUserContext userContext,
                            IMapper mapper,
                            IPhoneNumberParser phoneNumberParser,
-                           IDepartmentSelectListService departmentService
-                           )
+                           IDepartmentSelectListService departmentService)
     {
         httpClient = httpClientFactory.CreateClient("api");
-        _tokenModel = tokenModel;
         _staffService = staffService;
         _userService = userService;
         _userContext = userContext;
@@ -108,18 +104,57 @@ public class StaffController : Controller
     /// <returns>View with populated StaffDetailsModel inside.</returns>
     public async Task<IActionResult> Details(string message = "")
     {
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenModel.Token);
+        // HttpContext is from Controller, here we get the stored token from session
+        var token = HttpContext.Session.GetString("JwtToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            // Handle missing token (e.g., redirect to login)
+            return RedirectToAction("Login", "Account", new { area = "Identity" });
+        }
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         string userEmail = _userContext.GetUserEmail();
 
-        // check if user has already created Staff account
-        bool isCreated = await _staffService.CheckStaffByEmailAsync(userEmail);
+        // 1. Check if user has already created Staff account (API call)
+        var checkStaffResponse = await httpClient.GetAsync($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}");
+        if (!checkStaffResponse.IsSuccessStatusCode)
+        {
+            var errorContent = await checkStaffResponse.Content.ReadAsStringAsync();
+            string errorMsg = $"Failed to check staff account ({(int)checkStaffResponse.StatusCode} {checkStaffResponse.ReasonPhrase})";
+            if (checkStaffResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            {
+                errorMsg += $"\nDetails: {errorContent}";
+            }
+            // Show error view or message
+            return View("Error", errorMsg);
+        }
+        bool? isCreated = await checkStaffResponse.Content.ReadFromJsonAsync<bool>();
+        if (isCreated is null)
+        {
+            return View("Error", "Unexpected response from staff/check-email endpoint.");
+        }
 
-        // if user has no account yet we redirect him to Create Staff action
-        if (isCreated == false)
+        if (!isCreated.Value)
             return RedirectToAction("Create");
 
-        StaffFullModel fullModel = await _staffService.GetStaffByEmailAsync(userEmail);
+        // 2. Get StaffFullModel from API
+        var getStaffResponse = await httpClient.GetAsync($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}");
+        if (!getStaffResponse.IsSuccessStatusCode)
+        {
+            var errorContent = await getStaffResponse.Content.ReadAsStringAsync();
+            string errorMsg = $"Failed to get staff details ({(int)getStaffResponse.StatusCode} {getStaffResponse.ReasonPhrase})";
+            if (getStaffResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            {
+                errorMsg += $"\nDetails: {errorContent}";
+            }
+            return View("Error", errorMsg);
+        }
+
+        var fullModel = await getStaffResponse.Content.ReadFromJsonAsync<StaffFullModel>();
+        if (fullModel == null)
+        {
+            return View("Error", "Staff details could not be loaded.");
+        }
 
         StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(fullModel);
         detailsModel.Message = message;
