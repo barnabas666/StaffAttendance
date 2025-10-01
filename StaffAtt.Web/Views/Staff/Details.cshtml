@@ -4,7 +4,8 @@
     ViewData["Title"] = "Details";
 }
 
-@* Some warning message from different Action, probably from Create *@
+@* Warning message from Create Action when someone with already created account
+   try to get to Create View using URL. *@
 @if (string.IsNullOrEmpty(Model.Message) == false) {
     <h4 class="text-danger">@Model.Message</h4>
 }

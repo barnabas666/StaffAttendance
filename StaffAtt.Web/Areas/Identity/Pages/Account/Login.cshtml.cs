@@ -110,7 +110,7 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User logged in.");
 
-                    // new code
+                    // start of Authentication - Token request code
                     var loginModel = new AuthenticationModel { Email = Input.Email, Password = Input.Password };
                     var response = await httpClient.PostAsJsonAsync<AuthenticationModel>("AuthenticationWeb/token", loginModel);
 
@@ -131,7 +131,7 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
                         ModelState.AddModelError(string.Empty, message);
                         return Page();
                     }
-                    // end of new code
+                    // end of Authentication - Token request code
 
                     return LocalRedirect(returnUrl);
                 }

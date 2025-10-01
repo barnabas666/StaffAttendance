@@ -70,6 +70,10 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IApiClient, ApiClient>();
+
+
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();

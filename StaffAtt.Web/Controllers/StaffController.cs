@@ -6,6 +6,7 @@ using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 using System.Net.Http.Headers;
 
 namespace StaffAtt.Web.Controllers;
@@ -17,6 +18,7 @@ namespace StaffAtt.Web.Controllers;
 public class StaffController : Controller
 {
     private HttpClient httpClient;
+    private readonly IApiClient _apiClient;
     private readonly IStaffService _staffService;
     private readonly IUserService _userService;
     private readonly IUserContext _userContext;
@@ -24,7 +26,8 @@ public class StaffController : Controller
     private readonly IPhoneNumberParser _phoneNumberParser;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffController(IHttpClientFactory httpClientFactory,                           
+    public StaffController(IHttpClientFactory httpClientFactory,
+                           IApiClient apiClient,
                            IStaffService staffService,
                            IUserService userService,
                            IUserContext userContext,
@@ -33,6 +36,7 @@ public class StaffController : Controller
                            IDepartmentSelectListService departmentService)
     {
         httpClient = httpClientFactory.CreateClient("api");
+        _apiClient = apiClient;
         _staffService = staffService;
         _userService = userService;
         _userContext = userContext;
@@ -104,63 +108,28 @@ public class StaffController : Controller
     /// <returns>View with populated StaffDetailsModel inside.</returns>
     public async Task<IActionResult> Details(string message = "")
     {
-        // HttpContext is from Controller, here we get the stored token from session
-        var token = HttpContext.Session.GetString("JwtToken");
-        if (string.IsNullOrEmpty(token))
-        {
-            // Handle missing token (e.g., redirect to login)
-            return RedirectToAction("Login", "Account", new { area = "Identity" });
-        }
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
         string userEmail = _userContext.GetUserEmail();
 
-        // 1. Check if user has already created Staff account (API call)
-        var checkStaffResponse = await httpClient.GetAsync($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}");
-        if (!checkStaffResponse.IsSuccessStatusCode)
-        {
-            var errorContent = await checkStaffResponse.Content.ReadAsStringAsync();
-            string errorMsg = $"Failed to check staff account ({(int)checkStaffResponse.StatusCode} {checkStaffResponse.ReasonPhrase})";
-            if (checkStaffResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
-            {
-                errorMsg += $"\nDetails: {errorContent}";
-            }
-            // Show error view or message
-            return View("Error", errorMsg);
-        }
-        bool? isCreated = await checkStaffResponse.Content.ReadFromJsonAsync<bool>();
-        if (isCreated is null)
-        {
-            return View("Error", "Unexpected response from staff/check-email endpoint.");
-        }
+        // 1. Check if staff exists
+        var existsResult = await _apiClient.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}");
+        if (!existsResult.IsSuccess)
+            return View("Error", existsResult.ErrorMessage);
 
-        if (!isCreated.Value)
+        if (!existsResult.Value)
             return RedirectToAction("Create");
 
-        // 2. Get StaffFullModel from API
-        var getStaffResponse = await httpClient.GetAsync($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}");
-        if (!getStaffResponse.IsSuccessStatusCode)
-        {
-            var errorContent = await getStaffResponse.Content.ReadAsStringAsync();
-            string errorMsg = $"Failed to get staff details ({(int)getStaffResponse.StatusCode} {getStaffResponse.ReasonPhrase})";
-            if (getStaffResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
-            {
-                errorMsg += $"\nDetails: {errorContent}";
-            }
-            return View("Error", errorMsg);
-        }
+        // 2. Get staff details
+        var detailsResult = await _apiClient.GetAsync<StaffFullModel>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}");
+        if (!detailsResult.IsSuccess || detailsResult.Value is null)
+            return View("Error", detailsResult.ErrorMessage ?? "Staff details could not be loaded.");
 
-        var fullModel = await getStaffResponse.Content.ReadFromJsonAsync<StaffFullModel>();
-        if (fullModel == null)
-        {
-            return View("Error", "Staff details could not be loaded.");
-        }
-
-        StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(fullModel);
+        // 3. Map to view model
+        var detailsModel = _mapper.Map<StaffDetailsViewModel>(detailsResult.Value);
         detailsModel.Message = message;
 
         return View("Details", detailsModel);
     }
+
 
     /// <summary>
     /// Get Update Action. We get Staff's personal info and populate StaffUpdateModel with it.
