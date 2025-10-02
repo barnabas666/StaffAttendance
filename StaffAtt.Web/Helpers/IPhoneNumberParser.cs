@@ -1,9 +1,10 @@
 ﻿using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Helpers;
 
 public interface IPhoneNumberParser
 {
-    List<PhoneNumberModel> ParseStringToPhoneNumbers(string phoneNumbersText);
-    string ParsePhoneNumbersToString(List<PhoneNumberModel> phoneNumbers);
+    List<PhoneNumberDto> ParseStringToPhoneNumbers(string phoneNumbersText);
+    string ParsePhoneNumbersToString(List<PhoneNumberDto> phoneNumbers);
 }

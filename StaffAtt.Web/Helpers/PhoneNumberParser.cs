@@ -1,22 +1,22 @@
-﻿using StaffAttLibrary.Models;
+﻿using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Helpers;
 
 /// <summary>
 /// This class is used to parse phone numbers from a string to a list
-/// of PhoneNumberModel objects and vice versa.
+/// of PhoneNumberDto objects and vice versa.
 /// </summary>
 public class PhoneNumberParser : IPhoneNumberParser
 {
-    public List<PhoneNumberModel> ParseStringToPhoneNumbers(string phoneNumbersText)
+    public List<PhoneNumberDto> ParseStringToPhoneNumbers(string phoneNumbersText)
     {
         return phoneNumbersText
             .Split(',')
-            .Select(phone => new PhoneNumberModel { PhoneNumber = phone.Trim() })
+            .Select(phone => new PhoneNumberDto { PhoneNumber = phone.Trim() })
             .ToList();
     }
 
-    public string ParsePhoneNumbersToString(List<PhoneNumberModel> phoneNumbers)
+    public string ParsePhoneNumbersToString(List<PhoneNumberDto> phoneNumbers)
     {
         return string.Join(",", phoneNumbers.Select(x => x.PhoneNumber));
     }

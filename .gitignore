@@ -9,6 +9,7 @@ StaffAtt.Desktop/appsettings.Development.json
 StaffAttSQLiteDB/StaffAttSQLite.db
 StaffAtt.Web/app.db
 StaffAttApi/appsettings.Development.json
+SolutionStructure.txt
 
 # User-specific files
 *.rsuser

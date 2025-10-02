@@ -73,24 +73,39 @@ public class StaffController : Controller
     public async Task<IActionResult> Create(StaffCreateViewModel staff)
     {
         string userEmail = _userContext.GetUserEmail();
-        // check if user has already created Staff account
-        bool isCreated = await _staffService.CheckStaffByEmailAsync(userEmail);
+
+        // 1. Check if user already has staff account
+        var existsResult = await _apiClient.GetAsync<bool>(
+            $"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"
+        );
+
+        if (!existsResult.IsSuccess)
+            return View("Error", existsResult.ErrorMessage);
+
         // if user has already created account we redirect him to Details action
         // unreachable code, but we must check it in case someone get to Create action using URL
-        if (isCreated)
+        if (existsResult.Value)
             return RedirectToAction("Details", new { message = "You have already created account!" });
 
-        List<PhoneNumberModel> phoneNumbers = _phoneNumberParser.ParseStringToPhoneNumbers(staff.PhoneNumbersText);
+        // 2. Build request model for API
+        List<PhoneNumberDto> phoneNumbers = _phoneNumberParser.ParseStringToPhoneNumbers(staff.PhoneNumbersText);
+        AddressDto address = _mapper.Map<AddressDto>(staff.Address);
 
-        AddressModel address = _mapper.Map<AddressModel>(staff.Address);
+        var request = new CreateStaffRequest
+        {
+            DepartmentId = Convert.ToInt32(staff.DepartmentId),
+            Address = address,
+            PIN = staff.PIN.ToString(),
+            FirstName = staff.FirstName,
+            LastName = staff.LastName,
+            EmailAddress = userEmail,
+            PhoneNumbers = phoneNumbers
+        };
 
-        await _staffService.CreateStaffAsync(Convert.ToInt32(staff.DepartmentId),
-                                   address,
-                                   staff.PIN.ToString(),
-                                   staff.FirstName,
-                                   staff.LastName,
-                                   userEmail,
-                                   phoneNumbers);
+        // 3. Call API to create staff
+        var createResult = await _apiClient.PostAsync<CreateStaffRequest>("staff", request);
+        if (!createResult.IsSuccess)
+            return View("Error", createResult.ErrorMessage);
 
         IdentityUser newUser = await _userService.FindByEmailAsync(userEmail);
         await _userService.AddToRoleAsync(newUser, "Member");
