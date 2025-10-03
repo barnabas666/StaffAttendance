@@ -23,6 +23,7 @@ public class StaffController : Controller
     private readonly IUserService _userService;
     private readonly IUserContext _userContext;
     private readonly IMapper _mapper;
+    private readonly IPhoneNumberDtoParser _phoneNumberDtoParser;
     private readonly IPhoneNumberParser _phoneNumberParser;
     private readonly IDepartmentSelectListService _departmentService;
 
@@ -32,6 +33,7 @@ public class StaffController : Controller
                            IUserService userService,
                            IUserContext userContext,
                            IMapper mapper,
+                           IPhoneNumberDtoParser phoneNumberDtoParser,
                            IPhoneNumberParser phoneNumberParser,
                            IDepartmentSelectListService departmentService)
     {
@@ -41,6 +43,7 @@ public class StaffController : Controller
         _userService = userService;
         _userContext = userContext;
         _mapper = mapper;
+        _phoneNumberDtoParser = phoneNumberDtoParser;
         _phoneNumberParser = phoneNumberParser;
         _departmentService = departmentService;
     }
@@ -88,7 +91,7 @@ public class StaffController : Controller
             return RedirectToAction("Details", new { message = "You have already created account!" });
 
         // 2. Build request model for API
-        List<PhoneNumberDto> phoneNumbers = _phoneNumberParser.ParseStringToPhoneNumbers(staff.PhoneNumbersText);
+        List<PhoneNumberDto> phoneNumbers = _phoneNumberDtoParser.ParseStringToPhoneNumbers(staff.PhoneNumbersText);
         AddressDto address = _mapper.Map<AddressDto>(staff.Address);
 
         var request = new CreateStaffRequest
@@ -154,14 +157,21 @@ public class StaffController : Controller
     {
         string userEmail = _userContext.GetUserEmail();
 
-        StaffFullModel fullModel = await _staffService.GetStaffByEmailAsync(userEmail);
+        // 1. Call API to get staff by email
+        var result = await _apiClient.GetAsync<StaffFullDto>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}");
 
-        StaffUpdateViewModel updateModel = _mapper.Map<StaffUpdateViewModel>(fullModel);
+        if (!result.IsSuccess || result.Value is null)
+            return View("Error", result.ErrorMessage ?? "Could not load staff details for update.");
 
-        updateModel.PhoneNumbersText = _phoneNumberParser.ParsePhoneNumbersToString(fullModel.PhoneNumbers);
+        // 2. Map DTO => ViewModel
+        var updateModel = _mapper.Map<StaffUpdateViewModel>(result.Value);
+
+        // 3. Convert phone numbers into comma-separated string for textbox
+        updateModel.PhoneNumbersText = _phoneNumberDtoParser.ParsePhoneNumbersToString(result.Value.PhoneNumbers);
 
         return View("Update", updateModel);
     }
+
 
     /// <summary>
     /// Post Update Action. We update Staff's personal info.

@@ -13,7 +13,7 @@ public class StaffUpdateProfileTests
         // Arrange
         var config = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<StaffUpdateProfile>();
+            cfg.AddProfile<StaffUpdateViewProfile>();
             cfg.AddProfile<AddressProfile>();
         });
         var mapper = config.CreateMapper();

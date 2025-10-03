@@ -5,11 +5,11 @@ using StaffAttLibrary.Models;
 namespace StaffAtt.Web.Tests.Helpers;
 public class PhoneNumberParserTests
 {
-    private readonly PhoneNumberParser _sut;
+    private readonly PhoneNumberDtoParser _sut;
 
     public PhoneNumberParserTests()
     {
-        _sut = new PhoneNumberParser();
+        _sut = new PhoneNumberDtoParser();
     }
 
     [Fact]

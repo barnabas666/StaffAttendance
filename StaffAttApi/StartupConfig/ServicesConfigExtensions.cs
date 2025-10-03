@@ -56,6 +56,7 @@ public static class ServicesConfigExtensions
         }
 
         builder.Services.AddSingleton<IConnectionStringData, ConnectionStringData>();
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     }
 
     public static void AddAuthServices(this WebApplicationBuilder builder)

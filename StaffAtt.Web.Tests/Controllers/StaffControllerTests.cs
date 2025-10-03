@@ -18,7 +18,7 @@ public class StaffControllerTests
     private readonly Mock<IUserService> _userServiceMock = new();
     private readonly Mock<IUserContext> _userContextMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
-    private readonly Mock<IPhoneNumberParser> _phoneNumberParserMock = new();
+    private readonly Mock<IPhoneNumberDtoParser> _phoneNumberParserMock = new();
     private readonly Mock<IDepartmentSelectListService> _departmentSelectListServiceMock = new();
 
     public StaffControllerTests()

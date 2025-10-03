@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using StaffAttApi.DTOs;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Enums;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAttApi.Controllers;
 
@@ -14,11 +15,13 @@ public class StaffController : ControllerBase
 {
     private readonly IStaffService _staffService;
     private readonly ILogger<StaffController> _logger;
+    private readonly IMapper _mapper;
 
-    public StaffController(IStaffService staffService, ILogger<StaffController> logger)
+    public StaffController(IStaffService staffService, ILogger<StaffController> logger, IMapper mapper)
     {
         _staffService = staffService;
         _logger = logger;
+        _mapper = mapper;
     }
 
     // GET: api/staff/departments
@@ -47,14 +50,17 @@ public class StaffController : ControllerBase
 
         try
         {
+            // Map CreateStaffRequest to individual parameters for CreateStaffAsync
+            var staffData = _mapper.Map<CreateStaffRequest, (int DepartmentId, AddressModel Address, string PIN, string FirstName, string LastName, string EmailAddress, List<PhoneNumberModel> PhoneNumbers)>(request);
+
             await _staffService.CreateStaffAsync(
-                request.DepartmentId,
-                request.Address,
-                request.PIN,
-                request.FirstName,
-                request.LastName,
-                request.EmailAddress,
-                request.PhoneNumbers);
+                staffData.DepartmentId,
+                staffData.Address,
+                staffData.PIN,
+                staffData.FirstName,
+                staffData.LastName,
+                staffData.EmailAddress,
+                staffData.PhoneNumbers);
 
             return Ok();
         }
@@ -73,13 +79,16 @@ public class StaffController : ControllerBase
 
         try
         {
+            // Map UpdateStaffRequest to individual parameters for UpdateStaffAsync
+            var staffData = _mapper.Map<UpdateStaffRequest, (AddressModel Address, string PIN, string FirstName, string LastName, string EmailAddress, List<PhoneNumberModel> PhoneNumbers)>(request);
+
             await _staffService.UpdateStaffAsync(
-                request.Address,
-                request.PIN,
-                request.FirstName,
-                request.LastName,
-                request.EmailAddress,
-                request.PhoneNumbers);
+                staffData.Address,
+                staffData.PIN,
+                staffData.FirstName,
+                staffData.LastName,
+                staffData.EmailAddress,
+                staffData.PhoneNumbers);
 
             return Ok();
         }
@@ -148,19 +157,20 @@ public class StaffController : ControllerBase
     // remember to URL-encode @ in email address as %40
     // GET: api/staff/email?emailAddress={emailAddress}    
     [HttpGet("email")]
-    public async Task<ActionResult<StaffFullModel>> GetStaffByEmail([FromQuery] string emailAddress)
+    public async Task<ActionResult<StaffFullDto>> GetStaffByEmail([FromQuery] string emailAddress)
     {
         _logger.LogInformation("GET: api/Staff/email (Email: {Email})", emailAddress);
 
         try
         {
-            var staff = await _staffService.GetStaffByEmailAsync(emailAddress);
-            if (staff == null)
+            var staffFull = await _staffService.GetStaffByEmailAsync(emailAddress);
+            if (staffFull == null)
             {
                 _logger.LogWarning("Staff not found for Email: {Email}", emailAddress);
                 return NotFound();
             }
-            return Ok(staff);
+            var staffDto = _mapper.Map<StaffFullDto>(staffFull);
+            return Ok(staffDto);
         }
         catch (Exception ex)
         {

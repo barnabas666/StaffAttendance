@@ -61,7 +61,7 @@ else
 }
 
 builder.Services.AddTransient<IConnectionStringData, ConnectionStringData>();
-builder.Services.AddTransient<IPhoneNumberParser, PhoneNumberParser>();
+builder.Services.AddTransient<IPhoneNumberDtoParser, PhoneNumberDtoParser>();
 builder.Services.AddTransient<IUserContext, UserContext>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IDepartmentSelectListService, DepartmentSelectListService>();
@@ -69,6 +69,9 @@ builder.Services.AddTransient<IStaffSelectListService, StaffSelectListService>()
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// old Services, to be removed later after refactoring Controllers to consume API with DTOs
+builder.Services.AddTransient<IPhoneNumberParser, PhoneNumberParser>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IApiClient, ApiClient>();
