@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
 
 namespace StaffAtt.Web.Helpers;

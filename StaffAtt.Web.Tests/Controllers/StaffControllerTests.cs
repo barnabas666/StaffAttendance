@@ -7,14 +7,14 @@ using Moq;
 using StaffAtt.Web.Controllers;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Controllers;
 public class StaffControllerTests
 {
     private readonly StaffController _sut;
-    private readonly Mock<IStaffService> _staffServiceMock = new();
+    private readonly Mock<IApiClient> _apiClientMock = new();
     private readonly Mock<IUserService> _userServiceMock = new();
     private readonly Mock<IUserContext> _userContextMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
@@ -24,7 +24,7 @@ public class StaffControllerTests
     public StaffControllerTests()
     {
         _sut = new StaffController(
-            _staffServiceMock.Object,
+            _apiClientMock.Object,
             _userServiceMock.Object,
             _userContextMock.Object,
             _mapperMock.Object,
@@ -37,21 +37,28 @@ public class StaffControllerTests
     public async Task Create_ShouldReturnCreateViewWithStaffCreateViewModel()
     {
         // Arrange
-        string expectedViewName = "Create";
-        List<DepartmentModel> departments = new List<DepartmentModel>
-        {
-            new DepartmentModel { Id = 1, Title = "IT", Description = "IT department." },
-            new DepartmentModel { Id = 2, Title = "HR", Description = "Human resources department." }
-        };
-        SelectList selectListItems = new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
-        _departmentSelectListServiceMock.Setup(x => x.GetDepartmentSelectListAsync(It.IsAny<string>()))
+        const string expectedViewName = "Create";
+
+        var departments = new List<DepartmentModel>
+            {
+                new DepartmentModel { Id = 1, Title = "IT" },
+                new DepartmentModel { Id = 2, Title = "HR" }
+            };
+
+        var selectListItems = new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
+
+        _departmentSelectListServiceMock
+            .Setup(x => x.GetDepartmentSelectListAsync(It.IsAny<string>()))
             .ReturnsAsync(selectListItems);
+
         // Act
-        IActionResult result = await _sut.Create();
+        var result = await _sut.Create();
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        StaffCreateViewModel model = viewResult.Model.Should().BeAssignableTo<StaffCreateViewModel>().Subject;
+
+        var model = viewResult.Model.Should().BeAssignableTo<StaffCreateViewModel>().Subject;
         model.DepartmentItems.Should().BeEquivalentTo(selectListItems);
     }
 
@@ -59,8 +66,8 @@ public class StaffControllerTests
     public async Task CreatePost_ShouldRedirectToDetailsActionWithoutRouteValues_WhenUserHasNoAccountYet()
     {
         // Arrange
-        string expectedActionName = "Details";
-        StaffCreateViewModel staffCreateModel = new StaffCreateViewModel
+        const string expectedActionName = "Details";
+        var staffCreateModel = new StaffCreateViewModel
         {
             FirstName = "John",
             LastName = "Doe",
@@ -69,72 +76,114 @@ public class StaffControllerTests
             Address = new AddressViewModel(),
             PhoneNumbersText = "111222333,444555666",
         };
-        string userEmail = "john.doe@johndoe.com";
+
+        var userEmail = "john.doe@johndoe.com";
+
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
-        _staffServiceMock.Setup(x => x.CheckStaffByEmailAsync(userEmail)).ReturnsAsync(false);
-        _phoneNumberParserMock.Setup(x => x.ParseStringToPhoneNumbers(It.IsAny<string>()))
-            .Returns(It.IsAny<List<PhoneNumberModel>>);
-        _mapperMock.Setup(AddressViewModel => AddressViewModel.Map<AddressModel>(It.IsAny<AddressViewModel>()))
-            .Returns(It.IsAny<AddressModel>());
-        _staffServiceMock.Setup(x => x.CreateStaffAsync(Convert.ToInt32(staffCreateModel.DepartmentId),
-                                                        It.IsAny<AddressModel>(),
-                                                        staffCreateModel.PIN.ToString(),
-                                                        staffCreateModel.FirstName,
-                                                        staffCreateModel.LastName,
-                                                        userEmail,
-                                                        It.IsAny<List<PhoneNumberModel>>()))
-                                                        .Returns(Task.CompletedTask);
-        IdentityUser identityUser = new IdentityUser { Email = userEmail };
+
+        // API call: user does NOT have an account
+        _apiClientMock
+            .Setup(x => x.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<bool>.Success(false));
+
+        // API call: create staff
+        _apiClientMock
+            .Setup(x => x.PostAsync<CreateStaffRequest>("staff", It.IsAny<CreateStaffRequest>()))
+            .ReturnsAsync(Result<CreateStaffRequest>.Success(null));
+
+        // Mapping and parsing
+        _phoneNumberParserMock
+            .Setup(x => x.ParseStringToPhoneNumbers(It.IsAny<string>()))
+            .Returns(new List<PhoneNumberDto>());
+
+        _mapperMock
+            .Setup(x => x.Map<AddressDto>(It.IsAny<AddressViewModel>()))
+            .Returns(new AddressDto());
+
+        // Identity setup
+        var identityUser = new IdentityUser { Email = userEmail };
         _userServiceMock.Setup(x => x.FindByEmailAsync(userEmail)).ReturnsAsync(identityUser);
         _userServiceMock.Setup(x => x.AddToRoleAsync(identityUser, "Member")).ReturnsAsync(IdentityResult.Success);
         _userServiceMock.Setup(x => x.SignInAsync(identityUser, false)).Returns(Task.CompletedTask);
+
         // Act
-        IActionResult result = await _sut.Create(staffCreateModel);
+        var result = await _sut.Create(staffCreateModel);
+
         // Assert
-        RedirectToActionResult redirectToActionResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectToActionResult.ActionName.Should().Be(expectedActionName);
-        redirectToActionResult.RouteValues.Should().BeNull();
+        var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirect.ActionName.Should().Be(expectedActionName);
+        redirect.RouteValues.Should().BeNull();
     }
 
     [Fact]
     public async Task CreatePost_ShouldRedirectToDetailsActionWithRouteValues_WhenUserHasAlreadyAccount()
     {
         // Arrange
-        string expectedActionName = "Details";
-        string expectedRouteName = "message";
-        string expectedMessage = "You have already created account!";
-        StaffCreateViewModel staffCreateModel = new StaffCreateViewModel();
-        string userEmail = "john.doe@johndoe.com";
+        const string expectedActionName = "Details";
+        const string expectedRouteName = "message";
+        const string expectedMessage = "You have already created account!";
+
+        var staffCreateModel = new StaffCreateViewModel();
+        var userEmail = "john.doe@johndoe.com";
+
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
-        _staffServiceMock.Setup(x => x.CheckStaffByEmailAsync(userEmail)).ReturnsAsync(true);
+
+        // API call: user ALREADY has an account
+        _apiClientMock
+            .Setup(x => x.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<bool>.Success(true));
+
         // Act
-        IActionResult result = await _sut.Create(staffCreateModel);
+        var result = await _sut.Create(staffCreateModel);
+
         // Assert
-        RedirectToActionResult redirectToActionResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectToActionResult.ActionName.Should().Be(expectedActionName);
-        redirectToActionResult.RouteValues[expectedRouteName].Should().Be(expectedMessage);
+        var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirect.ActionName.Should().Be(expectedActionName);
+        redirect.RouteValues[expectedRouteName].Should().Be(expectedMessage);
     }
 
     [Fact]
     public async Task Details_ShouldReturnDetailsViewWithStaffDetailsViewModel_WhenUserHasAlreadyAccount()
     {
         // Arrange
-        string expectedViewName = "Details";
-        string expectedMessage = "expected message";
-        string userEmail = "john.doe@johndoe.com";
+        const string expectedViewName = "Details";
+        const string expectedMessage = "expected message";
+        var userEmail = "john.doe@johndoe.com";
+
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
-        _staffServiceMock.Setup(x => x.CheckStaffByEmailAsync(userEmail)).ReturnsAsync(true);
-        _staffServiceMock.Setup(x => x.GetStaffByEmailAsync(userEmail)).ReturnsAsync(It.IsAny<StaffFullModel>());
-        StaffDetailsViewModel expectedDetailsModel = new StaffDetailsViewModel();
-        _mapperMock.Setup(x => x.Map<StaffDetailsViewModel>(It.IsAny<StaffFullModel>()))
+
+        // API mock: user exists
+        _apiClientMock
+            .Setup(x => x.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<bool>.Success(true));
+
+        // API mock: get staff details
+        var staffFullDto = new StaffFullDto
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            EmailAddress = userEmail
+        };
+
+        _apiClientMock
+            .Setup(x => x.GetAsync<StaffFullDto>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<StaffFullDto>.Success(staffFullDto));
+
+        // Mapping to ViewModel
+        var expectedDetailsModel = new StaffDetailsViewModel();
+        _mapperMock
+            .Setup(x => x.Map<StaffDetailsViewModel>(staffFullDto))
             .Returns(expectedDetailsModel);
-        expectedDetailsModel.Message = expectedMessage;
+
         // Act
-        IActionResult result = await _sut.Details(expectedMessage);
+        var result = await _sut.Details(expectedMessage);
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        StaffDetailsViewModel model = viewResult.Model.Should().BeAssignableTo<StaffDetailsViewModel>().Subject;
+
+        var model = viewResult.Model.Should().BeAssignableTo<StaffDetailsViewModel>().Subject;
+        model.Should().BeEquivalentTo(expectedDetailsModel);
         model.Message.Should().Be(expectedMessage);
     }
 
@@ -142,72 +191,105 @@ public class StaffControllerTests
     public async Task Details_ShouldRedirectToCreateAction_WhenUserHasNoAccountYet()
     {
         // Arrange
-        string expectedActionName = "Create";
-        string userEmail = "john.doe@johndoe.com";
+        const string expectedActionName = "Create";
+        var userEmail = "john.doe@johndoe.com";
+
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
-        _staffServiceMock.Setup(x => x.CheckStaffByEmailAsync(userEmail)).ReturnsAsync(false);
+
+        // API mock: user does NOT exist
+        _apiClientMock
+            .Setup(x => x.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<bool>.Success(false));
+
         // Act
-        IActionResult result = await _sut.Details(It.IsAny<string>());
+        var result = await _sut.Details(It.IsAny<string>());
+
         // Assert
-        RedirectToActionResult redirectToActionResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectToActionResult.ActionName.Should().Be(expectedActionName);
+        var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirect.ActionName.Should().Be(expectedActionName);
     }
 
     [Fact]
     public async Task Update_ShouldReturnUpdateViewWithStaffUpdateViewModel()
     {
         // Arrange
-        string expectedViewName = "Update";
-        string userEmail = "john.doe@johndoe.com";
-        StaffFullModel fullModel = new StaffFullModel();
-        StaffUpdateViewModel expectedUpdateModel = new StaffUpdateViewModel();
+        const string expectedViewName = "Update";
+        var userEmail = "john.doe@johndoe.com";
+
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
-        _staffServiceMock.Setup(x => x.GetStaffByEmailAsync(userEmail)).ReturnsAsync(fullModel);
-        _mapperMock.Setup(x => x.Map<StaffUpdateViewModel>(fullModel))
+
+        var staffDto = new StaffFullDto
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            EmailAddress = userEmail,
+            PhoneNumbers = new List<PhoneNumberDto>
+                {
+                    new PhoneNumberDto { Id = 1, PhoneNumber = "111222333" }
+                }
+        };
+
+        // API mock: get staff data
+        _apiClientMock
+            .Setup(x => x.GetAsync<StaffFullDto>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<StaffFullDto>.Success(staffDto));
+
+        // Mapping
+        var expectedUpdateModel = new StaffUpdateViewModel();
+        _mapperMock.Setup(x => x.Map<StaffUpdateViewModel>(staffDto))
             .Returns(expectedUpdateModel);
-        _phoneNumberParserMock.Setup(x => x.ParsePhoneNumbersToString(fullModel.PhoneNumbers))
-            .Returns(expectedUpdateModel.PhoneNumbersText);
+
+        _phoneNumberParserMock
+            .Setup(x => x.ParsePhoneNumbersToString(staffDto.PhoneNumbers))
+            .Returns("111222333");
+
         // Act
-        IActionResult result = await _sut.Update();
+        var result = await _sut.Update();
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        StaffUpdateViewModel model = viewResult.Model.Should().BeAssignableTo<StaffUpdateViewModel>().Subject;
+        viewResult.Model.Should().BeAssignableTo<StaffUpdateViewModel>();
     }
 
     [Fact]
     public async Task UpdatePost_ShouldRedirectToDetailsAction()
     {
         // Arrange
-        string expectedActionName = "Details";
-        string userEmail = "john.doe@johndoe.com";
+        const string expectedActionName = "Details";
+        var userEmail = "john.doe@johndoe.com";
+
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
-        StaffUpdateViewModel staffUpdateModel = new StaffUpdateViewModel
+
+        var updateModel = new StaffUpdateViewModel
         {
             FirstName = "John",
             LastName = "Doe",
             PIN = 1234,
             Address = new AddressViewModel(),
             EmailAddress = userEmail,
-            PhoneNumbersText = "111222333,444555666",
+            PhoneNumbersText = "111222333,444555666"
         };
-        List<PhoneNumberModel> phoneNumbers = new List<PhoneNumberModel>();
-        _phoneNumberParserMock.Setup(x => x.ParseStringToPhoneNumbers(staffUpdateModel.PhoneNumbersText))
-            .Returns(phoneNumbers);
-        AddressModel address = new AddressModel();
-        _mapperMock.Setup(x => x.Map<AddressModel>(staffUpdateModel.Address))
-            .Returns(address);
-        _staffServiceMock.Setup(x => x.UpdateStaffAsync(address,
-                                                        staffUpdateModel.PIN.ToString(),
-                                                        staffUpdateModel.FirstName,
-                                                        staffUpdateModel.LastName,
-                                                        userEmail,
-                                                        phoneNumbers))
-            .Returns(Task.CompletedTask);
+
+        // Parse and map
+        _phoneNumberParserMock
+            .Setup(x => x.ParseStringToPhoneNumbers(updateModel.PhoneNumbersText))
+            .Returns(new List<PhoneNumberDto>());
+
+        _mapperMock
+            .Setup(x => x.Map<AddressDto>(updateModel.Address))
+            .Returns(new AddressDto());
+
+        // API call to update staff
+        _apiClientMock
+            .Setup(x => x.PutAsync<UpdateStaffRequest>("staff", It.IsAny<UpdateStaffRequest>()))
+            .ReturnsAsync(Result<UpdateStaffRequest>.Success(null));
+
         // Act
-        IActionResult result = await _sut.Update(staffUpdateModel);
+        var result = await _sut.Update(updateModel);
+
         // Assert
-        RedirectToActionResult redirectToActionResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectToActionResult.ActionName.Should().Be(expectedActionName);
+        var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirect.ActionName.Should().Be(expectedActionName);
     }
 }

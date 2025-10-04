@@ -1,4 +1,4 @@
-﻿using StaffAttLibrary.Models;
+﻿using StaffAttShared.DTOs;
 using System.ComponentModel;
 
 namespace StaffAtt.Web.Models;
@@ -22,7 +22,7 @@ public class StaffDetailsViewModel
     /// Staff's Phone Numbers.
     /// </summary>
     [DisplayName("Phone Numbers")]
-    public List<PhoneNumberModel> PhoneNumbers { get; set; } = new List<PhoneNumberModel>();
+    public List<PhoneNumberDto> PhoneNumbers { get; set; } = new List<PhoneNumberDto>();
 
     /// <summary>
     /// Details Action optional parameter. Some warning message from different Action, probably from Create.

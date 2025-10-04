@@ -2,27 +2,27 @@
 using FluentAssertions;
 using StaffAtt.Web.Models;
 using StaffAtt.Web.Profiles;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Profiles;
-public class StaffUpdateProfileTests
+public class StaffUpdateViewProfileTests
 {
     [Fact]
-    public void TestStaffUpdateMapping()
+    public void TestStaffUpdateViewMapping()
     {
         // Arrange
         var config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<StaffUpdateViewProfile>();
-            cfg.AddProfile<AddressProfile>();
+            cfg.AddProfile<AddressDtoProfile>();
         });
         var mapper = config.CreateMapper();
-        var staffFullModel = new StaffFullModel
+        var staffFullModel = new StaffFullDto
         {
             FirstName = "John",
             LastName = "Doe",
             EmailAddress = "john.doe@johndoe.com",
-            Address = new AddressModel
+            Address = new AddressDto
             {
                 Street = "123 Main St",
                 City = "Anytown",

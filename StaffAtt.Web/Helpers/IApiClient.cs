@@ -4,5 +4,5 @@ public interface IApiClient
 {
     Task<Result<T>> GetAsync<T>(string endpoint);
     Task<Result<T>> PostAsync<T>(string endpoint, T data);
-    // Add Put/Delete as needed
+    Task<Result<T>> PutAsync<T>(string endpoint, T data);
 }

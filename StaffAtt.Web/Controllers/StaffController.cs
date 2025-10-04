@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Data;
-using StaffAttLibrary.Models;
+
 using StaffAttShared.DTOs;
-using System.Net.Http.Headers;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -17,34 +15,26 @@ namespace StaffAtt.Web.Controllers;
 [Authorize]
 public class StaffController : Controller
 {
-    private HttpClient httpClient;
+
     private readonly IApiClient _apiClient;
-    private readonly IStaffService _staffService;
     private readonly IUserService _userService;
     private readonly IUserContext _userContext;
     private readonly IMapper _mapper;
     private readonly IPhoneNumberDtoParser _phoneNumberDtoParser;
-    private readonly IPhoneNumberParser _phoneNumberParser;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffController(IHttpClientFactory httpClientFactory,
-                           IApiClient apiClient,
-                           IStaffService staffService,
+    public StaffController(IApiClient apiClient,                           
                            IUserService userService,
                            IUserContext userContext,
                            IMapper mapper,
-                           IPhoneNumberDtoParser phoneNumberDtoParser,
-                           IPhoneNumberParser phoneNumberParser,
+                           IPhoneNumberDtoParser phoneNumberDtoParser,                           
                            IDepartmentSelectListService departmentService)
-    {
-        httpClient = httpClientFactory.CreateClient("api");
-        _apiClient = apiClient;
-        _staffService = staffService;
+    {        
+        _apiClient = apiClient;        
         _userService = userService;
         _userContext = userContext;
         _mapper = mapper;
-        _phoneNumberDtoParser = phoneNumberDtoParser;
-        _phoneNumberParser = phoneNumberParser;
+        _phoneNumberDtoParser = phoneNumberDtoParser;        
         _departmentService = departmentService;
     }
 
@@ -54,6 +44,7 @@ public class StaffController : Controller
     /// to View which modifies StaffCreateModel properties and send back.
     /// </summary>
     /// <returns>View with populated StaffCreateModel.</returns>
+    [HttpGet]
     public async Task<IActionResult> Create()
     {
         // Model to send to our View, populate it there and send model back.
@@ -124,6 +115,7 @@ public class StaffController : Controller
     /// </summary>
     /// <param name="message">Optional parameter. Some warning message from different Action.</param>
     /// <returns>View with populated StaffDetailsModel inside.</returns>
+    [HttpGet]
     public async Task<IActionResult> Details(string message = "")
     {
         string userEmail = _userContext.GetUserEmail();
@@ -137,7 +129,7 @@ public class StaffController : Controller
             return RedirectToAction("Create");
 
         // 2. Get staff details
-        var detailsResult = await _apiClient.GetAsync<StaffFullModel>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}");
+        var detailsResult = await _apiClient.GetAsync<StaffFullDto>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}");
         if (!detailsResult.IsSuccess || detailsResult.Value is null)
             return View("Error", detailsResult.ErrorMessage ?? "Staff details could not be loaded.");
 
@@ -153,6 +145,7 @@ public class StaffController : Controller
     /// Get Update Action. We get Staff's personal info and populate StaffUpdateModel with it.
     /// </summary>
     /// <returns>View with populated StaffUpdateModel.</returns>
+    [HttpGet]
     public async Task<IActionResult> Update()
     {
         string userEmail = _userContext.GetUserEmail();
@@ -174,27 +167,34 @@ public class StaffController : Controller
 
 
     /// <summary>
-    /// Post Update Action. We update Staff's personal info.
+    /// Put Update Action. We update Staff's personal info.
     /// We use Custom Action Filter (class ValidateModelAttribute) to validate model state - [ValidateModel].
     /// </summary>
     /// <param name="updateModel">Staff Updated Information.</param>
     /// <returns>Redirect to Details Action.</returns>
-    [HttpPost]
+    [HttpPut]
     [ValidateModel]
     public async Task<IActionResult> Update(StaffUpdateViewModel updateModel)
     {
         string userEmail = _userContext.GetUserEmail();
 
-        List<PhoneNumberModel> phoneNumbers = _phoneNumberParser.ParseStringToPhoneNumbers(updateModel.PhoneNumbersText);
+        List<PhoneNumberDto> phoneNumbers = _phoneNumberDtoParser.ParseStringToPhoneNumbers(updateModel.PhoneNumbersText);
+        AddressDto address = _mapper.Map<AddressDto>(updateModel.Address);
 
-        AddressModel address = _mapper.Map<AddressModel>(updateModel.Address);
+        var request = new UpdateStaffRequest
+        {
+            Address = address,
+            PIN = updateModel.PIN.ToString(),
+            FirstName = updateModel.FirstName,
+            LastName = updateModel.LastName,
+            EmailAddress = userEmail,
+            PhoneNumbers = phoneNumbers
+        };
 
-        await _staffService.UpdateStaffAsync(address,
-                                   updateModel.PIN.ToString(),
-                                   updateModel.FirstName,
-                                   updateModel.LastName,
-                                   userEmail,
-                                   phoneNumbers);
+        var result = await _apiClient.PutAsync<UpdateStaffRequest>("staff", request);
+
+        if (!result.IsSuccess)
+            return View("Error", result.ErrorMessage);
 
         return RedirectToAction("Details");
     }

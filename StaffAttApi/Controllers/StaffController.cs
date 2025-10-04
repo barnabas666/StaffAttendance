@@ -50,17 +50,17 @@ public class StaffController : ControllerBase
 
         try
         {
-            // Map CreateStaffRequest to individual parameters for CreateStaffAsync
-            var staffData = _mapper.Map<CreateStaffRequest, (int DepartmentId, AddressModel Address, string PIN, string FirstName, string LastName, string EmailAddress, List<PhoneNumberModel> PhoneNumbers)>(request);
+            var address = _mapper.Map<AddressModel>(request.Address);
+            var phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
 
             await _staffService.CreateStaffAsync(
-                staffData.DepartmentId,
-                staffData.Address,
-                staffData.PIN,
-                staffData.FirstName,
-                staffData.LastName,
-                staffData.EmailAddress,
-                staffData.PhoneNumbers);
+                request.DepartmentId,
+                address,
+                request.PIN,
+                request.FirstName,
+                request.LastName,
+                request.EmailAddress,
+                phoneNumbers);
 
             return Ok();
         }
@@ -79,16 +79,16 @@ public class StaffController : ControllerBase
 
         try
         {
-            // Map UpdateStaffRequest to individual parameters for UpdateStaffAsync
-            var staffData = _mapper.Map<UpdateStaffRequest, (AddressModel Address, string PIN, string FirstName, string LastName, string EmailAddress, List<PhoneNumberModel> PhoneNumbers)>(request);
+            var address = _mapper.Map<AddressModel>(request.Address);
+            var phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
 
             await _staffService.UpdateStaffAsync(
-                staffData.Address,
-                staffData.PIN,
-                staffData.FirstName,
-                staffData.LastName,
-                staffData.EmailAddress,
-                staffData.PhoneNumbers);
+                address,
+                request.PIN,
+                request.FirstName,
+                request.LastName,
+                request.EmailAddress,
+                phoneNumbers);
 
             return Ok();
         }

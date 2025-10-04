@@ -1,13 +1,13 @@
 ﻿using FluentAssertions;
 using StaffAtt.Web.Helpers;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Helpers;
-public class PhoneNumberParserTests
+public class PhoneNumberDtoParserTests
 {
     private readonly PhoneNumberDtoParser _sut;
 
-    public PhoneNumberParserTests()
+    public PhoneNumberDtoParserTests()
     {
         _sut = new PhoneNumberDtoParser();
     }
@@ -17,11 +17,11 @@ public class PhoneNumberParserTests
     {
         // Arrange
         string input = "111222333,444555666,777888999";
-        var expected = new List<PhoneNumberModel>
+        var expected = new List<PhoneNumberDto>
         {
-            new PhoneNumberModel { PhoneNumber = "111222333" },
-            new PhoneNumberModel { PhoneNumber = "444555666" },
-            new PhoneNumberModel { PhoneNumber = "777888999" }
+            new PhoneNumberDto { PhoneNumber = "111222333" },
+            new PhoneNumberDto { PhoneNumber = "444555666" },
+            new PhoneNumberDto { PhoneNumber = "777888999" }
         };
         // Act
         var result = _sut.ParseStringToPhoneNumbers(input);
@@ -33,11 +33,11 @@ public class PhoneNumberParserTests
     public void ParsePhoneNumbersToString_ShouldReturnString()
     {
         // Arrange
-        var phoneNumbers = new List<PhoneNumberModel>
+        var phoneNumbers = new List<PhoneNumberDto>
         {
-            new PhoneNumberModel { PhoneNumber = "111222333" },
-            new PhoneNumberModel { PhoneNumber = "444555666" },
-            new PhoneNumberModel { PhoneNumber = "777888999" }
+            new PhoneNumberDto { PhoneNumber = "111222333" },
+            new PhoneNumberDto { PhoneNumber = "444555666" },
+            new PhoneNumberDto { PhoneNumber = "777888999" }
         };
         string expected = "111222333,444555666,777888999";
         // Act

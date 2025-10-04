@@ -68,5 +68,22 @@ public class ApiClient : IApiClient
 
         return Result<T>.Success(data);
     }
+
+    public async Task<Result<T>> PutAsync<T>(string endpoint, T data)
+    {
+        var client = CreateClient();
+        var response = await client.PutAsJsonAsync(endpoint, data);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            return Result<T>.Failure(
+                $"PUT {endpoint} failed with {(int)response.StatusCode} {response.ReasonPhrase}. {error}"
+            );
+        }
+
+        return Result<T>.Success(data);
+    }
+
 }
 
