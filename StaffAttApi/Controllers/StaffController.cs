@@ -102,7 +102,7 @@ public class StaffController : ControllerBase
     // Example request: GET /api/staff/basic/filter?departmentId=5&approvedType=Approved    
     // GET: api/staff/basic/filter?departmentId={departmentId}&approvedType={approvedType}
     [HttpGet("basic/filter")]
-    public async Task<ActionResult<List<StaffBasicModel>>> GetAllBasicStaffFiltered(
+    public async Task<ActionResult<List<StaffBasicDto>>> GetAllBasicStaffFiltered(
         [FromQuery] int departmentId,
         [FromQuery] ApprovedType approvedType)
     {
@@ -113,13 +113,14 @@ public class StaffController : ControllerBase
         {
             var staffList = await _staffService.GetAllBasicStaffFilteredAsync(departmentId, approvedType);
 
-            if (staffList == null || staffList.Count == 0)
+            if (staffList == null)
             {
                 _logger.LogWarning("No staff found for DepartmentId: {departmentId}, ApprovedType: {approvedType}",
                     departmentId, approvedType);
                 return NotFound();
             }
-            return Ok(staffList);
+            var staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
+            return Ok(staffDto);
         }
         catch (Exception ex)
         {
@@ -131,7 +132,7 @@ public class StaffController : ControllerBase
 
     // GET: api/staff/basic
     [HttpGet("basic")]
-    public async Task<ActionResult<List<StaffBasicModel>>> GetAllBasicStaff()
+    public async Task<ActionResult<List<StaffBasicDto>>> GetAllBasicStaff()
     {
         _logger.LogInformation("GET: api/Staff/basic");
 
@@ -139,12 +140,13 @@ public class StaffController : ControllerBase
         {
             var staffList = await _staffService.GetAllBasicStaffAsync();
 
-            if (staffList == null || staffList.Count == 0)
+            if (staffList == null)
             {
                 _logger.LogWarning("No staff found.");
                 return NotFound();
             }
-            return Ok(staffList);
+            var staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
+            return Ok(staffDto);
         }
         catch (Exception ex)
         {
@@ -182,19 +184,20 @@ public class StaffController : ControllerBase
     // Example request: GET /api/staff/123
     // GET: api/staff/{id}    
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<StaffFullModel>> GetStaffById(int id)
+    public async Task<ActionResult<StaffFullDto>> GetStaffById(int id)
     {
         _logger.LogInformation("GET: api/Staff/{id} (Staff's Id: {Id})", id, id);
 
         try
         {
-            var staff = await _staffService.GetStaffByIdAsync(id);
-            if (staff == null)
+            var staffFull = await _staffService.GetStaffByIdAsync(id);
+            if (staffFull == null)
             {
                 _logger.LogWarning("Staff not found for Id: {Id}", id);
                 return NotFound();
             }
-            return Ok(staff);
+            var staffDto = _mapper.Map<StaffFullDto>(staffFull);
+            return Ok(staffDto);
         }
         catch (Exception ex)
         {

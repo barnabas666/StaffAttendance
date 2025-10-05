@@ -6,6 +6,7 @@ using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -15,16 +16,19 @@ namespace StaffAtt.Web.Controllers;
 [Authorize(Roles = "Administrator")]
 public class StaffManagementController : Controller
 {
+    private readonly IApiClient _apiClient;
     private readonly IStaffService _staffService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffManagementController(IStaffService staffService,
+    public StaffManagementController(IApiClient apiClient,
+                                     IStaffService staffService,
                                      IUserService userService,
                                      IMapper mapper,
                                      IDepartmentSelectListService departmentService)
     {
+        _apiClient = apiClient;
         _staffService = staffService;
         _userService = userService;
         _mapper = mapper;
@@ -38,12 +42,17 @@ public class StaffManagementController : Controller
     /// It also retrieves a list of departments for selection purposes. The resulting data is passed  to the view for
     /// rendering. Display Check-In Approval status for all staff.</remarks>
     /// <returns>An <see cref="IActionResult"/> that renders the staff management list view with the populated data.</returns>
+    [HttpGet]
     public async Task<IActionResult> List()
     {
         StaffManagementListViewModel staffModel = new StaffManagementListViewModel();
-        List<StaffBasicModel> staffs = await _staffService.GetAllBasicStaffAsync();
-        staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
 
+        var result = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
+
+        if (!result.IsSuccess || result.Value is null)
+            return View("Error", result.ErrorMessage ?? "Failed to load staff list.");
+
+        staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(result.Value);
         staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
 
         return View("List", staffModel);
@@ -61,9 +70,19 @@ public class StaffManagementController : Controller
     [HttpPost]
     public async Task<IActionResult> List(StaffManagementListViewModel staffModel)
     {
-        List<StaffBasicModel> staffs = await _staffService.GetAllBasicStaffFilteredAsync(Convert.ToInt32(staffModel.DepartmentId),
-                                                                                              staffModel.ApprovedRadio);
-        staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(staffs);
+        // Call API endpoint with query parameters
+        var result = await _apiClient.GetAsync<List<StaffBasicDto>>(
+            $"staff/basic/filter?departmentId={staffModel.DepartmentId}&approvedType={(int)staffModel.ApprovedRadio}"
+        );
+       
+        if (!result.IsSuccess || result.Value is null)
+            return View("Error", new ErrorViewModel
+            {
+                Message = result.ErrorMessage ?? "Failed to load filtered staff list."
+            });
+
+
+        staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(result.Value);
 
         staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
 
@@ -78,11 +97,17 @@ public class StaffManagementController : Controller
     /// name="id"/> corresponds to an existing staff member in the system.</remarks>
     /// <param name="id">The unique identifier of the staff member to retrieve.</param>
     /// <returns>An <see cref="IActionResult"/> that renders the details view of the staff member.</returns>
+    [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
-        StaffFullModel staff = await _staffService.GetStaffByIdAsync(id);
-        StaffDetailsViewModel detailsModel = _mapper.Map<StaffDetailsViewModel>(staff);
-
+        // Call API to get staff by ID
+        var result = await _apiClient.GetAsync<StaffFullDto>($"staff/{id}");
+        
+        if (!result.IsSuccess || result.Value is null)
+            return View("Error", result.ErrorMessage ?? $"Failed to load staff with ID {id}.");
+        
+        var detailsModel = _mapper.Map<StaffDetailsViewModel>(result.Value);
+        
         return View("Details", detailsModel);
     }
 

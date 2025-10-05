@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-
 using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Controllers;
@@ -165,14 +164,13 @@ public class StaffController : Controller
         return View("Update", updateModel);
     }
 
-
     /// <summary>
-    /// Put Update Action. We update Staff's personal info.
+    /// Post Update Action. We update Staff's personal info.
     /// We use Custom Action Filter (class ValidateModelAttribute) to validate model state - [ValidateModel].
     /// </summary>
     /// <param name="updateModel">Staff Updated Information.</param>
     /// <returns>Redirect to Details Action.</returns>
-    [HttpPut]
+    [HttpPost]
     [ValidateModel]
     public async Task<IActionResult> Update(StaffUpdateViewModel updateModel)
     {
