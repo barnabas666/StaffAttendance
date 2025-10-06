@@ -33,8 +33,13 @@
             @Html.DisplayFor(model => model.BasicInfo.Title)
         </dd>
     </dl>
-    
-    <form asp-action="Delete">
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        @* Hidden inputs ensure model binding works *@
+        <input asp-for="BasicInfo.Id" type="hidden" />
+        <input asp-for="BasicInfo.EmailAddress" type="hidden" />
+
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="List" class="btn btn-secondary">Cancel</a>
     </form>

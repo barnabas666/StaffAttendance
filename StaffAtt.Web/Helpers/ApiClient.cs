@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Text.Json;
+using System.Net.Http.Headers;
 
 namespace StaffAtt.Web.Helpers;
 
@@ -47,6 +48,15 @@ public class ApiClient : IApiClient
 
             return Result<T>.Success(value);
         }
+        catch (JsonException)
+        {
+            // if it fails, maybe it's plain text
+            var raw = await response.Content.ReadAsStringAsync();
+            if (typeof(T) == typeof(string))
+                return Result<T>.Success((T)(object)raw.Trim());
+
+            return Result<T>.Failure($"Failed to deserialize JSON from {endpoint}.");
+        }
         catch (Exception ex)
         {
             return Result<T>.Failure($"Failed to deserialize response from {endpoint}. {ex.Message}");
@@ -85,5 +95,20 @@ public class ApiClient : IApiClient
         return Result<T>.Success(data);
     }
 
+    public async Task<Result<bool>> DeleteAsync(string endpoint)
+    {
+        var client = CreateClient();
+        var response = await client.DeleteAsync(endpoint);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            return Result<bool>.Failure(
+                $"DELETE {endpoint} failed with {(int)response.StatusCode} {response.ReasonPhrase}. {error}"
+            );
+        }
+
+        return Result<bool>.Success(true);
+    }
 }
 

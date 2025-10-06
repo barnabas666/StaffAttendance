@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Models;
 using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Controllers;
@@ -48,7 +47,6 @@ public class StaffManagementController : Controller
         StaffManagementListViewModel staffModel = new StaffManagementListViewModel();
 
         var result = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
-
         if (!result.IsSuccess || result.Value is null)
             return View("Error", result.ErrorMessage ?? "Failed to load staff list.");
 
@@ -73,17 +71,11 @@ public class StaffManagementController : Controller
         // Call API endpoint with query parameters
         var result = await _apiClient.GetAsync<List<StaffBasicDto>>(
             $"staff/basic/filter?departmentId={staffModel.DepartmentId}&approvedType={(int)staffModel.ApprovedRadio}"
-        );
-       
+        );       
         if (!result.IsSuccess || result.Value is null)
-            return View("Error", new ErrorViewModel
-            {
-                Message = result.ErrorMessage ?? "Failed to load filtered staff list."
-            });
-
+            return View("Error", result.ErrorMessage ?? "Failed to load filtered staff list.");
 
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(result.Value);
-
         staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
 
         return View("List", staffModel);
@@ -101,8 +93,7 @@ public class StaffManagementController : Controller
     public async Task<IActionResult> Details(int id)
     {
         // Call API to get staff by ID
-        var result = await _apiClient.GetAsync<StaffFullDto>($"staff/{id}");
-        
+        var result = await _apiClient.GetAsync<StaffFullDto>($"staff/{id}");        
         if (!result.IsSuccess || result.Value is null)
             return View("Error", result.ErrorMessage ?? $"Failed to load staff with ID {id}.");
         
@@ -120,11 +111,14 @@ public class StaffManagementController : Controller
     /// <param name="id">The unique identifier of the staff member to update.</param>
     /// <returns>An <see cref="IActionResult"/> that renders the update view populated with the staff member's details  and a
     /// list of available departments.</returns>
+    [HttpGet]
     public async Task<IActionResult> Update(int id)
     {
-        StaffBasicModel basicModel = await _staffService.GetBasicStaffByIdAsync(id);
-        StaffManagementUpdateViewModel updateModel = _mapper.Map<StaffManagementUpdateViewModel>(basicModel);
+        var result = await _apiClient.GetAsync<StaffBasicDto>($"staff/basic/{id}");
+        if (!result.IsSuccess || result.Value is null)
+            return View("Error", result.ErrorMessage ?? $"Failed to load staff with ID {id}.");
 
+        var updateModel = _mapper.Map<StaffManagementUpdateViewModel>(result.Value);
         updateModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync(String.Empty);
 
         return View("Update", updateModel);
@@ -133,9 +127,16 @@ public class StaffManagementController : Controller
     [HttpPost]
     public async Task<IActionResult> Update(StaffManagementUpdateViewModel updateModel)
     {
-        await _staffService.UpdateStaffByAdminAsync(updateModel.BasicInfo.Id,
-                                          Convert.ToInt32(updateModel.BasicInfo.DepartmentId),
-                                          updateModel.BasicInfo.IsApproved);
+        var request = new UpdateStaffByAdminRequest
+        {
+            Id = updateModel.BasicInfo.Id,
+            DepartmentId = Convert.ToInt32(updateModel.BasicInfo.DepartmentId),
+            IsApproved = updateModel.BasicInfo.IsApproved
+        };
+
+        var createResult = await _apiClient.PutAsync<UpdateStaffByAdminRequest>("staff/admin", request);
+        if (!createResult.IsSuccess)
+            return View("Error", createResult.ErrorMessage ?? "Failed to update staff.");
 
         return RedirectToAction("List");
     }
@@ -147,11 +148,14 @@ public class StaffManagementController : Controller
     /// <param name="id">The unique identifier of the staff member to delete.</param>
     /// <returns>An <see cref="IActionResult"/> that renders the delete confirmation view populated with the staff member's
     /// details.</returns>
+    [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        StaffBasicModel basicModel = await _staffService.GetBasicStaffByIdAsync(id);
+        var result = await _apiClient.GetAsync<StaffBasicDto>($"staff/basic/{id}");        
+        if (!result.IsSuccess || result.Value is null)
+            return View("Error", result.ErrorMessage ?? $"Failed to load staff with ID {id}.");
 
-        StaffManagementDeleteViewModel deleteModel = _mapper.Map<StaffManagementDeleteViewModel>(basicModel);
+        StaffManagementDeleteViewModel deleteModel = _mapper.Map<StaffManagementDeleteViewModel>(result.Value);
 
         // return View with our Staff Info to delete.
         return View("Delete", deleteModel);
@@ -163,20 +167,30 @@ public class StaffManagementController : Controller
     /// <remarks>This method performs the following actions: Retrieves
     /// the email address of the staff member using their ID. Deletes the staff
     /// member from the system. Finds and deletes the associated user account
-    /// based on the retrieved email address. Ensure that the <paramref name="staffModel"/>
+    /// based on the retrieved email address. Ensure that the <paramref name="deleteModel"/>
     /// contains a valid staff ID before calling this method.</remarks>
-    /// <param name="staffModel">The model containing the ID of the staff member to delete.</param>
+    /// <param name="deleteModel">The model containing the ID of the staff member to delete.</param>
     /// <returns>An <see cref="IActionResult"/> that redirects to the "List" action after the deletion is complete.</returns>
     [HttpPost]
-    public async Task<IActionResult> Delete(StaffBasicModel staffModel)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(StaffManagementDeleteViewModel deleteModel)
     {
-        string userEmail = await _staffService.GetStaffEmailByIdAsync(staffModel.Id);
-        await _staffService.DeleteStaffAsync(staffModel.Id);
+        int id = deleteModel.BasicInfo.Id;
+        string userEmail = deleteModel.BasicInfo.EmailAddress;
 
+        if (id <= 0)
+            return View("Error", new ErrorViewModel { Message = "Invalid staff ID." });     
+
+        // Delete staff record
+        var deleteStaffResult = await _apiClient.DeleteAsync($"staff/{id}");
+        if (!deleteStaffResult.IsSuccess)
+            return View("Error", new ErrorViewModel { Message = deleteStaffResult.ErrorMessage ?? "Failed to delete staff record." });
+
+        // Delete IdentityUser
         IdentityUser userToDelete = await _userService.FindByEmailAsync(userEmail);
-        await _userService.DeleteIdentityUserAsync(userToDelete);
+        if (userToDelete is not null)
+            await _userService.DeleteIdentityUserAsync(userToDelete);
 
-        // After deleting Staff we redirect back to List Action.
         return RedirectToAction("List");
     }
 }
