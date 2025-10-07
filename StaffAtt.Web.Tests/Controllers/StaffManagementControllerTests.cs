@@ -7,15 +7,16 @@ using Moq;
 using StaffAtt.Web.Controllers;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Data;
 using StaffAttLibrary.Enums;
-using StaffAttLibrary.Models;
+
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Controllers;
+
 public class StaffManagementControllerTests
 {
     private readonly StaffManagementController _sut;
-    private readonly Mock<IStaffService> _staffServiceMock = new();
+    private readonly Mock<IApiClient> _apiClientMock = new();
     private readonly Mock<IUserService> _userServiceMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
     private readonly Mock<IDepartmentSelectListService> _departmentSelectListServiceMock = new();
@@ -23,7 +24,7 @@ public class StaffManagementControllerTests
     public StaffManagementControllerTests()
     {
         _sut = new StaffManagementController(
-            _staffServiceMock.Object,
+            _apiClientMock.Object,           
             _userServiceMock.Object,
             _mapperMock.Object,
             _departmentSelectListServiceMock.Object
@@ -35,27 +36,40 @@ public class StaffManagementControllerTests
     {
         // Arrange
         string expectedViewName = "List";
-        StaffManagementListViewModel staffManagementListViewModel = new StaffManagementListViewModel();
-        List<StaffBasicModel> staffBasicModels = new List<StaffBasicModel>();
-        _staffServiceMock.Setup(m => m.GetAllBasicStaffAsync()).
-            ReturnsAsync(staffBasicModels);
-        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(staffBasicModels))
-            .Returns(staffManagementListViewModel.BasicInfos);
-        List<DepartmentModel> departments = new List<DepartmentModel>
+
+        // Mock API result
+        var staffDtos = new List<StaffBasicDto>
         {
-            new DepartmentModel { Id = 1, Title = "IT", Description = "IT department." },
-            new DepartmentModel { Id = 2, Title = "HR", Description = "Human resources department." }
+            new() { Id = 1, FirstName = "John", LastName = "Doe", DepartmentId = 1, Title = "IT" },
+            new() { Id = 2, FirstName = "Jane", LastName = "Smith", DepartmentId = 2, Title = "HR" }
         };
-        SelectList selectListItems = new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
-        _departmentSelectListServiceMock.Setup(m => m.GetDepartmentSelectListAsync("All"))
-            .ReturnsAsync(selectListItems);
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>("staff/basic"))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Success(staffDtos));
+
+        // Mock mapping
+        var staffViewModels = new List<StaffBasicViewModel>();
+        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(staffDtos))
+            .Returns(staffViewModels);
+
+        // Mock departments
+        var departments = new List<DepartmentDto>
+        {
+            new() { Id = 1, Title = "IT" },
+            new() { Id = 2, Title = "HR" }
+        };
+        var selectList = new SelectList(departments, nameof(DepartmentDto.Id), nameof(DepartmentDto.Title));
+        _departmentSelectListServiceMock.Setup(x => x.GetDepartmentSelectListAsync("All"))
+            .ReturnsAsync(selectList);
+
         // Act
-        IActionResult result = await _sut.List();
+        var result = await _sut.List();
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        StaffManagementListViewModel model = viewResult.Model.Should().BeOfType<StaffManagementListViewModel>().Subject;
-        model.DepartmentItems.Should().BeEquivalentTo(selectListItems);
+        var model = viewResult.Model.Should().BeAssignableTo<StaffManagementListViewModel>().Subject;
+        model.DepartmentItems.Should().BeEquivalentTo(selectList);
     }
 
     [Fact]
@@ -63,31 +77,42 @@ public class StaffManagementControllerTests
     {
         // Arrange
         string expectedViewName = "List";
-        StaffManagementListViewModel staffModel = new StaffManagementListViewModel
+        var staffModel = new StaffManagementListViewModel
         {
             DepartmentId = "1",
             ApprovedRadio = ApprovedType.Approved
         };
-        List<StaffBasicModel> staffBasicModels = new List<StaffBasicModel>();
-        _staffServiceMock.Setup(m => m.GetAllBasicStaffFilteredAsync(Convert.ToInt32(staffModel.DepartmentId),
-            staffModel.ApprovedRadio)).ReturnsAsync(staffBasicModels);
-        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(staffBasicModels))
-            .Returns(staffModel.BasicInfos);
-        List<DepartmentModel> departments = new List<DepartmentModel>
+        var filteredDtos = new List<StaffBasicDto>
         {
-            new DepartmentModel { Id = 1, Title = "IT", Description = "IT department." },
-            new DepartmentModel { Id = 2, Title = "HR", Description = "Human resources department." }
+            new() { Id = 1, FirstName = "Alice", LastName = "Doe", DepartmentId = 1, Title = "IT" }
         };
-        SelectList selectListItems = new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
-        _departmentSelectListServiceMock.Setup(m => m.GetDepartmentSelectListAsync("All"))
-            .ReturnsAsync(selectListItems);
+
+        string expectedUrl = $"staff/basic/filter?departmentId={staffModel.DepartmentId}&approvedType={(int)staffModel.ApprovedRadio}";
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>(expectedUrl))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Success(filteredDtos));
+
+        var mappedViewModels = new List<StaffBasicViewModel>();
+        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(filteredDtos))
+            .Returns(mappedViewModels);
+
+        var departments = new List<DepartmentDto>
+        {
+            new() { Id = 1, Title = "IT" },
+            new() { Id = 2, Title = "HR" }
+        };
+        var selectList = new SelectList(departments, nameof(DepartmentDto.Id), nameof(DepartmentDto.Title));
+        _departmentSelectListServiceMock.Setup(x => x.GetDepartmentSelectListAsync("All"))
+            .ReturnsAsync(selectList);
+
         // Act
-        IActionResult result = await _sut.List(staffModel);
+        var result = await _sut.List(staffModel);
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        StaffManagementListViewModel model = viewResult.Model.Should().BeOfType<StaffManagementListViewModel>().Subject;
-        model.DepartmentItems.Should().BeEquivalentTo(selectListItems);
+        var model = viewResult.Model.Should().BeAssignableTo<StaffManagementListViewModel>().Subject;
+        model.DepartmentItems.Should().BeEquivalentTo(selectList);
     }
 
     [Fact]
@@ -96,20 +121,28 @@ public class StaffManagementControllerTests
         // Arrange
         int staffId = 1;
         string expectedViewName = "Details";
-        StaffFullModel staffFullModel = new StaffFullModel { Id = staffId };
-        _staffServiceMock.Setup(m => m.GetStaffByIdAsync(staffId)).ReturnsAsync(staffFullModel);
-        StaffDetailsViewModel detailsModel = new StaffDetailsViewModel
+        var staffFullDto = new StaffFullDto { Id = staffId };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<StaffFullDto>($"staff/{staffId}"))
+            .ReturnsAsync(Result<StaffFullDto>.Success(staffFullDto));
+
+        var detailsModel = new StaffDetailsViewModel
         {
             BasicInfo = new StaffBasicViewModel { Id = staffId }
         };
-        _mapperMock.Setup(m => m.Map<StaffDetailsViewModel>(staffFullModel))
+
+        _mapperMock.Setup(m => m.Map<StaffDetailsViewModel>(staffFullDto))
             .Returns(detailsModel);
+
         // Act
         IActionResult result = await _sut.Details(staffId);
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        StaffDetailsViewModel model = viewResult.Model.Should().BeOfType<StaffDetailsViewModel>().Subject;
+        var model = viewResult.Model.Should().BeOfType<StaffDetailsViewModel>().Subject;
+        model.BasicInfo.Id.Should().Be(staffId);
     }
 
     [Fact]
@@ -118,20 +151,40 @@ public class StaffManagementControllerTests
         // Arrange
         int staffId = 1;
         string expectedViewName = "Update";
-        StaffBasicModel staffBasicModel = new StaffBasicModel { Id = staffId };
-        _staffServiceMock.Setup(m => m.GetBasicStaffByIdAsync(staffId)).ReturnsAsync(staffBasicModel);
-        StaffManagementUpdateViewModel updateModel = new StaffManagementUpdateViewModel
+        var staffBasicDto = new StaffBasicDto { Id = staffId };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<StaffBasicDto>($"staff/basic/{staffId}"))
+            .ReturnsAsync(Result<StaffBasicDto>.Success(staffBasicDto));
+
+        var updateModel = new StaffManagementUpdateViewModel
         {
             BasicInfo = new StaffBasicViewModel { Id = staffId }
         };
-        _mapperMock.Setup(m => m.Map<StaffManagementUpdateViewModel>(staffBasicModel))
+
+        _mapperMock.Setup(m => m.Map<StaffManagementUpdateViewModel>(staffBasicDto))
             .Returns(updateModel);
+
+        var departments = new List<DepartmentDto>
+    {
+        new() { Id = 1, Title = "IT" },
+        new() { Id = 2, Title = "HR" }
+    };
+        var selectList = new SelectList(departments, nameof(DepartmentDto.Id), nameof(DepartmentDto.Title));
+
+        _departmentSelectListServiceMock
+            .Setup(x => x.GetDepartmentSelectListAsync(string.Empty))
+            .ReturnsAsync(selectList);
+
         // Act
         IActionResult result = await _sut.Update(staffId);
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        StaffManagementUpdateViewModel model = viewResult.Model.Should().BeOfType<StaffManagementUpdateViewModel>().Subject;
+        var model = viewResult.Model.Should().BeOfType<StaffManagementUpdateViewModel>().Subject;
+        model.BasicInfo.Id.Should().Be(staffId);
+        model.DepartmentItems.Should().BeEquivalentTo(selectList);
     }
 
     [Fact]
@@ -140,7 +193,8 @@ public class StaffManagementControllerTests
         // Arrange
         int staffId = 1;
         string expectedActionName = "List";
-        StaffManagementUpdateViewModel updateModel = new StaffManagementUpdateViewModel
+
+        var updateModel = new StaffManagementUpdateViewModel
         {
             BasicInfo = new StaffBasicViewModel
             {
@@ -149,10 +203,23 @@ public class StaffManagementControllerTests
                 IsApproved = true
             }
         };
+
+        var request = new UpdateStaffByAdminRequest
+        {
+            Id = staffId,
+            DepartmentId = 1,
+            IsApproved = true
+        };
+
+        _apiClientMock
+            .Setup(api => api.PutAsync("staff/admin", It.IsAny<UpdateStaffByAdminRequest>()))
+            .ReturnsAsync(Result<UpdateStaffByAdminRequest>.Success(request));
+
         // Act
         IActionResult result = await _sut.Update(updateModel);
+
         // Assert
-        RedirectToActionResult redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirectResult.ActionName.Should().Be(expectedActionName);
     }
 
@@ -162,39 +229,68 @@ public class StaffManagementControllerTests
         // Arrange
         int staffId = 1;
         string expectedViewName = "Delete";
-        StaffBasicModel staffBasicModel = new StaffBasicModel { Id = staffId };
-        _staffServiceMock.Setup(m => m.GetBasicStaffByIdAsync(staffId)).ReturnsAsync(staffBasicModel);
-        StaffManagementDeleteViewModel deleteModel = new StaffManagementDeleteViewModel
+
+        var staffBasicDto = new StaffBasicDto { Id = staffId };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<StaffBasicDto>($"staff/basic/{staffId}"))
+            .ReturnsAsync(Result<StaffBasicDto>.Success(staffBasicDto));
+
+        var deleteModel = new StaffManagementDeleteViewModel
         {
             BasicInfo = new StaffBasicViewModel { Id = staffId }
         };
-        _mapperMock.Setup(m => m.Map<StaffManagementDeleteViewModel>(staffBasicModel))
+
+        _mapperMock
+            .Setup(m => m.Map<StaffManagementDeleteViewModel>(staffBasicDto))
             .Returns(deleteModel);
+
         // Act
         IActionResult result = await _sut.Delete(staffId);
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        StaffManagementDeleteViewModel model = viewResult.Model.Should().BeOfType<StaffManagementDeleteViewModel>().Subject;
+        var model = viewResult.Model.Should().BeOfType<StaffManagementDeleteViewModel>().Subject;
+        model.BasicInfo.Id.Should().Be(staffId);
     }
 
     [Fact]
-    public async Task DeletePost_ShoudRedirectToListAction()
+    public async Task DeletePost_ShouldRedirectToListAction()
     {
         // Arrange
         int staffId = 1;
         string userEmail = "john.doe@johndoe.com";
-        StaffBasicModel staffBasicModel = new StaffBasicModel { Id = staffId };
-        IdentityUser identityUser = new IdentityUser { Email = userEmail };
         string expectedActionName = "List";
-        _staffServiceMock.Setup(m => m.GetStaffEmailByIdAsync(staffId)).ReturnsAsync(userEmail);
-        _staffServiceMock.Setup(m => m.DeleteStaffAsync(staffId)).Returns(Task.CompletedTask);
-        _userServiceMock.Setup(x => x.FindByEmailAsync(userEmail)).ReturnsAsync(identityUser);
-        _userServiceMock.Setup(x => x.DeleteIdentityUserAsync(identityUser)).Returns(Task.CompletedTask);
+
+        var deleteViewModel = new StaffManagementDeleteViewModel
+        {
+            BasicInfo = new StaffBasicViewModel
+            {
+                Id = staffId,
+                EmailAddress = userEmail
+            }
+        };
+
+        _apiClientMock
+            .Setup(api => api.DeleteAsync($"staff/{staffId}"))
+            .ReturnsAsync(Result<bool>.Success(true));
+
+        IdentityUser identityUser = new() { Email = userEmail };
+
+        _userServiceMock
+            .Setup(x => x.FindByEmailAsync(userEmail))
+            .ReturnsAsync(identityUser);
+
+        _userServiceMock
+            .Setup(x => x.DeleteIdentityUserAsync(identityUser))
+            .Returns(Task.CompletedTask);
+
         // Act
-        IActionResult result = await _sut.Delete(staffBasicModel);
+        IActionResult result = await _sut.Delete(deleteViewModel);
+
         // Assert
-        RedirectToActionResult redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirectResult.ActionName.Should().Be(expectedActionName);
     }
 }

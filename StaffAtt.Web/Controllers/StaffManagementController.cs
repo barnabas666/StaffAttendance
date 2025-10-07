@@ -16,19 +16,16 @@ namespace StaffAtt.Web.Controllers;
 public class StaffManagementController : Controller
 {
     private readonly IApiClient _apiClient;
-    private readonly IStaffService _staffService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffManagementController(IApiClient apiClient,
-                                     IStaffService staffService,
+    public StaffManagementController(IApiClient apiClient,                                     
                                      IUserService userService,
                                      IMapper mapper,
                                      IDepartmentSelectListService departmentService)
     {
         _apiClient = apiClient;
-        _staffService = staffService;
         _userService = userService;
         _mapper = mapper;
         _departmentService = departmentService;
