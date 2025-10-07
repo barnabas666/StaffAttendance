@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using StaffAttLibrary.Enums;
+using StaffAttShared.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace StaffAtt.Web.Models;

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Enums;
+using StaffAttShared.Enums;
 using StaffAttLibrary.Models;
 using StaffAttShared.DTOs;
 

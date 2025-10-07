@@ -3,7 +3,7 @@ using Moq;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.SQL;
 using StaffAttLibrary.Db.SQL;
-using StaffAttLibrary.Enums;
+using StaffAttShared.Enums;
 using StaffAttLibrary.Models;
 
 namespace StaffAttLibrary.Tests.Data.SQL;

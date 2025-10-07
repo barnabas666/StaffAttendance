@@ -1,6 +1,6 @@
 ﻿using StaffAttLibrary.Db.PostgreSQL;
 using StaffAttLibrary.Db.SQL;
-using StaffAttLibrary.Enums;
+using StaffAttShared.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
 using System;

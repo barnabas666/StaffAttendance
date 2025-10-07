@@ -1,5 +1,5 @@
 ﻿using StaffAttLibrary.Db.SQL;
-using StaffAttLibrary.Enums;
+using StaffAttShared.Enums;
 using StaffAttLibrary.Models;
 
 namespace StaffAttLibrary.Data.SQL;

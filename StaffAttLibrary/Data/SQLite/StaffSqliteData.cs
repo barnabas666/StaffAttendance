@@ -1,5 +1,5 @@
 ﻿using StaffAttLibrary.Db.SQLite;
-using StaffAttLibrary.Enums;
+using StaffAttShared.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
 

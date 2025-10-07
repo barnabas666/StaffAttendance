@@ -3,7 +3,7 @@ using Moq;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.SQLite;
 using StaffAttLibrary.Db.SQLite;
-using StaffAttLibrary.Enums;
+using StaffAttShared.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
 
