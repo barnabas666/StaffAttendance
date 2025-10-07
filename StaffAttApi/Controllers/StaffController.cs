@@ -26,14 +26,15 @@ public class StaffController : ControllerBase
 
     // GET: api/staff/departments
     [HttpGet("departments")]
-    public async Task<ActionResult<List<DepartmentModel>>> GetAllDepartments()
+    public async Task<ActionResult<List<DepartmentDto>>> GetAllDepartments()
     {
         _logger.LogInformation("GET: api/Staff/departments");
 
         try
         {
             var departments = await _staffService.GetAllDepartmentsAsync();
-            return Ok(departments);
+            var departmentDtos = _mapper.Map<List<DepartmentDto>>(departments);
+            return Ok(departmentDtos);
         }
         catch (Exception ex)
         {
@@ -209,7 +210,7 @@ public class StaffController : ControllerBase
     // Example request: GET /api/staff/basic/123
     // GET: api/staff/basic/{id}    
     [HttpGet("basic/{id:int}")]
-    public async Task<ActionResult<StaffBasicModel>> GetBasicStaffById(int id)
+    public async Task<ActionResult<StaffBasicDto>> GetBasicStaffById(int id)
     {
         _logger.LogInformation("GET: api/Staff/basic/{id} (Staff's Id: {Id})", id, id);
 
@@ -221,7 +222,8 @@ public class StaffController : ControllerBase
                 _logger.LogWarning("Basic staff not found for Id: {Id}", id);
                 return NotFound();
             }
-            return Ok(staff);
+            var staffDto = _mapper.Map<StaffBasicDto>(staff);
+            return Ok(staffDto);
         }
         catch (Exception ex)
         {
@@ -233,7 +235,7 @@ public class StaffController : ControllerBase
     // Example request: GET /api/staff/basic/alias/456
     // GET: api/staff/basic/alias/{aliasId}    
     [HttpGet("basic/alias/{aliasId:int}")]
-    public async Task<ActionResult<StaffBasicModel>> GetBasicStaffByAliasId(int aliasId)
+    public async Task<ActionResult<StaffBasicDto>> GetBasicStaffByAliasId(int aliasId)
     {
         _logger.LogInformation("GET: api/Staff/basic/alias/{aliasId} (AliasId: {AliasId})", aliasId, aliasId);
 
@@ -245,7 +247,8 @@ public class StaffController : ControllerBase
                 _logger.LogWarning("Staff not found for AliasId: {AliasId}", aliasId);
                 return NotFound();
             }
-            return Ok(staff);
+            var staffDto = _mapper.Map<StaffBasicDto>(staff);
+            return Ok(staffDto);
         }
         catch (Exception ex)
         {

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Data;
 using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Controllers;

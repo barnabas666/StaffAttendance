@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Helpers;
 
@@ -24,12 +24,12 @@ public class DepartmentSelectListService : IDepartmentSelectListService
     public async Task<SelectList> GetDepartmentSelectListAsync(string defaultValue = "")
     {
         // Call API
-        var result = await _apiClient.GetAsync<List<DepartmentModel>>("staff/departments");
+        var result = await _apiClient.GetAsync<List<DepartmentDto>>("staff/departments");
 
         if (!result.IsSuccess || result.Value is null)
         {
             // Instead of crashing UI, return empty dropdown
-            return new SelectList(Enumerable.Empty<DepartmentModel>(), nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
+            return new SelectList(Enumerable.Empty<DepartmentDto>(), nameof(DepartmentDto.Id), nameof(DepartmentDto.Title));
         }
 
         var departments = result.Value;
@@ -37,10 +37,10 @@ public class DepartmentSelectListService : IDepartmentSelectListService
         if (!string.IsNullOrEmpty(defaultValue))
         {
             // Creating default item = All Departments for DropDown.
-            departments.Insert(0, new DepartmentModel { Id = 0, Title = defaultValue });
+            departments.Insert(0, new DepartmentDto { Id = 0, Title = defaultValue });
         }
 
         // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user, both expect string.
-        return new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
+        return new SelectList(departments, nameof(DepartmentDto.Id), nameof(DepartmentDto.Title));
     }
 }

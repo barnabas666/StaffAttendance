@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
 using StaffAtt.Web.Helpers;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;  
 
 namespace StaffAtt.Web.Tests.Helpers
 {
@@ -21,15 +21,15 @@ namespace StaffAtt.Web.Tests.Helpers
         {
             // Arrange
             string defaultValue = "All";
-            var departments = new List<DepartmentModel>
+            var departments = new List<DepartmentDto>
             {
-                new DepartmentModel { Id = 1, Title = "HR" },
-                new DepartmentModel { Id = 2, Title = "IT" }
+                new DepartmentDto { Id = 1, Title = "HR" },
+                new DepartmentDto { Id = 2, Title = "IT" }
             };
 
             _apiClientMock
-                .Setup(x => x.GetAsync<List<DepartmentModel>>("staff/departments"))
-                .ReturnsAsync(Result<List<DepartmentModel>>.Success(departments));
+                .Setup(x => x.GetAsync<List<DepartmentDto>>("staff/departments"))
+                .ReturnsAsync(Result<List<DepartmentDto>>.Success(departments));
 
             // Act
             var result = await _sut.GetDepartmentSelectListAsync(defaultValue);
@@ -46,15 +46,15 @@ namespace StaffAtt.Web.Tests.Helpers
         public async Task GetDepartmentSelectListAsync_ShouldReturnSelectListWithoutDefaultValue_WhenDefaultValueIsNotProvided()
         {
             // Arrange
-            var departments = new List<DepartmentModel>
+            var departments = new List<DepartmentDto>
             {
-                new DepartmentModel { Id = 1, Title = "HR" },
-                new DepartmentModel { Id = 2, Title = "IT" }
+                new DepartmentDto { Id = 1, Title = "HR" },
+                new DepartmentDto { Id = 2, Title = "IT" }
             };
 
             _apiClientMock
-                .Setup(x => x.GetAsync<List<DepartmentModel>>("staff/departments"))
-                .ReturnsAsync(Result<List<DepartmentModel>>.Success(departments));
+                .Setup(x => x.GetAsync<List<DepartmentDto>>("staff/departments"))
+                .ReturnsAsync(Result<List<DepartmentDto>>.Success(departments));
 
             // Act
             var result = await _sut.GetDepartmentSelectListAsync();
@@ -72,8 +72,8 @@ namespace StaffAtt.Web.Tests.Helpers
         {
             // Arrange
             _apiClientMock
-                .Setup(x => x.GetAsync<List<DepartmentModel>>("staff/departments"))
-                .ReturnsAsync(Result<List<DepartmentModel>>.Failure("API error"));
+                .Setup(x => x.GetAsync<List<DepartmentDto>>("staff/departments"))
+                .ReturnsAsync(Result<List<DepartmentDto>>.Failure("API error"));
 
             // Act
             var result = await _sut.GetDepartmentSelectListAsync();
