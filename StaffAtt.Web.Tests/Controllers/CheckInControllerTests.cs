@@ -1,27 +1,26 @@
 ﻿using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
 using StaffAtt.Web.Controllers;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Data;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Controllers;
 public class CheckInControllerTests
 {
     private readonly CheckInController _sut;
-    private readonly Mock<IStaffService> _staffServiceMock = new();
-    private readonly Mock<ICheckInService> _checkInServiceMock = new();
+    private readonly Mock<IApiClient> _apiClientMock = new();
     private readonly Mock<IUserContext> _userContextMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
     private readonly Mock<IStaffSelectListService> _staffSelectListServiceMock = new();
+
     public CheckInControllerTests()
     {
         _sut = new CheckInController(
-            _staffServiceMock.Object,
-            _checkInServiceMock.Object,
+            _apiClientMock.Object,
             _userContextMock.Object,
             _mapperMock.Object,
             _staffSelectListServiceMock.Object
@@ -32,103 +31,220 @@ public class CheckInControllerTests
     public async Task List_ShouldReturnListViewWithCheckInDisplayAdminViewModel()
     {
         // Arrange
-        string expectedViewName = "List";
-        CheckInDisplayAdminViewModel checkInDisplayAdminViewModel = new CheckInDisplayAdminViewModel();
-        List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
-        _checkInServiceMock.Setup(m => m.GetAllCheckInsByDateAsync(checkInDisplayAdminViewModel.StartDate,
-                                                                   checkInDisplayAdminViewModel.EndDate))
-            .ReturnsAsync(checkIns);
-        _mapperMock.Setup(m => m.Map<List<CheckInFullViewModel>>(checkIns))
-            .Returns(checkInDisplayAdminViewModel.CheckIns);
-        List<StaffBasicModel> basicStaff = new List<StaffBasicModel>();
-        _staffServiceMock.Setup(m => m.GetAllBasicStaffAsync())
-            .ReturnsAsync(basicStaff);
-        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(basicStaff))
-            .Returns(checkInDisplayAdminViewModel.StaffList);
+        const string expectedViewName = "List";
+
+        // Prepare DTOs returned by API
+        var checkInDtos = new List<CheckInFullDto>
+        {
+            new CheckInFullDto { Id = 1, FirstName = "John", LastName = "Doe", EmailAddress = "john@example.com", Title = "IT", StaffId = 1, CheckInDate = DateTime.Today }
+        };
+
+        var staffDtos = new List<StaffBasicDto>
+        {
+            new StaffBasicDto { Id = 1, FirstName = "John", LastName = "Doe", EmailAddress = "john@example.com", Title = "IT", DepartmentId = 1 }
+        };
+
+        // Mock API call for checkins: match any "checkin/all?startDate=" prefix (avoid strict date matching)
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s => s.StartsWith("checkin/all?startDate="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Success(checkInDtos));
+
+        // Mock API call for staff list
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>("staff/basic"))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Success(staffDtos));
+
+        // Map DTOs to view models (controller will call these)
+        var mappedCheckInViewModels = new List<CheckInFullViewModel>
+        {
+            new CheckInFullViewModel { Id = 1, FirstName = "John", LastName = "Doe", EmailAddress = "john@example.com", Title = "IT" }
+        };
+        _mapperMock
+            .Setup(m => m.Map<List<CheckInFullViewModel>>(checkInDtos))
+            .Returns(mappedCheckInViewModels);
+
+        var mappedStaffViewModels = new List<StaffBasicViewModel>
+        {
+            new StaffBasicViewModel { Id = 1, FirstName = "John", LastName = "Doe", EmailAddress = "john@example.com", Title = "IT", DepartmentId = 1 }
+        };
+        _mapperMock
+            .Setup(m => m.Map<List<StaffBasicViewModel>>(staffDtos))
+            .Returns(mappedStaffViewModels);
+
+        // Staff dropdown service (controller calls this — return any SelectList)
+        _staffSelectListServiceMock
+            .Setup(s => s.GetStaffSelectListAsync(It.IsAny<CheckInDisplayAdminViewModel>(), "All Staff"))
+            .ReturnsAsync(new SelectList(new List<StaffBasicViewModel>(), "Id", "FullName"));
+
         // Act
         IActionResult result = await _sut.List();
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        CheckInDisplayAdminViewModel model = viewResult.Model.Should().BeOfType<CheckInDisplayAdminViewModel>().Subject;
+
+        var model = viewResult.Model.Should().BeOfType<CheckInDisplayAdminViewModel>().Subject;
+        model.CheckIns.Should().BeEquivalentTo(mappedCheckInViewModels);
+        model.StaffList.Should().BeEquivalentTo(mappedStaffViewModels);
     }
 
     [Fact]
     public async Task ListPost_ShouldReturnListViewWithCheckInDisplayAdminViewModel()
     {
         // Arrange
-        string expectedViewName = "List";
-        CheckInDisplayAdminViewModel checkInDisplayAdminViewModel = new CheckInDisplayAdminViewModel();
-        checkInDisplayAdminViewModel.SelectedStaffId = "0"; // All Staff selected
-        List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
-        _checkInServiceMock.Setup(m => m.GetAllCheckInsByDateAsync(checkInDisplayAdminViewModel.StartDate,
-                                                                   checkInDisplayAdminViewModel.EndDate))
-            .ReturnsAsync(checkIns);
-        _mapperMock.Setup(m => m.Map<List<CheckInFullViewModel>>(checkIns))
-            .Returns(checkInDisplayAdminViewModel.CheckIns);
-        List<StaffBasicModel> basicStaff = new List<StaffBasicModel>();
-        _staffServiceMock.Setup(m => m.GetAllBasicStaffAsync())
-            .ReturnsAsync(basicStaff);
-        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(basicStaff))
-            .Returns(checkInDisplayAdminViewModel.StaffList);
+        const string expectedViewName = "List";
+
+        var vm = new CheckInDisplayAdminViewModel
+        {
+            SelectedStaffId = "0", // "All Staff" selected
+            StartDate = DateTime.Today.AddDays(-1),
+            EndDate = DateTime.Today
+        };
+
+        // API returns same DTOs as above (for "all" branch)
+        var checkInDtos = new List<CheckInFullDto>
+        {
+            new CheckInFullDto { Id = 2, FirstName = "Alice", LastName = "Smith", EmailAddress = "alice@example.com", Title = "HR", StaffId = 2, CheckInDate = DateTime.Today }
+        };
+
+        var staffDtos = new List<StaffBasicDto>
+        {
+            new StaffBasicDto { Id = 2, FirstName = "Alice", LastName = "Smith", EmailAddress = "alice@example.com", Title = "HR", DepartmentId = 2 }
+        };
+
+        // Controller will call checkin/all?startDate=... for SelectedStaffId == "0"
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s => s.StartsWith("checkin/all?startDate="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Success(checkInDtos));
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>("staff/basic"))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Success(staffDtos));
+
+        var mappedCheckIns = new List<CheckInFullViewModel>
+        {
+            new CheckInFullViewModel { Id = 2, FirstName = "Alice", LastName = "Smith", EmailAddress = "alice@example.com", Title = "HR" }
+        };
+        _mapperMock
+            .Setup(m => m.Map<List<CheckInFullViewModel>>(checkInDtos))
+            .Returns(mappedCheckIns);
+
+        var mappedStaff = new List<StaffBasicViewModel>
+        {
+            new StaffBasicViewModel { Id = 2, FirstName = "Alice", LastName = "Smith", EmailAddress = "alice@example.com", Title = "HR", DepartmentId = 2 }
+        };
+        _mapperMock
+            .Setup(m => m.Map<List<StaffBasicViewModel>>(staffDtos))
+            .Returns(mappedStaff);
+
+        _staffSelectListServiceMock
+            .Setup(s => s.GetStaffSelectListAsync(It.IsAny<CheckInDisplayAdminViewModel>(), "All Staff"))
+            .ReturnsAsync(new SelectList(new List<StaffBasicViewModel>(), "Id", "FullName"));
+
         // Act
-        IActionResult result = await _sut.List(checkInDisplayAdminViewModel);
+        IActionResult result = await _sut.List(vm);
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        CheckInDisplayAdminViewModel model = viewResult.Model.Should().BeOfType<CheckInDisplayAdminViewModel>().Subject;
+
+        var model = viewResult.Model.Should().BeOfType<CheckInDisplayAdminViewModel>().Subject;
+        model.CheckIns.Should().BeEquivalentTo(mappedCheckIns);
+        model.StaffList.Should().BeEquivalentTo(mappedStaff);
     }
 
     [Fact]
-    public async Task ListPost_ShouldCallGetAllCheckInsByDateAsyncMethod_WhenAllStaffIsSelected()
+    public async Task ListPost_ShouldCallAllCheckInsEndpoint_WhenAllStaffIsSelected()
     {
         // Arrange
-        string expectedViewName = "List";
-        CheckInDisplayAdminViewModel checkInDisplayAdminViewModel = new CheckInDisplayAdminViewModel();
-        checkInDisplayAdminViewModel.SelectedStaffId = "0"; // All Staff selected
-        List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
-        _checkInServiceMock.Setup(m => m.GetAllCheckInsByDateAsync(checkInDisplayAdminViewModel.StartDate,
-                                                                   checkInDisplayAdminViewModel.EndDate))
-            .ReturnsAsync(checkIns);
-        _mapperMock.Setup(m => m.Map<List<CheckInFullViewModel>>(checkIns))
-            .Returns(checkInDisplayAdminViewModel.CheckIns);
-        List<StaffBasicModel> basicStaff = new List<StaffBasicModel>();
-        _staffServiceMock.Setup(m => m.GetAllBasicStaffAsync())
-            .ReturnsAsync(basicStaff);
-        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(basicStaff))
-            .Returns(checkInDisplayAdminViewModel.StaffList);
+        var vm = new CheckInDisplayAdminViewModel
+        {
+            SelectedStaffId = "0", // All Staff selected
+            StartDate = DateTime.Today.AddDays(-1),
+            EndDate = DateTime.Today
+        };
+
+        // Mock API call for "checkin/all" endpoint
+        var checkInDtos = new List<CheckInFullDto>
+        {
+        new CheckInFullDto { Id = 1, FirstName = "John", LastName = "Doe", StaffId = 1 }
+        };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s => s.StartsWith("checkin/all?startDate="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Success(checkInDtos))
+            .Verifiable(); // ensures it gets called
+
+        // Mock staff fetch
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>("staff/basic"))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Success(new List<StaffBasicDto>()));
+
+        _mapperMock.Setup(m => m.Map<List<CheckInFullViewModel>>(checkInDtos))
+            .Returns(new List<CheckInFullViewModel>());
+
+        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(It.IsAny<List<StaffBasicDto>>()))
+            .Returns(new List<StaffBasicViewModel>());
+
+        _staffSelectListServiceMock
+            .Setup(s => s.GetStaffSelectListAsync(It.IsAny<CheckInDisplayAdminViewModel>(), "All Staff"))
+            .ReturnsAsync(new SelectList(new List<StaffBasicViewModel>(), "Id", "FullName"));
+
         // Act
-        IActionResult result = await _sut.List(checkInDisplayAdminViewModel);
+        var result = await _sut.List(vm);
+
         // Assert
-        _checkInServiceMock.Verify(m => m.GetAllCheckInsByDateAsync(checkInDisplayAdminViewModel.StartDate,
-                                                                   checkInDisplayAdminViewModel.EndDate), Times.Once);
+        _apiClientMock.Verify(api =>
+            api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s => s.StartsWith("checkin/all?startDate="))),
+            Times.Once);
     }
 
     [Fact]
-    public async Task ListPost_ShouldCallGetCheckInsByDateAndIdAsyncMethod_WhenSingleStaffIsSelected()
+    public async Task ListPost_ShouldCallCheckInsByIdEndpoint_WhenSingleStaffIsSelected()
     {
         // Arrange
-        string expectedViewName = "List";
-        CheckInDisplayAdminViewModel checkInDisplayAdminViewModel = new CheckInDisplayAdminViewModel();
-        checkInDisplayAdminViewModel.SelectedStaffId = "1"; // Single Staff selected
-        List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
-        _checkInServiceMock.Setup(m => m.GetCheckInsByDateAndIdAsync(Convert.ToInt32(checkInDisplayAdminViewModel.SelectedStaffId),
-                                                                     checkInDisplayAdminViewModel.StartDate,
-                                                                     checkInDisplayAdminViewModel.EndDate))
-            .ReturnsAsync(checkIns);
-        _mapperMock.Setup(m => m.Map<List<CheckInFullViewModel>>(checkIns))
-            .Returns(checkInDisplayAdminViewModel.CheckIns);
-        List<StaffBasicModel> basicStaff = new List<StaffBasicModel>();
-        _staffServiceMock.Setup(m => m.GetAllBasicStaffAsync())
-            .ReturnsAsync(basicStaff);
-        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(basicStaff))
-            .Returns(checkInDisplayAdminViewModel.StaffList);
+        var vm = new CheckInDisplayAdminViewModel
+        {
+            SelectedStaffId = "5", // Single staff selected
+            StartDate = DateTime.Today.AddDays(-1),
+            EndDate = DateTime.Today
+        };
+
+        // Mock API call for "checkin/byId/5" endpoint
+        var checkInDtos = new List<CheckInFullDto>
+        {
+        new CheckInFullDto { Id = 2, FirstName = "Alice", LastName = "Smith", StaffId = 5 }
+        };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s =>
+                s.StartsWith("checkin/byId/5?startDate="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Success(checkInDtos))
+            .Verifiable();
+
+        // Mock staff fetch
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>("staff/basic"))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Success(new List<StaffBasicDto>()));
+
+        _mapperMock.Setup(m => m.Map<List<CheckInFullViewModel>>(checkInDtos))
+            .Returns(new List<CheckInFullViewModel>());
+
+        _mapperMock.Setup(m => m.Map<List<StaffBasicViewModel>>(It.IsAny<List<StaffBasicDto>>()))
+            .Returns(new List<StaffBasicViewModel>());
+
+        _staffSelectListServiceMock
+            .Setup(s => s.GetStaffSelectListAsync(It.IsAny<CheckInDisplayAdminViewModel>(), "All Staff"))
+            .ReturnsAsync(new SelectList(new List<StaffBasicViewModel>(), "Id", "FullName"));
+
         // Act
-        IActionResult result = await _sut.List(checkInDisplayAdminViewModel);
+        var result = await _sut.List(vm);
+
         // Assert
-        _checkInServiceMock.Verify(m => m.GetCheckInsByDateAndIdAsync(Convert.ToInt32(checkInDisplayAdminViewModel.SelectedStaffId),
-                                                                      checkInDisplayAdminViewModel.StartDate,
-                                                                      checkInDisplayAdminViewModel.EndDate), Times.Once);
+        _apiClientMock.Verify(api =>
+            api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s =>
+                s.StartsWith("checkin/byId/5?startDate="))),
+            Times.Once);
     }
 
     [Fact]
@@ -138,20 +254,34 @@ public class CheckInControllerTests
         string expectedViewName = "Display";
         string userEmail = "john.doe@johndoe.com";
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
-        CheckInDisplayStaffViewModel checkInDisplayStaffViewModel = new CheckInDisplayStaffViewModel();
-        List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
-        _checkInServiceMock.Setup(m => m.GetCheckInsByDateAndEmailAsync(userEmail,
-                                                                      checkInDisplayStaffViewModel.StartDate,
-                                                                      checkInDisplayStaffViewModel.EndDate))
-            .ReturnsAsync(checkIns);
-        _mapperMock.Setup(m => m.Map<List<CheckInFullViewModel>>(checkIns))
-            .Returns(checkInDisplayStaffViewModel.CheckIns);
+
+        var checkInDtos = new List<CheckInFullDto>
+        {
+        new CheckInFullDto { Id = 1, FirstName = "John", LastName = "Doe", EmailAddress = userEmail }
+        };
+
+        var mappedViewModels = new List<CheckInFullViewModel>
+        {
+        new CheckInFullViewModel { Id = 1, FirstName = "John", LastName = "Doe", EmailAddress = userEmail }
+        };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s =>
+                s.StartsWith("checkin/byEmail?emailAddress="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Success(checkInDtos));
+
+        _mapperMock
+            .Setup(m => m.Map<List<CheckInFullViewModel>>(checkInDtos))
+            .Returns(mappedViewModels);
+
         // Act
         IActionResult result = await _sut.Display();
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        CheckInDisplayStaffViewModel model = viewResult.Model.Should().BeOfType<CheckInDisplayStaffViewModel>().Subject;
+        var model = viewResult.Model.Should().BeOfType<CheckInDisplayStaffViewModel>().Subject;
+        model.CheckIns.Should().BeEquivalentTo(mappedViewModels);
     }
 
     [Fact]
@@ -161,19 +291,39 @@ public class CheckInControllerTests
         string expectedViewName = "Display";
         string userEmail = "john.doe@johndoe.com";
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
-        CheckInDisplayStaffViewModel checkInDisplayStaffViewModel = new CheckInDisplayStaffViewModel();
-        List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
-        _checkInServiceMock.Setup(m => m.GetCheckInsByDateAndEmailAsync(userEmail,
-                                                                      checkInDisplayStaffViewModel.StartDate,
-                                                                      checkInDisplayStaffViewModel.EndDate))
-            .ReturnsAsync(checkIns);
-        _mapperMock.Setup(m => m.Map<List<CheckInFullViewModel>>(checkIns))
-            .Returns(checkInDisplayStaffViewModel.CheckIns);
+
+        var inputModel = new CheckInDisplayStaffViewModel
+        {
+            StartDate = DateTime.Today.AddDays(-3),
+            EndDate = DateTime.Today
+        };
+
+        var checkInDtos = new List<CheckInFullDto>
+        {
+        new CheckInFullDto { Id = 2, FirstName = "Alice", LastName = "Smith", EmailAddress = userEmail }
+        };
+
+        var mappedViewModels = new List<CheckInFullViewModel>
+        {
+        new CheckInFullViewModel { Id = 2, FirstName = "Alice", LastName = "Smith", EmailAddress = userEmail  }
+        };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s =>
+                s.Contains("checkin/byEmail") && s.Contains(Uri.EscapeDataString(userEmail)))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Success(checkInDtos));
+
+        _mapperMock
+            .Setup(m => m.Map<List<CheckInFullViewModel>>(checkInDtos))
+            .Returns(mappedViewModels);
+
         // Act
-        IActionResult result = await _sut.Display(checkInDisplayStaffViewModel);
+        IActionResult result = await _sut.Display(inputModel);
+
         // Assert
-        ViewResult viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
-        CheckInDisplayStaffViewModel model = viewResult.Model.Should().BeOfType<CheckInDisplayStaffViewModel>().Subject;
+        var model = viewResult.Model.Should().BeOfType<CheckInDisplayStaffViewModel>().Subject;
+        model.CheckIns.Should().BeEquivalentTo(mappedViewModels);
     }
 }
