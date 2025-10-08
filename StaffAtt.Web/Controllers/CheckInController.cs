@@ -5,6 +5,7 @@ using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -14,124 +15,126 @@ namespace StaffAtt.Web.Controllers;
 [Authorize]
 public class CheckInController : Controller
 {
-    private readonly IStaffService _staffService;
-    private readonly ICheckInService _checkInService;
+    private readonly IApiClient _apiClient;
     private readonly IUserContext _userContext;
     private readonly IMapper _mapper;
     private readonly IStaffSelectListService _staffSelectListService;
 
-    public CheckInController(IStaffService staffService,
-                             ICheckInService checkInService,
+    public CheckInController(IApiClient apiClient,
                              IUserContext userContext,
                              IMapper mapper,
                              IStaffSelectListService staffSelectListService)
     {
-        _staffService = staffService;
-        _checkInService = checkInService;
+        _apiClient = apiClient;
         _userContext = userContext;
         _mapper = mapper;
         _staffSelectListService = staffSelectListService;
     }
 
-    public IActionResult Index()
-    {
-        return View();
-    }
-
     /// <summary>
-    /// Display list of all CheckIns by Date and Staff for Admin.
-    /// First populate ViewModel with data from Db and send to View.
+    /// Displays list of all CheckIns by Date and Staff for Admin (initial load).
     /// </summary>
-    /// <returns>ViewModel with populated CheckInDateDisplayAdminModel.</returns>
     [Authorize(Roles = "Administrator")]
+    [HttpGet]
     public async Task<IActionResult> List()
     {
-        CheckInDisplayAdminViewModel dateDisplayModel = new CheckInDisplayAdminViewModel();
+        var viewModel = new CheckInDisplayAdminViewModel();
 
-        List<CheckInFullModel> checkIns = await _checkInService.GetAllCheckInsByDateAsync(dateDisplayModel.StartDate,
-                                                                              dateDisplayModel.EndDate);
-        dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
+        // --- Load all check-ins by date range ---
+        var checkInResult = await _apiClient.GetAsync<List<CheckInFullDto>>(
+            $"checkin/all?startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}"
+        );
 
-        List<StaffBasicModel> basicStaff = await _staffService.GetAllBasicStaffAsync();
-        dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
+        if (!checkInResult.IsSuccess)
+            return View("Error", new ErrorViewModel { Message = checkInResult.ErrorMessage ?? "Failed to load check-ins." });
 
-        dateDisplayModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(dateDisplayModel,
-                                                                                  "All Staff");
+        viewModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkInResult.Value);
 
-        return View("List", dateDisplayModel);
+        // --- Load staff for dropdown ---
+        var staffResult = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
+        if (!staffResult.IsSuccess)
+            return View("Error", new ErrorViewModel { Message = staffResult.ErrorMessage ?? "Failed to load staff list." });
+
+        viewModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(staffResult.Value);
+        viewModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(viewModel, "All Staff");
+
+        return View("List", viewModel);
     }
 
     /// <summary>
-    /// HttpPost Action for displaying of list of all CheckIns by Date and Staff for Admin.
-    /// After hit Submit button or changing of Staff in DropDown, we get data from Db,
-    /// repopulate ViewModel and send back to View.
+    /// Handles filter requests for CheckIns (by date and staff).
     /// </summary>
-    /// <param name="dateDisplayModel">ViewModel</param>
-    /// <returns>ViewModel with repopulated CheckInDateDisplayAdminModel.</returns>
     [Authorize(Roles = "Administrator")]
     [HttpPost]
-    public async Task<IActionResult> List(CheckInDisplayAdminViewModel dateDisplayModel)
+    public async Task<IActionResult> List(CheckInDisplayAdminViewModel viewModel)
     {
-        List<CheckInFullModel> checkIns = new List<CheckInFullModel>();
+        // Determine which API endpoint to use
+        string endpoint;
 
-        if (dateDisplayModel.SelectedStaffId == "0")
-        {
-            checkIns = await _checkInService.GetAllCheckInsByDateAsync(dateDisplayModel.StartDate,
-                                                                  dateDisplayModel.EndDate);
-            dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
-        }
-        else
-        {
-            checkIns = await _checkInService.GetCheckInsByDateAndIdAsync(Convert.ToInt32(dateDisplayModel.SelectedStaffId),
-                                                                             dateDisplayModel.StartDate,
-                                                                             dateDisplayModel.EndDate);
-            dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
-        }
+        if (viewModel.SelectedStaffId == "0")        
+            endpoint = $"checkin/all?startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}";        
+        else        
+            endpoint = $"checkin/byId/{viewModel.SelectedStaffId}?startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}";
+        
+        var checkInResult = await _apiClient.GetAsync<List<CheckInFullDto>>(endpoint);
+        if (!checkInResult.IsSuccess)
+            return View("Error", new ErrorViewModel { Message = checkInResult.ErrorMessage ?? "Failed to load filtered check-ins." });
 
-        List<StaffBasicModel> basicStaff = await _staffService.GetAllBasicStaffAsync();
-        dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(basicStaff);
+        viewModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkInResult.Value);
 
-        dateDisplayModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(dateDisplayModel,
-                                                                                  "All Staff");
+        // Reload dropdown + staff list
+        var staffResult = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
+        if (!staffResult.IsSuccess)
+            return View("Error", new ErrorViewModel { Message = staffResult.ErrorMessage ?? "Failed to reload staff list." });
 
-        return View("List", dateDisplayModel);
+        viewModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(staffResult.Value);
+        viewModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(viewModel, "All Staff");
+
+        return View("List", viewModel);
     }
 
     /// <summary>
-    /// Display list of all CheckIns by Date and Staff for given Staff.
-    /// First populate ViewModel with data from Db for given Staff and send to View.
+    /// Display list of all CheckIns by Date and Staff for the currently logged-in staff member.
     /// </summary>
-    /// <returns>ViewModel with populated CheckInDateDisplayStaffModel.</returns>
+    [HttpGet]
     public async Task<IActionResult> Display()
     {
         string userEmail = _userContext.GetUserEmail();
 
-        CheckInDisplayStaffViewModel dateDisplayModel = new CheckInDisplayStaffViewModel();
+        var viewModel = new CheckInDisplayStaffViewModel();
 
-        List<CheckInFullModel> checkIns = await _checkInService.GetCheckInsByDateAndEmailAsync(userEmail,
-                                                                                   dateDisplayModel.StartDate,
-                                                                                   dateDisplayModel.EndDate);
-        dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
+        // Call API endpoint: GET /api/checkin/byEmail?emailAddress=...&startDate=...&endDate=...
+        var result = await _apiClient.GetAsync<List<CheckInFullDto>>(
+            $"checkin/byEmail?emailAddress={Uri.EscapeDataString(userEmail)}" +
+            $"&startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}"
+        );
 
-        return View("Display", dateDisplayModel);
+        if (!result.IsSuccess)
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage ?? "Failed to load check-ins for current user." });
+
+        viewModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(result.Value);
+
+        return View("Display", viewModel);
     }
 
     /// <summary>
-    /// HttpPost Action for displaying of list of all CheckIns by Date and Staff for given Staff.
-    /// After hit Submit button we get data from Db, repopulate ViewModel and send back to View.
+    /// HttpPost Action for displaying list of CheckIns for given Staff within date range.
     /// </summary>
-    /// <param name="dateDisplayModel">ViewModel</param>
-    /// <returns>ViewModel with repopulated CheckInDateDisplayStaffModel.</returns>
     [HttpPost]
-    public async Task<IActionResult> Display(CheckInDisplayStaffViewModel dateDisplayModel)
+    public async Task<IActionResult> Display(CheckInDisplayStaffViewModel viewModel)
     {
         string userEmail = _userContext.GetUserEmail();
 
-        List<CheckInFullModel> checkIns = await _checkInService.GetCheckInsByDateAndEmailAsync(userEmail,
-                                                                             dateDisplayModel.StartDate,
-                                                                             dateDisplayModel.EndDate);
-        dateDisplayModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkIns);
+        var result = await _apiClient.GetAsync<List<CheckInFullDto>>(
+            $"checkin/byEmail?emailAddress={Uri.EscapeDataString(userEmail)}" +
+            $"&startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}"
+        );
 
-        return View("Display", dateDisplayModel);
+        if (!result.IsSuccess)
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage ?? "Failed to reload check-ins." });
+
+        viewModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(result.Value);
+
+        return View("Display", viewModel);
     }
 }

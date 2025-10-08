@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAttApi.Controllers;
 
@@ -12,17 +14,19 @@ public class CheckInController : ControllerBase
 {
     private readonly ICheckInService _checkInService;
     private readonly ILogger<CheckInController> _logger;
+    private readonly IMapper _mapper;
 
-    public CheckInController(ICheckInService checkInService, ILogger<CheckInController> logger)
+    public CheckInController(ICheckInService checkInService, ILogger<CheckInController> logger, IMapper mapper)
     {
         _checkInService = checkInService;
         _logger = logger;
+        _mapper = mapper;
     }
 
     // Example request: GET /api/checkin/last/1
     // GET: api/checkin/last/{staffId}
     [HttpGet("last/{staffId:int}")]
-    public async Task<ActionResult<CheckInModel>> GetLastCheckIn(int staffId)
+    public async Task<ActionResult<CheckInDto>> GetLastCheckIn(int staffId)
     {
         _logger.LogInformation("GET: api/CheckIn/last/{staffId} (StaffId: {StaffId})", staffId, staffId);
 
@@ -34,7 +38,8 @@ public class CheckInController : ControllerBase
                 _logger.LogWarning("No check-in found for StaffId: {StaffId}", staffId);
                 return NotFound();
             }
-            return Ok(checkIn);
+            var checkInDto = _mapper.Map<CheckInDto>(checkIn);
+            return Ok(checkInDto);
         }
         catch (Exception ex)
         {
@@ -65,7 +70,7 @@ public class CheckInController : ControllerBase
     // Example request: GET /api/checkin/all?startDate=2025-09-01&endDate=2025-09-22
     // GET: api/checkin/all
     [HttpGet("all")]
-    public async Task<ActionResult<List<CheckInFullModel>>> GetAllCheckInsByDate([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public async Task<ActionResult<List<CheckInFullDto>>> GetAllCheckInsByDate([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         _logger.LogInformation("GET: api/CheckIn/all (StartDate: {StartDate}, EndDate: {EndDate})", startDate, endDate);
 
@@ -77,8 +82,8 @@ public class CheckInController : ControllerBase
                 _logger.LogWarning("No check-ins found between {StartDate} and {EndDate}", startDate, endDate);
                 return NotFound();
             }
-
-            return Ok(checkIns);
+            var checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
+            return Ok(checkInDtos);
         }
         catch (Exception ex)
         {
@@ -91,7 +96,7 @@ public class CheckInController : ControllerBase
     // remember to URL-encode @ in email address as %40
     // GET: api/checkin/byEmail
     [HttpGet("byEmail")]
-    public async Task<ActionResult<List<CheckInFullModel>>> GetCheckInsByDateAndEmail([FromQuery] string emailAddress, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public async Task<ActionResult<List<CheckInFullDto>>> GetCheckInsByDateAndEmail([FromQuery] string emailAddress, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         _logger.LogInformation("GET: api/CheckIn/byEmail (Email: {Email}, StartDate: {StartDate}, EndDate: {EndDate})",
                                emailAddress, startDate, endDate);
@@ -104,8 +109,8 @@ public class CheckInController : ControllerBase
                 _logger.LogWarning("No check-ins found for Email: {Email} between {StartDate} and {EndDate}", emailAddress, startDate, endDate);
                 return NotFound();
             }
-
-            return Ok(checkIns);
+            var checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
+            return Ok(checkInDtos);
         }
         catch (Exception ex)
         {
@@ -119,7 +124,7 @@ public class CheckInController : ControllerBase
     // Example request: GET /api/checkin/byId/1?startDate=2025-09-01&endDate=2025-09-22
     // GET: api/checkin/byId/{id}  
     [HttpGet("byId/{id:int}")]
-    public async Task<ActionResult<List<CheckInFullModel>>> GetCheckInsByDateAndId(int id, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public async Task<ActionResult<List<CheckInFullDto>>> GetCheckInsByDateAndId(int id, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         _logger.LogInformation("GET: api/CheckIn/byId/{id} (Id: {Id}, StartDate: {StartDate}, EndDate: {EndDate})", 
                                id, id, startDate, endDate);
@@ -132,7 +137,8 @@ public class CheckInController : ControllerBase
                 _logger.LogWarning("No check-ins found for Id: {Id} between {StartDate} and {EndDate}", id, startDate, endDate);
                 return NotFound();
             }
-            return Ok(checkIns);
+            var checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
+            return Ok(checkInDtos);
         }
         catch (Exception ex)
         {
