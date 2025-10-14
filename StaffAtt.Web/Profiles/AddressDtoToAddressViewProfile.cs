@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Profiles;
 
-public class AddressProfile : Profile
+public class AddressDtoToAddressViewProfile : Profile
 {
-    public AddressProfile()
+    public AddressDtoToAddressViewProfile()
     {
-        CreateMap<AddressModel, AddressViewModel>()
+        CreateMap<AddressDto, AddressViewModel>()
             .ForPath(dest => dest.Street, opt => opt.MapFrom(src => src.Street))
             .ForPath(dest => dest.City, opt => opt.MapFrom(src => src.City))
             .ForPath(dest => dest.Zip, opt => opt.MapFrom(src => src.Zip))

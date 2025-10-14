@@ -2,10 +2,10 @@
 using FluentAssertions;
 using StaffAtt.Web.Models;
 using StaffAtt.Web.Profiles;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Profiles;
-public class StaffManagementDeleteProfileTests
+public class StaffBasicDtoToStaffManagementDeleteViewProfileTests
 {
     [Fact]
     public void TestStaffManagementDeleteMapping()
@@ -13,10 +13,10 @@ public class StaffManagementDeleteProfileTests
         // Arrange
         var config = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<StaffManagementDeleteProfile>();
+            cfg.AddProfile<StaffBasicDtoToStaffManagementDeleteViewProfile>();
         });
         var mapper = config.CreateMapper();
-        var staffBasicModel = new StaffBasicModel
+        var staffBasicModel = new StaffBasicDto
         {
             Id = 1,
             FirstName = "John",

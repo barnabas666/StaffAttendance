@@ -132,7 +132,7 @@ public class CheckInController : ControllerBase
         try
         {
             var checkIns = await _checkInService.GetCheckInsByDateAndIdAsync(id, startDate, endDate);
-            if (checkIns == null || !checkIns.Any())
+            if (checkIns == null)
             {
                 _logger.LogWarning("No check-ins found for Id: {Id} between {StartDate} and {EndDate}", id, startDate, endDate);
                 return NotFound();

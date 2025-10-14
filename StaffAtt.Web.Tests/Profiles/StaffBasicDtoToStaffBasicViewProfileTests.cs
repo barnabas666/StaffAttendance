@@ -2,18 +2,18 @@
 using FluentAssertions;
 using StaffAtt.Web.Models;
 using StaffAtt.Web.Profiles;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Profiles;
-public class StaffBasicProfileTests
+public class StaffBasicDtoToStaffBasicViewProfileTests
 {
     [Fact]
     public void TestStaffBasicMapping()
     {
         // Arrange
-        var config = new MapperConfiguration(cfg => cfg.AddProfile<StaffBasicProfile>());
+        var config = new MapperConfiguration(cfg => cfg.AddProfile<StaffBasicDtoToStaffBasicViewProfile>());
         var mapper = config.CreateMapper();
-        var staffBasicModel = new StaffBasicModel
+        var staffBasicModel = new StaffBasicDto
         {
             Id = 1,
             FirstName = "John",

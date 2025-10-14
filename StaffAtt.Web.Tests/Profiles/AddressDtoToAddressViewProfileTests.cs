@@ -2,18 +2,18 @@
 using FluentAssertions;
 using StaffAtt.Web.Models;
 using StaffAtt.Web.Profiles;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Profiles;
-public class AddressProfileTests
+public class AddressDtoToAddressViewProfileTests
 {
     [Fact]
     public void TestAddressMapping()
     {
         // Arrange
-        var config = new MapperConfiguration(cfg => cfg.AddProfile<AddressProfile>());
+        var config = new MapperConfiguration(cfg => cfg.AddProfile<AddressDtoToAddressViewProfile>());
         var mapper = config.CreateMapper();
-        var addressModel = new AddressModel
+        var addressModel = new AddressDto
         {
             Street = "123 Main St",
             City = "Anytown",

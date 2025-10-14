@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Profiles;
 
-public class StaffManagementDeleteProfile : Profile
+public class StaffBasicDtoToStaffManagementDeleteViewProfile : Profile
 {
-    public StaffManagementDeleteProfile()
+    public StaffBasicDtoToStaffManagementDeleteViewProfile()
     {
-        CreateMap<StaffBasicModel, StaffManagementDeleteViewModel>()
+        CreateMap<StaffBasicDto, StaffManagementDeleteViewModel>()
         .ForPath(dest => dest.BasicInfo.Id, opt => opt.MapFrom(src => src.Id))
         .ForPath(dest => dest.BasicInfo.FirstName, opt => opt.MapFrom(src => src.FirstName))
         .ForPath(dest => dest.BasicInfo.LastName, opt => opt.MapFrom(src => src.LastName))

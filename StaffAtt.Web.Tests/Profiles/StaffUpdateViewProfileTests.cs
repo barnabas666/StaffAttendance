@@ -13,8 +13,8 @@ public class StaffUpdateViewProfileTests
         // Arrange
         var config = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<StaffUpdateViewProfile>();
-            cfg.AddProfile<AddressDtoProfile>();
+            cfg.AddProfile<StaffFullDtoToStaffUpdateViewProfile>();
+            cfg.AddProfile<AddressDtoToAddressViewProfile>();
         });
         var mapper = config.CreateMapper();
         var staffFullModel = new StaffFullDto

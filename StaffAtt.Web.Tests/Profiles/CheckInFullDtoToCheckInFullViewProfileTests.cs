@@ -2,18 +2,18 @@
 using FluentAssertions;
 using StaffAtt.Web.Models;
 using StaffAtt.Web.Profiles;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Profiles;
-public class CheckInFullProfileTests
+public class CheckInFullDtoToCheckInFullViewProfileTests
 {
     [Fact]
     public void TestCheckInFullMapping()
     {
         // Arrange
-        var config = new MapperConfiguration(cfg => cfg.AddProfile<CheckInFullProfile>());
+        var config = new MapperConfiguration(cfg => cfg.AddProfile<CheckInFullDtoToCheckInFullViewProfile>());
         var mapper = config.CreateMapper();
-        var checkInFullModel = new CheckInFullModel
+        var checkInFullModel = new CheckInFullDto
         {
             Id = 1,
             FirstName = "John",

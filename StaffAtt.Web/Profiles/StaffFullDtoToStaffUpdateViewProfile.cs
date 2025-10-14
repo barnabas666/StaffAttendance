@@ -4,9 +4,9 @@ using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Profiles;
 
-public class StaffUpdateViewProfile : Profile
+public class StaffFullDtoToStaffUpdateViewProfile : Profile
 {
-    public StaffUpdateViewProfile()
+    public StaffFullDtoToStaffUpdateViewProfile()
     {
         CreateMap<StaffFullDto, StaffUpdateViewModel>()
             .ForPath(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
