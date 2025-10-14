@@ -4,7 +4,7 @@ using StaffAttLibrary.Models;
 namespace StaffAttLibrary.Data;
 public interface IStaffService
 {
-    Task CreateStaffAsync(int departmentId,
+    Task<int> CreateStaffAsync(int departmentId,
                           AddressModel address,
                           string pIN,
                           string firstName,

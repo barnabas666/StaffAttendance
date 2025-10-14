@@ -44,7 +44,7 @@ public class StaffManagementController : Controller
 
         var result = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
         if (!result.IsSuccess || result.Value is null)
-            return View("Error", result.ErrorMessage ?? "Failed to load staff list.");
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(result.Value);
         staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
@@ -69,7 +69,7 @@ public class StaffManagementController : Controller
             $"staff/basic/filter?departmentId={staffModel.DepartmentId}&approvedType={(int)staffModel.ApprovedRadio}"
         );       
         if (!result.IsSuccess || result.Value is null)
-            return View("Error", result.ErrorMessage ?? "Failed to load filtered staff list.");
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(result.Value);
         staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
@@ -91,8 +91,8 @@ public class StaffManagementController : Controller
         // Call API to get staff by ID
         var result = await _apiClient.GetAsync<StaffFullDto>($"staff/{id}");        
         if (!result.IsSuccess || result.Value is null)
-            return View("Error", result.ErrorMessage ?? $"Failed to load staff with ID {id}.");
-        
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
+
         var detailsModel = _mapper.Map<StaffDetailsViewModel>(result.Value);
         
         return View("Details", detailsModel);
@@ -112,7 +112,7 @@ public class StaffManagementController : Controller
     {
         var result = await _apiClient.GetAsync<StaffBasicDto>($"staff/basic/{id}");
         if (!result.IsSuccess || result.Value is null)
-            return View("Error", result.ErrorMessage ?? $"Failed to load staff with ID {id}.");
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         var updateModel = _mapper.Map<StaffManagementUpdateViewModel>(result.Value);
         updateModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync(String.Empty);
@@ -132,7 +132,7 @@ public class StaffManagementController : Controller
 
         var createResult = await _apiClient.PutAsync<UpdateStaffByAdminRequest>("staff/admin", request);
         if (!createResult.IsSuccess)
-            return View("Error", createResult.ErrorMessage ?? "Failed to update staff.");
+            return View("Error", new ErrorViewModel { Message = createResult.ErrorMessage });
 
         return RedirectToAction("List");
     }
@@ -149,7 +149,7 @@ public class StaffManagementController : Controller
     {
         var result = await _apiClient.GetAsync<StaffBasicDto>($"staff/basic/{id}");        
         if (!result.IsSuccess || result.Value is null)
-            return View("Error", result.ErrorMessage ?? $"Failed to load staff with ID {id}.");
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         StaffManagementDeleteViewModel deleteModel = _mapper.Map<StaffManagementDeleteViewModel>(result.Value);
 
@@ -180,7 +180,7 @@ public class StaffManagementController : Controller
         // Delete staff record
         var deleteStaffResult = await _apiClient.DeleteAsync($"staff/{id}");
         if (!deleteStaffResult.IsSuccess)
-            return View("Error", new ErrorViewModel { Message = deleteStaffResult.ErrorMessage ?? "Failed to delete staff record." });
+            return View("Error", new ErrorViewModel { Message = deleteStaffResult.ErrorMessage });
 
         // Delete IdentityUser
         IdentityUser userToDelete = await _userService.FindByEmailAsync(userEmail);

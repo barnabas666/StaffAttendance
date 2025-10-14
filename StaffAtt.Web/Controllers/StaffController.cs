@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttShared.DTOs;
+using System.Diagnostics;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -73,7 +74,7 @@ public class StaffController : Controller
         );
 
         if (!existsResult.IsSuccess)
-            return View("Error", existsResult.ErrorMessage);
+            return View("Error", new ErrorViewModel { Message = existsResult.ErrorMessage });
 
         // if user has already created account we redirect him to Details action
         // unreachable code, but we must check it in case someone get to Create action using URL
@@ -98,7 +99,7 @@ public class StaffController : Controller
         // 3. Call API to create staff
         var createResult = await _apiClient.PostAsync<CreateStaffRequest>("staff", request);
         if (!createResult.IsSuccess)
-            return View("Error", createResult.ErrorMessage);
+            return View("Error", new ErrorViewModel { Message = createResult.ErrorMessage });
 
         IdentityUser newUser = await _userService.FindByEmailAsync(userEmail);
         await _userService.AddToRoleAsync(newUser, "Member");
@@ -122,7 +123,7 @@ public class StaffController : Controller
         // 1. Check if staff exists
         var existsResult = await _apiClient.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}");
         if (!existsResult.IsSuccess)
-            return View("Error", existsResult.ErrorMessage);
+            return View("Error", new ErrorViewModel { Message = existsResult.ErrorMessage });
 
         if (!existsResult.Value)
             return RedirectToAction("Create");
@@ -130,7 +131,7 @@ public class StaffController : Controller
         // 2. Get staff details
         var detailsResult = await _apiClient.GetAsync<StaffFullDto>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}");
         if (!detailsResult.IsSuccess || detailsResult.Value is null)
-            return View("Error", detailsResult.ErrorMessage ?? "Staff details could not be loaded.");
+            return View("Error", new ErrorViewModel { Message = detailsResult.ErrorMessage });
 
         // 3. Map to view model
         var detailsModel = _mapper.Map<StaffDetailsViewModel>(detailsResult.Value);
@@ -153,7 +154,7 @@ public class StaffController : Controller
         var result = await _apiClient.GetAsync<StaffFullDto>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}");
 
         if (!result.IsSuccess || result.Value is null)
-            return View("Error", result.ErrorMessage ?? "Could not load staff details for update.");
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         // 2. Map DTO => ViewModel
         var updateModel = _mapper.Map<StaffUpdateViewModel>(result.Value);
@@ -192,7 +193,7 @@ public class StaffController : Controller
         var result = await _apiClient.PutAsync<UpdateStaffRequest>("staff", request);
 
         if (!result.IsSuccess)
-            return View("Error", result.ErrorMessage);
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         return RedirectToAction("Details");
     }

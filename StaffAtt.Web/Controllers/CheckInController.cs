@@ -46,14 +46,14 @@ public class CheckInController : Controller
         );
 
         if (!checkInResult.IsSuccess)
-            return View("Error", new ErrorViewModel { Message = checkInResult.ErrorMessage ?? "Failed to load check-ins." });
+            return View("Error", new ErrorViewModel { Message = checkInResult.ErrorMessage });
 
         viewModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkInResult.Value);
 
         // --- Load staff for dropdown ---
         var staffResult = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
         if (!staffResult.IsSuccess)
-            return View("Error", new ErrorViewModel { Message = staffResult.ErrorMessage ?? "Failed to load staff list." });
+            return View("Error", new ErrorViewModel { Message = staffResult.ErrorMessage });
 
         viewModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(staffResult.Value);
         viewModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(viewModel, "All Staff");
@@ -78,14 +78,14 @@ public class CheckInController : Controller
         
         var checkInResult = await _apiClient.GetAsync<List<CheckInFullDto>>(endpoint);
         if (!checkInResult.IsSuccess)
-            return View("Error", new ErrorViewModel { Message = checkInResult.ErrorMessage ?? "Failed to load filtered check-ins." });
+            return View("Error", new ErrorViewModel { Message = checkInResult.ErrorMessage });
 
         viewModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(checkInResult.Value);
 
         // Reload dropdown + staff list
         var staffResult = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
         if (!staffResult.IsSuccess)
-            return View("Error", new ErrorViewModel { Message = staffResult.ErrorMessage ?? "Failed to reload staff list." });
+            return View("Error", new ErrorViewModel { Message = staffResult.ErrorMessage });
 
         viewModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(staffResult.Value);
         viewModel.StaffDropDownData = await _staffSelectListService.GetStaffSelectListAsync(viewModel, "All Staff");
@@ -110,7 +110,7 @@ public class CheckInController : Controller
         );
 
         if (!result.IsSuccess)
-            return View("Error", new ErrorViewModel { Message = result.ErrorMessage ?? "Failed to load check-ins for current user." });
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         viewModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(result.Value);
 
@@ -131,7 +131,7 @@ public class CheckInController : Controller
         );
 
         if (!result.IsSuccess)
-            return View("Error", new ErrorViewModel { Message = result.ErrorMessage ?? "Failed to reload check-ins." });
+            return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         viewModel.CheckIns = _mapper.Map<List<CheckInFullViewModel>>(result.Value);
 

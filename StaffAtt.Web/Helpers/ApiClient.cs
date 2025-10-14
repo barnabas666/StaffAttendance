@@ -7,19 +7,17 @@ public class ApiClient : IApiClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly JsonSerializerOptions _jsonOptions;
+
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     public ApiClient(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
     {
         _httpClientFactory = httpClientFactory;
         _httpContextAccessor = httpContextAccessor;
-
-        // consistent serializer options across methods
-        _jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true
-        };
     }
 
     private HttpClient CreateClient()
@@ -28,79 +26,90 @@ public class ApiClient : IApiClient
 
         var token = _httpContextAccessor.HttpContext?.Session.GetString("JwtToken");
         if (!string.IsNullOrEmpty(token))
-        {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        }
 
         return client;
     }
-
-    // shared helper for consistent deserialization
-    private async Task<Result<T>> DeserializeResponseAsync<T>(HttpResponseMessage response, string endpoint, string verb)
+    
+    // Common helper for reading response    
+    private static async Task<Result<T>> ReadResponseAsync<T>(HttpResponseMessage response, string verb, string endpoint)
     {
+        var status = (int)response.StatusCode;
+
+        // Case 1: Error status code
         if (!response.IsSuccessStatusCode)
         {
-            var error = await response.Content.ReadAsStringAsync();
-            return Result<T>.Failure($"{verb} {endpoint} failed with {(int)response.StatusCode} {response.ReasonPhrase}. {error}");
+            var errorText = await response.Content.ReadAsStringAsync();
+            return Result<T>.Failure($"{verb} {endpoint} failed ({status}): {response.ReasonPhrase}. {errorText}");
         }
 
+        // Case 2: No content (e.g. 204 or empty body)
+        if (response.StatusCode == System.Net.HttpStatusCode.NoContent ||
+            response.Content.Headers.ContentLength == 0)
+        {
+            // For POST we may not expect body, so success anyway
+            if (typeof(T) == typeof(bool))
+                return Result<T>.Success((T)(object)true);
+
+            return Result<T>.Failure($"{verb} {endpoint} returned no content.");
+        }
+
+        // Case 3: Try to parse JSON
         try
         {
-            // Try to parse JSON
-            var value = await response.Content.ReadFromJsonAsync<T>(_jsonOptions);
-            if (value is not null)
-                return Result<T>.Success(value);
+            var stream = await response.Content.ReadAsStreamAsync();
+            var value = await JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions);
 
-            // Sometimes servers return an empty body
-            return Result<T>.Failure($"{verb} {endpoint} returned empty response.");
+            if (value == null)
+                return Result<T>.Failure($"{verb} {endpoint} returned null JSON.");
+
+            return Result<T>.Success(value);
         }
         catch (JsonException)
         {
-            // If not JSON, try reading as plain text
+            // Maybe server returned a plain string or HTML
             var raw = await response.Content.ReadAsStringAsync();
             if (typeof(T) == typeof(string))
                 return Result<T>.Success((T)(object)raw.Trim());
 
-            return Result<T>.Failure($"Failed to parse response from {verb} {endpoint}. Expected JSON but got raw text: {raw}");
-        }
-        catch (Exception ex)
-        {
-            return Result<T>.Failure($"Unexpected error while reading response from {verb} {endpoint}. {ex.Message}");
+            // If POST succeeded but returned plain text, just mark success
+            if (verb == "POST" && response.IsSuccessStatusCode)
+                return Result<T>.Success(default!);
+
+            return Result<T>.Failure($"{verb} {endpoint} returned non-JSON response: {raw}");
         }
     }
-
+        
+    // CRUD methods    
     public async Task<Result<T>> GetAsync<T>(string endpoint)
     {
         var client = CreateClient();
         var response = await client.GetAsync(endpoint);
-        return await DeserializeResponseAsync<T>(response, endpoint, "GET");
+        return await ReadResponseAsync<T>(response, "GET", endpoint);
     }
 
     public async Task<Result<T>> PostAsync<T>(string endpoint, T data)
     {
         var client = CreateClient();
         var response = await client.PostAsJsonAsync(endpoint, data, _jsonOptions);
-        return await DeserializeResponseAsync<T>(response, endpoint, "POST");
+        return await ReadResponseAsync<T>(response, "POST", endpoint);
     }
 
     public async Task<Result<T>> PutAsync<T>(string endpoint, T data)
     {
         var client = CreateClient();
         var response = await client.PutAsJsonAsync(endpoint, data, _jsonOptions);
-        return await DeserializeResponseAsync<T>(response, endpoint, "PUT");
+        return await ReadResponseAsync<T>(response, "PUT", endpoint);
     }
 
     public async Task<Result<bool>> DeleteAsync(string endpoint)
     {
         var client = CreateClient();
         var response = await client.DeleteAsync(endpoint);
+        var result = await ReadResponseAsync<string>(response, "DELETE", endpoint);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            return Result<bool>.Failure($"DELETE {endpoint} failed with {(int)response.StatusCode} {response.ReasonPhrase}. {error}");
-        }
-
-        return Result<bool>.Success(true);
+        return result.IsSuccess
+            ? Result<bool>.Success(true)
+            : Result<bool>.Failure(result.ErrorMessage);
     }
 }

@@ -51,7 +51,7 @@ public class StaffPostgresService : IStaffService
     /// <param name="emailAddress"></param>
     /// <param name="phoneNumbers"></param>
     /// <returns></returns>
-    public async Task CreateStaffAsync(int departmentId,
+    public async Task<int> CreateStaffAsync(int departmentId,
                                  AddressModel address,
                                  string pIN,
                                  string firstName,
@@ -68,6 +68,8 @@ public class StaffPostgresService : IStaffService
                                                       addressId,
                                                       aliasId);
         await _staffData.CreatePhoneNumbersAsync(staffId, phoneNumbers);
+
+        return staffId;
     }
 
 

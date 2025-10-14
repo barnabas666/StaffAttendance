@@ -58,7 +58,7 @@ public class CheckInController : ControllerBase
         try
         {
             await _checkInService.DoCheckInOrCheckOutAsync(staffId);
-            return NoContent();
+            return Ok(new { StaffId = staffId });
         }
         catch (Exception ex)
         {
@@ -77,7 +77,7 @@ public class CheckInController : ControllerBase
         try
         {
             var checkIns = await _checkInService.GetAllCheckInsByDateAsync(startDate, endDate);
-            if (checkIns == null || !checkIns.Any())
+            if (checkIns == null)
             {
                 _logger.LogWarning("No check-ins found between {StartDate} and {EndDate}", startDate, endDate);
                 return NotFound();
@@ -104,7 +104,7 @@ public class CheckInController : ControllerBase
         try
         {
             var checkIns = await _checkInService.GetCheckInsByDateAndEmailAsync(emailAddress, startDate, endDate);
-            if (checkIns == null || !checkIns.Any())
+            if (checkIns == null)
             {
                 _logger.LogWarning("No check-ins found for Email: {Email} between {StartDate} and {EndDate}", emailAddress, startDate, endDate);
                 return NotFound();

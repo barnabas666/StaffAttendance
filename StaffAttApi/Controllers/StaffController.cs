@@ -54,7 +54,7 @@ public class StaffController : ControllerBase
             var address = _mapper.Map<AddressModel>(request.Address);
             var phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
 
-            await _staffService.CreateStaffAsync(
+            int staffId = await _staffService.CreateStaffAsync(
                 request.DepartmentId,
                 address,
                 request.PIN,
@@ -63,7 +63,7 @@ public class StaffController : ControllerBase
                 request.EmailAddress,
                 phoneNumbers);
 
-            return Ok();
+            return Ok(new { StaffId = staffId });
         }
         catch (Exception ex)
         {
@@ -91,7 +91,7 @@ public class StaffController : ControllerBase
                 request.EmailAddress,
                 phoneNumbers);
 
-            return Ok();
+            return Ok(new { request.EmailAddress });
         }
         catch (Exception ex)
         {
@@ -272,7 +272,7 @@ public class StaffController : ControllerBase
                 _logger.LogWarning("Email not found for staff Id: {Id}", id);
                 return NotFound();
             }
-            return Ok(email);
+            return Ok(new { EmailAddress = email });
         }
         catch (Exception ex)
         {
@@ -311,7 +311,7 @@ public class StaffController : ControllerBase
         try
         {
             await _staffService.UpdateStaffByAdminAsync(request.Id, request.DepartmentId, request.IsApproved);
-            return Ok();
+            return Ok(new { request.Id });
         }
         catch (Exception ex)
         {
@@ -330,7 +330,7 @@ public class StaffController : ControllerBase
         try
         {
             await _staffService.DeleteStaffAsync(staffId);
-            return Ok();
+            return Ok(new { StaffId = staffId });
         }
         catch (Exception ex)
         {
