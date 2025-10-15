@@ -35,9 +35,11 @@ public class CheckInController : ControllerBase
             var checkIn = await _checkInService.GetLastCheckInAsync(staffId);
             if (checkIn == null)
             {
-                _logger.LogWarning("No check-in found for StaffId: {StaffId}", staffId);
-                return NotFound();
+                _logger.LogInformation("No previous check-in found for StaffId: {StaffId}", staffId);
+                // returns JSON null body
+                return Ok((CheckInDto?)null);
             }
+
             var checkInDto = _mapper.Map<CheckInDto>(checkIn);
             return Ok(checkInDto);
         }

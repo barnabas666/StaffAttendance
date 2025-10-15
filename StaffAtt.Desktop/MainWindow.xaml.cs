@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using StaffAtt.Desktop.Models;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -45,7 +45,7 @@ public partial class MainWindow : Window
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {        
         AuthenticationModel login = new();
-        StaffBasicModel staff = new();        
+        StaffBasicDto staff = new();        
 
         if (string.IsNullOrWhiteSpace(aliasText.Text) || string.IsNullOrWhiteSpace(pINText.Text))
         {
@@ -96,7 +96,7 @@ public partial class MainWindow : Window
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            staff = await staffResponse.Content.ReadFromJsonAsync<StaffBasicModel>();
+            staff = await staffResponse.Content.ReadFromJsonAsync<StaffBasicDto>();
                         
             if (staff.IsApproved)
             {

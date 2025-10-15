@@ -1,8 +1,9 @@
 ﻿using StaffAtt.Desktop.Models;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Windows;
 
 namespace StaffAtt.Desktop;
@@ -24,11 +25,11 @@ public partial class CheckInForm : Window
     /// <summary>
     /// Instance of class which holds Basic Staff data.
     /// </summary>
-    private StaffBasicModel _basicStaffModel = null;
+    private StaffBasicDto _basicStaffModel = null;
     /// <summary>
     /// Instance of class which holds CheckIn data.
     /// </summary>
-    private CheckInModel _checkInModel = null;
+    private CheckInDto _checkInModel = null;
 
     /// <summary>
     /// Constructor, initialize instance of this class.
@@ -47,7 +48,7 @@ public partial class CheckInForm : Window
     /// Just info for Staff to be sure its really his/her own CheckIn/Out.
     /// </summary>
     /// <param name="basicStaffModel">Holds Basic Staff data.</param>
-    public async void PopulateStaff(StaffBasicModel basicStaffModel)
+    public async void PopulateStaff(StaffBasicDto basicStaffModel)
     {
         _basicStaffModel = basicStaffModel;
         firstNameText.Text = _basicStaffModel.FirstName;
@@ -72,7 +73,17 @@ public partial class CheckInForm : Window
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            _checkInModel = await lastCheckInResponse.Content.ReadFromJsonAsync<CheckInModel>();
+            
+            var content = await lastCheckInResponse.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(content) || content == "null")
+                _checkInModel = null;
+            else
+            {
+                _checkInModel = JsonSerializer.Deserialize<CheckInDto>(content, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
         }
         catch (HttpRequestException ex)
         {
