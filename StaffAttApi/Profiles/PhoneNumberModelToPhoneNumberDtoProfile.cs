@@ -4,9 +4,9 @@ using StaffAttLibrary.Models;
 
 namespace StaffAttApi.Profiles;
 
-public class PhoneNumberDtoProfile : Profile
+public class PhoneNumberModelToPhoneNumberDtoProfile : Profile
 {
-    public PhoneNumberDtoProfile()
+    public PhoneNumberModelToPhoneNumberDtoProfile()
     {
         CreateMap<PhoneNumberModel, PhoneNumberDto>()
             .ForPath(dest => dest.Id, opt => opt.MapFrom(src => src.Id))

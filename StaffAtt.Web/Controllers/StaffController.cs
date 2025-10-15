@@ -79,7 +79,7 @@ public class StaffController : Controller
         // if user has already created account we redirect him to Details action
         // unreachable code, but we must check it in case someone get to Create action using URL
         if (existsResult.Value)
-            return RedirectToAction("Details", new { message = "You have already created account!" });
+            return RedirectToAction("Details", new { errorMessage = "You have already created account!" });
 
         // 2. Build request model for API
         List<PhoneNumberDto> phoneNumbers = _phoneNumberDtoParser.ParseStringToPhoneNumbers(staff.PhoneNumbersText);
@@ -105,7 +105,7 @@ public class StaffController : Controller
         await _userService.AddToRoleAsync(newUser, "Member");
         await _userService.SignInAsync(newUser, false);
 
-        return RedirectToAction("Details");
+        return RedirectToAction("Details", new { successMessage = "Your staff profile was successfully created." });
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public class StaffController : Controller
     /// <param name="message">Optional parameter. Some warning message from different Action.</param>
     /// <returns>View with populated StaffDetailsModel inside.</returns>
     [HttpGet]
-    public async Task<IActionResult> Details(string message = "")
+    public async Task<IActionResult> Details(string? message = "", string? successMessage = "", string? errorMessage = "")
     {
         string userEmail = _userContext.GetUserEmail();
 
@@ -136,6 +136,8 @@ public class StaffController : Controller
         // 3. Map to view model
         var detailsModel = _mapper.Map<StaffDetailsViewModel>(detailsResult.Value);
         detailsModel.Message = message;
+        detailsModel.SuccessMessage = successMessage;
+        detailsModel.ErrorMessage = errorMessage;
 
         return View("Details", detailsModel);
     }
@@ -195,6 +197,6 @@ public class StaffController : Controller
         if (!result.IsSuccess)
             return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
-        return RedirectToAction("Details");
+        return RedirectToAction("Details", new { successMessage = "Your profile was successfully updated." });
     }
 }

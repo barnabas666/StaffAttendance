@@ -40,6 +40,8 @@
     <div class="col-md-4">
         <form asp-action="Update"> 
             <input asp-for="@Model.BasicInfo.Id" type="hidden" />
+            <input asp-for="@Model.BasicInfo.FirstName" type="hidden" />
+            <input asp-for="@Model.BasicInfo.LastName" type="hidden" />
             <div class="form-group">
                 <label asp-for="@Model.DepartmentItems" class="control-label"></label>
                 <select asp-items="@Model.DepartmentItems" asp-for="@Model.BasicInfo.DepartmentId"></select>

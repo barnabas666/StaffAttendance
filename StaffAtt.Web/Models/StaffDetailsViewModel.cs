@@ -25,7 +25,9 @@ public class StaffDetailsViewModel
     public List<PhoneNumberDto> PhoneNumbers { get; set; } = new List<PhoneNumberDto>();
 
     /// <summary>
-    /// Details Action optional parameter. Some warning message from different Action, probably from Create.
+    /// Details Action optional parameter. Some info message from different Action.
     /// </summary>
-    public string Message { get; set; }
+    public string? Message { get; set; }
+    public string? SuccessMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 }

@@ -4,9 +4,9 @@ using StaffAttLibrary.Models;
 
 namespace StaffAttApi.Profiles;
 
-public class AddressDtoProfile : Profile
+public class AddressModelToAddressDtoProfile : Profile
 {
-    public AddressDtoProfile()
+    public AddressModelToAddressDtoProfile()
     {        
         CreateMap<AddressModel, AddressDto>()
             .ForPath(dest => dest.Id, opt => opt.MapFrom(src => src.Id))

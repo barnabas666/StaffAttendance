@@ -38,7 +38,7 @@ public class StaffManagementController : Controller
     /// rendering. Display Check-In Approval status for all staff.</remarks>
     /// <returns>An <see cref="IActionResult"/> that renders the staff management list view with the populated data.</returns>
     [HttpGet]
-    public async Task<IActionResult> List()
+    public async Task<IActionResult> List(string? message = "", string? successMessage = "", string? errorMessage = "")
     {
         StaffManagementListViewModel staffModel = new StaffManagementListViewModel();
 
@@ -48,6 +48,10 @@ public class StaffManagementController : Controller
 
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(result.Value);
         staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
+
+        staffModel.Message = message;
+        staffModel.SuccessMessage = successMessage;
+        staffModel.ErrorMessage = errorMessage;
 
         return View("List", staffModel);
     }
@@ -134,7 +138,8 @@ public class StaffManagementController : Controller
         if (!createResult.IsSuccess)
             return View("Error", new ErrorViewModel { Message = createResult.ErrorMessage });
 
-        return RedirectToAction("List");
+        return RedirectToAction("List",
+                                new { successMessage = $"{updateModel.BasicInfo.FirstName} {updateModel.BasicInfo.LastName} profile was successfully updated." });
     }
 
     /// <summary>
@@ -187,6 +192,7 @@ public class StaffManagementController : Controller
         if (userToDelete is not null)
             await _userService.DeleteIdentityUserAsync(userToDelete);
 
-        return RedirectToAction("List");
+        return RedirectToAction("List",
+                                new { successMessage = $"{deleteModel.BasicInfo.FirstName} {deleteModel.BasicInfo.LastName} profile was successfully deleted." });
     }
 }

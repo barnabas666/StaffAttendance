@@ -4,9 +4,9 @@ using StaffAttLibrary.Models;
 
 namespace StaffAttApi.Profiles;
 
-public class StaffFullDtoProfile : Profile
+public class StaffFullModelToStaffFullDtoProfile : Profile
 {
-    public StaffFullDtoProfile()
+    public StaffFullModelToStaffFullDtoProfile()
     {
         CreateMap<StaffFullModel, StaffFullDto>()
             .ForPath(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
