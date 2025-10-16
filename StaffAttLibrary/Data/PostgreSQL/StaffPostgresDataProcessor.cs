@@ -95,6 +95,23 @@ public class StaffPostgresDataProcessor : IStaffDataProcessor
     }
 
     /// <summary>
+    /// Check if PhoneNumber link already exists in DB.
+    /// </summary>
+    /// <param name="staffId"></param>
+    /// <param name="phoneNumberId"></param>
+    /// <returns></returns>
+    public async Task<bool> CheckPhoneNumberLinkAsync(int staffId, int phoneNumberId)
+    {
+        string sql = await QueryHelper.LoadPostgresQueryAsync("StaffPhoneNumbers_Check.sql");
+        List<bool> output = await _db.LoadDataAsync<bool, dynamic>(
+            sql,
+            new { staffId, phoneNumberId },
+            _connectionStringName);
+
+        return output.FirstOrDefault();
+    }
+
+    /// <summary>
     /// Delete PhoneNumber link from DB.
     /// </summary>
     /// <param name="staffId"></param>

@@ -108,12 +108,18 @@ public class StaffSqliteData : IStaffData
         foreach (PhoneNumberModel phoneNumber in phoneNumbers)
         {
             // Check if given Phone Number is already in Db (some Staff can share it because they live together).
-            bool isPhoneNumberExistingInDb = await _staffDataProcessor.CheckPhoneNumberAsync(phoneNumber);
+            bool existsNumber = await _staffDataProcessor.CheckPhoneNumberAsync(phoneNumber);
 
             // If we found that Phone Number in Db we get Id and just store it inside relation StaffPhoneNumbers Table.
-            if (isPhoneNumberExistingInDb)
+            if (existsNumber)
             {
                 int phoneNumberId = await _staffDataProcessor.GetPhoneNumberIdAsync(phoneNumber);
+
+                // check for existing link Staff-PhoneNumber to avoid duplicates in case user enters same number twice.
+                bool existsLink = await _staffDataProcessor.CheckPhoneNumberLinkAsync(staffId, phoneNumberId);
+                if (existsLink)
+                    continue;
+
                 await _staffDataProcessor.SavePhoneNumberLinkAsync(staffId, phoneNumberId);
             }
             // If its new Phone Number we add it first to PhoneNumbers Table and after we create relation.
