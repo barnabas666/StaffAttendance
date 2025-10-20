@@ -57,7 +57,7 @@ public static class ServiceCollectionExtensions
         });
 
         // Register services for dependency injection according to the DbType specified in config
-        string dbType = configuration["DbType"] ?? "SQLite";
+        string dbType = configuration["DbType"] ?? "Postgres";
         if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
         {
             services.AddSingleton<ISqliteDataAccess, SqliteDataAccess>();
@@ -67,16 +67,7 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<ICheckInData, CheckInSqliteData>();
             services.AddSingleton<IStaffDataProcessor, StaffSqliteDataProcessor>();
         }
-        else if (dbType.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
-        {
-            services.AddSingleton<IPostgresDataAccess, PostgresDataAccess>();
-            services.AddSingleton<IStaffService, StaffPostgresService>();
-            services.AddSingleton<ICheckInService, CheckInPostgresService>();
-            services.AddSingleton<IStaffData, StaffPostgresData>();
-            services.AddSingleton<ICheckInData, CheckInPostgresData>();
-            services.AddSingleton<IStaffDataProcessor, StaffPostgresDataProcessor>();
-        }
-        else
+        else if (dbType.Equals("Sql", StringComparison.OrdinalIgnoreCase))
         {
             services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
             services.AddSingleton<IStaffService, StaffService>();
@@ -84,6 +75,15 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<IStaffData, StaffData>();
             services.AddSingleton<ICheckInData, CheckInData>();
             services.AddSingleton<IStaffDataProcessor, StaffDataProcessor>();
+        }
+        else
+        {
+            services.AddSingleton<IPostgresDataAccess, PostgresDataAccess>();
+            services.AddSingleton<IStaffService, StaffPostgresService>();
+            services.AddSingleton<ICheckInService, CheckInPostgresService>();
+            services.AddSingleton<IStaffData, StaffPostgresData>();
+            services.AddSingleton<ICheckInData, CheckInPostgresData>();
+            services.AddSingleton<IStaffDataProcessor, StaffPostgresDataProcessor>();
         }
 
         services.AddSingleton<IConnectionStringData, ConnectionStringData>();

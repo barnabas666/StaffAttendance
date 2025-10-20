@@ -1,5 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
+using StaffAtt.Identity; // Use the same ApplicationDbContext as your web app
+using StaffAttApi.Helpers;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.PostgreSQL;
 using StaffAttLibrary.Data.SQL;
@@ -8,9 +13,6 @@ using StaffAttLibrary.Db.PostgreSQL;
 using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Db.SQLite;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using StaffAtt.Identity; // Use the same ApplicationDbContext as your web app
 
 namespace StaffAttApi.StartupConfig;
 
@@ -26,7 +28,7 @@ public static class ServicesConfigExtensions
     public static void AddCustomServices(this WebApplicationBuilder builder)
     {
         // Register services for dependency injection according to the DbType specified in appsettings.json
-        string dbType = builder.Configuration.GetValue<string>("DbType") ?? "SQLite";
+        string dbType = builder.Configuration.GetValue<string>("DbType") ?? "Postgres";
         if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
         {
             builder.Services.AddSingleton<ISqliteDataAccess, SqliteDataAccess>();
@@ -36,16 +38,7 @@ public static class ServicesConfigExtensions
             builder.Services.AddSingleton<ICheckInData, CheckInSqliteData>();
             builder.Services.AddSingleton<IStaffDataProcessor, StaffSqliteDataProcessor>();
         }
-        else if (dbType.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
-        {
-            builder.Services.AddSingleton<IPostgresDataAccess, PostgresDataAccess>();
-            builder.Services.AddSingleton<IStaffService, StaffPostgresService>();
-            builder.Services.AddSingleton<ICheckInService, CheckInPostgresService>();
-            builder.Services.AddSingleton<IStaffData, StaffPostgresData>();
-            builder.Services.AddSingleton<ICheckInData, CheckInPostgresData>();
-            builder.Services.AddSingleton<IStaffDataProcessor, StaffPostgresDataProcessor>();
-        }
-        else
+        else if (dbType.Equals("Sql", StringComparison.OrdinalIgnoreCase))
         {
             builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
             builder.Services.AddSingleton<IStaffService, StaffService>();
@@ -53,6 +46,15 @@ public static class ServicesConfigExtensions
             builder.Services.AddSingleton<IStaffData, StaffData>();
             builder.Services.AddSingleton<ICheckInData, CheckInData>();
             builder.Services.AddSingleton<IStaffDataProcessor, StaffDataProcessor>();
+        }
+        else
+        {
+            builder.Services.AddSingleton<IPostgresDataAccess, PostgresDataAccess>();
+            builder.Services.AddSingleton<IStaffService, StaffPostgresService>();
+            builder.Services.AddSingleton<ICheckInService, CheckInPostgresService>();
+            builder.Services.AddSingleton<IStaffData, StaffPostgresData>();
+            builder.Services.AddSingleton<ICheckInData, CheckInPostgresData>();
+            builder.Services.AddSingleton<IStaffDataProcessor, StaffPostgresDataProcessor>();
         }
 
         builder.Services.AddSingleton<IConnectionStringData, ConnectionStringData>();
@@ -105,4 +107,27 @@ public static class ServicesConfigExtensions
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
     }
+
+    public static void AddHealthCheckServices(this WebApplicationBuilder builder)
+    {
+        var dbType = builder.Configuration.GetValue<string>("DbType") ?? "Postgres";
+        var healthChecks = builder.Services.AddHealthChecks();
+
+        if (dbType.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
+        {
+            healthChecks.AddCheck<PostgresHealthCheck>("Postgres Database");
+        }
+        else
+        {
+            healthChecks.AddCheck("self", () => HealthCheckResult.Healthy("API is OK"));
+        }
+
+        builder.Services.AddHealthChecksUI(opts =>
+        {
+            opts.AddHealthCheckEndpoint("API", "/health");
+            opts.SetEvaluationTimeInSeconds(10);
+            opts.SetMinimumSecondsBetweenFailureNotifications(30);
+        }).AddInMemoryStorage();
+    }
+
 }
