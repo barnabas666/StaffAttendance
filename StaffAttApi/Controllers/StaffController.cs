@@ -16,18 +16,32 @@ public class StaffController : ControllerBase
     private readonly IStaffService _staffService;
     private readonly ILogger<StaffController> _logger;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _config;
 
-    public StaffController(IStaffService staffService, ILogger<StaffController> logger, IMapper mapper)
+    public StaffController(IStaffService staffService, ILogger<StaffController> logger, IMapper mapper, IConfiguration config)
     {
         _staffService = staffService;
         _logger = logger;
         _mapper = mapper;
+        _config = config;
+    }
+
+    /// <summary>
+    /// Applies response caching headers based on configuration settings inside appsettings.json.
+    /// Atm short is 10 seconds, medium is 30 seconds, long is 120 seconds.
+    /// </summary>
+    /// <param name="level"></param>
+    private void ApplyResponseCache(string level)
+    {
+        int duration = _config.GetValue<int>($"Caching:{level}");
+        Response.Headers["Cache-Control"] = $"public,max-age={duration}";
     }
 
     // GET: api/staff/departments
     [HttpGet("departments")]
     public async Task<ActionResult<List<DepartmentDto>>> GetAllDepartments()
     {
+        ApplyResponseCache("LongDuration");
         _logger.LogInformation("GET: api/Staff/departments");
 
         try
@@ -107,6 +121,7 @@ public class StaffController : ControllerBase
         [FromQuery] int departmentId,
         [FromQuery] ApprovedType approvedType)
     {
+        ApplyResponseCache("MediumDuration");
         _logger.LogInformation("GET: api/Staff/basic/filter (DepartmentId: {departmentId}, ApprovedType: {approvedType})",
             departmentId, approvedType);
 
@@ -135,6 +150,7 @@ public class StaffController : ControllerBase
     [HttpGet("basic")]
     public async Task<ActionResult<List<StaffBasicDto>>> GetAllBasicStaff()
     {
+        ApplyResponseCache("MediumDuration");
         _logger.LogInformation("GET: api/Staff/basic");
 
         try
@@ -162,6 +178,7 @@ public class StaffController : ControllerBase
     [HttpGet("email")]
     public async Task<ActionResult<StaffFullDto>> GetStaffByEmail([FromQuery] string emailAddress)
     {
+        ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/email (Email: {Email})", emailAddress);
 
         try
@@ -187,6 +204,7 @@ public class StaffController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<StaffFullDto>> GetStaffById(int id)
     {
+        ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/{id} (Staff's Id: {Id})", id, id);
 
         try
@@ -212,6 +230,7 @@ public class StaffController : ControllerBase
     [HttpGet("basic/{id:int}")]
     public async Task<ActionResult<StaffBasicDto>> GetBasicStaffById(int id)
     {
+        ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/basic/{id} (Staff's Id: {Id})", id, id);
 
         try
@@ -237,6 +256,7 @@ public class StaffController : ControllerBase
     [HttpGet("basic/alias/{aliasId:int}")]
     public async Task<ActionResult<StaffBasicDto>> GetBasicStaffByAliasId(int aliasId)
     {
+        ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/basic/alias/{aliasId} (AliasId: {AliasId})", aliasId, aliasId);
 
         try
@@ -262,6 +282,7 @@ public class StaffController : ControllerBase
     [HttpGet("email/{id:int}")]
     public async Task<ActionResult<string>> GetStaffEmailById(int id)
     {
+        ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/email/{id} (Staff's Id: {Id})", id, id);
 
         try
@@ -287,6 +308,7 @@ public class StaffController : ControllerBase
     [HttpGet("check-email")]
     public async Task<ActionResult<bool>> CheckStaffByEmail([FromQuery] string emailAddress)
     {
+        ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/check-email (Email: {Email})", emailAddress);
 
         try

@@ -23,6 +23,7 @@ public static class ServicesConfigExtensions
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddResponseCaching();
     }
 
     public static void AddCustomServices(this WebApplicationBuilder builder)
@@ -129,5 +130,4 @@ public static class ServicesConfigExtensions
             opts.SetMinimumSecondsBetweenFailureNotifications(30);
         }).AddInMemoryStorage();
     }
-
 }

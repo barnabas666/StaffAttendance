@@ -15,12 +15,25 @@ public class CheckInController : ControllerBase
     private readonly ICheckInService _checkInService;
     private readonly ILogger<CheckInController> _logger;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _config;
 
-    public CheckInController(ICheckInService checkInService, ILogger<CheckInController> logger, IMapper mapper)
+    public CheckInController(ICheckInService checkInService, ILogger<CheckInController> logger, IMapper mapper, IConfiguration config)
     {
         _checkInService = checkInService;
         _logger = logger;
         _mapper = mapper;
+        _config = config;
+    }
+
+    /// <summary>
+    /// Applies response caching headers based on configuration settings inside appsettings.json.
+    /// Atm short is 10 seconds, medium is 30 seconds, long is 120 seconds.
+    /// </summary>
+    /// <param name="level"></param>
+    private void ApplyResponseCache(string level)
+    {
+        int duration = _config.GetValue<int>($"Caching:{level}");
+        Response.Headers["Cache-Control"] = $"public,max-age={duration}";
     }
 
     // Example request: GET /api/checkin/last/1
@@ -28,6 +41,7 @@ public class CheckInController : ControllerBase
     [HttpGet("last/{staffId:int}")]
     public async Task<ActionResult<CheckInDto>> GetLastCheckIn(int staffId)
     {
+        ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/CheckIn/last/{staffId} (StaffId: {StaffId})", staffId, staffId);
 
         try
@@ -74,6 +88,7 @@ public class CheckInController : ControllerBase
     [HttpGet("all")]
     public async Task<ActionResult<List<CheckInFullDto>>> GetAllCheckInsByDate([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
+        ApplyResponseCache("MediumDuration");
         _logger.LogInformation("GET: api/CheckIn/all (StartDate: {StartDate}, EndDate: {EndDate})", startDate, endDate);
 
         try
@@ -100,6 +115,7 @@ public class CheckInController : ControllerBase
     [HttpGet("byEmail")]
     public async Task<ActionResult<List<CheckInFullDto>>> GetCheckInsByDateAndEmail([FromQuery] string emailAddress, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
+        ApplyResponseCache("MediumDuration");
         _logger.LogInformation("GET: api/CheckIn/byEmail (Email: {Email}, StartDate: {StartDate}, EndDate: {EndDate})",
                                emailAddress, startDate, endDate);
 
@@ -128,6 +144,7 @@ public class CheckInController : ControllerBase
     [HttpGet("byId/{id:int}")]
     public async Task<ActionResult<List<CheckInFullDto>>> GetCheckInsByDateAndId(int id, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
+        ApplyResponseCache("MediumDuration");
         _logger.LogInformation("GET: api/CheckIn/byId/{id} (Id: {Id}, StartDate: {StartDate}, EndDate: {EndDate})", 
                                id, id, startDate, endDate);
 
