@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -23,7 +24,8 @@ public static class ServicesConfigExtensions
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddResponseCaching();
+        builder.Services.AddMemoryCache();      // for in-memory counters & caching
+        builder.Services.AddResponseCaching();  // for output caching of GET endpoints
     }
 
     public static void AddCustomServices(this WebApplicationBuilder builder)
@@ -129,5 +131,34 @@ public static class ServicesConfigExtensions
             opts.SetEvaluationTimeInSeconds(10);
             opts.SetMinimumSecondsBetweenFailureNotifications(30);
         }).AddInMemoryStorage();
+    }
+
+    public static void AddRateLimitServices(this WebApplicationBuilder builder)
+    {
+        // Load IpRateLimiting section from appsettings.json
+        var ipRateLimitSection = builder.Configuration.GetSection("IpRateLimiting");
+        builder.Services.Configure<IpRateLimitOptions>(options =>
+        {
+            ipRateLimitSection.Bind(options);
+
+            // Custom 429 response message
+            options.QuotaExceededResponse = new QuotaExceededResponse
+            {
+                Content = "Too many requests. Please wait a moment before retrying.",
+                ContentType = "text/plain",
+                StatusCode = 429
+            };
+        });
+
+        // Add in-memory stores (use Redis or SQLServer for distributed)
+        builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+        builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+
+        // Add default configuration and async key locking
+        builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+        builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+
+        // Enable in-memory rate limiting
+        builder.Services.AddInMemoryRateLimiting();
     }
 }

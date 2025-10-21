@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using StaffAttApi.StartupConfig;
@@ -9,8 +10,15 @@ builder.AddCustomServices();
 builder.AddIdentityServices();
 builder.AddAuthServices();
 builder.AddHealthCheckServices();
+builder.AddRateLimitServices();
 
 var app = builder.Build();
+
+app.UseHttpsRedirection();
+app.UseIpRateLimiting();
+app.UseResponseCaching();
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
@@ -32,12 +40,5 @@ else
     app.MapHealthChecksUI(options => options.UIPath = "/health-ui").RequireAuthorization();
 }
 
-app.UseHttpsRedirection();
-app.UseResponseCaching();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
