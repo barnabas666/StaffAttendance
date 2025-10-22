@@ -33,7 +33,10 @@ public class CheckInController : ControllerBase
     private void ApplyResponseCache(string level)
     {
         int duration = _config.GetValue<int>($"Caching:{level}");
-        Response.Headers["Cache-Control"] = $"public,max-age={duration}";
+        if (Response?.Headers != null)
+        {
+            Response.Headers["Cache-Control"] = $"public,max-age={duration}";
+        }
     }
 
     // Example request: GET /api/checkin/last/1
@@ -46,15 +49,15 @@ public class CheckInController : ControllerBase
 
         try
         {
-            var checkIn = await _checkInService.GetLastCheckInAsync(staffId);
-            if (checkIn == null)
+            CheckInModel checkInModel = await _checkInService.GetLastCheckInAsync(staffId);
+            if (checkInModel == null)
             {
                 _logger.LogInformation("No previous check-in found for StaffId: {StaffId}", staffId);
                 // returns JSON null body
                 return Ok((CheckInDto?)null);
             }
 
-            var checkInDto = _mapper.Map<CheckInDto>(checkIn);
+            CheckInDto checkInDto = _mapper.Map<CheckInDto>(checkInModel);
             return Ok(checkInDto);
         }
         catch (Exception ex)
@@ -93,13 +96,13 @@ public class CheckInController : ControllerBase
 
         try
         {
-            var checkIns = await _checkInService.GetAllCheckInsByDateAsync(startDate, endDate);
+            List<CheckInFullModel> checkIns = await _checkInService.GetAllCheckInsByDateAsync(startDate, endDate);
             if (checkIns == null)
             {
                 _logger.LogWarning("No check-ins found between {StartDate} and {EndDate}", startDate, endDate);
                 return NotFound();
             }
-            var checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
+            List<CheckInFullDto> checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
             return Ok(checkInDtos);
         }
         catch (Exception ex)
@@ -121,13 +124,13 @@ public class CheckInController : ControllerBase
 
         try
         {
-            var checkIns = await _checkInService.GetCheckInsByDateAndEmailAsync(emailAddress, startDate, endDate);
+            List<CheckInFullModel> checkIns = await _checkInService.GetCheckInsByDateAndEmailAsync(emailAddress, startDate, endDate);
             if (checkIns == null)
             {
                 _logger.LogWarning("No check-ins found for Email: {Email} between {StartDate} and {EndDate}", emailAddress, startDate, endDate);
                 return NotFound();
             }
-            var checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
+            List<CheckInFullDto> checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
             return Ok(checkInDtos);
         }
         catch (Exception ex)
@@ -150,13 +153,13 @@ public class CheckInController : ControllerBase
 
         try
         {
-            var checkIns = await _checkInService.GetCheckInsByDateAndIdAsync(id, startDate, endDate);
+            List<CheckInFullModel> checkIns = await _checkInService.GetCheckInsByDateAndIdAsync(id, startDate, endDate);
             if (checkIns == null)
             {
                 _logger.LogWarning("No check-ins found for Id: {Id} between {StartDate} and {EndDate}", id, startDate, endDate);
                 return NotFound();
             }
-            var checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
+            List<CheckInFullDto> checkInDtos = _mapper.Map<List<CheckInFullDto>>(checkIns);
             return Ok(checkInDtos);
         }
         catch (Exception ex)

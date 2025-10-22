@@ -67,6 +67,8 @@ public class StaffControllerTests
     {
         // Arrange
         const string expectedActionName = "Details";
+        const string expectedRouteName = "successMessage";
+        const string expectedMessage = "Your staff profile was successfully created.";
         var staffCreateModel = new StaffCreateViewModel
         {
             FirstName = "John",
@@ -112,7 +114,7 @@ public class StaffControllerTests
         // Assert
         var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirect.ActionName.Should().Be(expectedActionName);
-        redirect.RouteValues.Should().BeNull();
+        redirect.RouteValues[expectedRouteName].Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -120,7 +122,7 @@ public class StaffControllerTests
     {
         // Arrange
         const string expectedActionName = "Details";
-        const string expectedRouteName = "message";
+        const string expectedRouteName = "errorMessage";
         const string expectedMessage = "You have already created account!";
 
         var staffCreateModel = new StaffCreateViewModel();
@@ -257,6 +259,8 @@ public class StaffControllerTests
     {
         // Arrange
         const string expectedActionName = "Details";
+        const string expectedRouteName = "successMessage";
+        const string expectedMessage = "Your profile was successfully updated.";
         var userEmail = "john.doe@johndoe.com";
 
         _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
@@ -291,5 +295,6 @@ public class StaffControllerTests
         // Assert
         var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirect.ActionName.Should().Be(expectedActionName);
+        redirect.RouteValues[expectedRouteName].Should().Be(expectedMessage);
     }
 }

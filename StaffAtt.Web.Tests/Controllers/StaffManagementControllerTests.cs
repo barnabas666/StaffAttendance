@@ -193,16 +193,20 @@ public class StaffManagementControllerTests
         // Arrange
         int staffId = 1;
         string expectedActionName = "List";
+        const string expectedRouteName = "successMessage";
 
         var updateModel = new StaffManagementUpdateViewModel
         {
             BasicInfo = new StaffBasicViewModel
             {
                 Id = staffId,
+                FirstName = "John",
+                LastName = "Doe",
                 DepartmentId = 1,
                 IsApproved = true
             }
         };
+        string expectedMessage = $"{updateModel.BasicInfo.FirstName} {updateModel.BasicInfo.LastName} profile was successfully updated.";
 
         var request = new UpdateStaffByAdminRequest
         {
@@ -221,6 +225,7 @@ public class StaffManagementControllerTests
         // Assert
         var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirectResult.ActionName.Should().Be(expectedActionName);
+        redirectResult.RouteValues[expectedRouteName].Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -262,15 +267,19 @@ public class StaffManagementControllerTests
         int staffId = 1;
         string userEmail = "john.doe@johndoe.com";
         string expectedActionName = "List";
+        const string expectedRouteName = "successMessage";
 
         var deleteViewModel = new StaffManagementDeleteViewModel
         {
             BasicInfo = new StaffBasicViewModel
             {
                 Id = staffId,
+                FirstName = "John",
+                LastName = "Doe",
                 EmailAddress = userEmail
             }
         };
+        string expectedMessage = $"{deleteViewModel.BasicInfo.FirstName} {deleteViewModel.BasicInfo.LastName} profile was successfully deleted.";
 
         _apiClientMock
             .Setup(api => api.DeleteAsync($"staff/{staffId}"))
@@ -292,5 +301,6 @@ public class StaffManagementControllerTests
         // Assert
         var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirectResult.ActionName.Should().Be(expectedActionName);
+        redirectResult.RouteValues[expectedRouteName].Should().Be(expectedMessage);
     }
 }
