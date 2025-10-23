@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Data;
-using StaffAttLibrary.Models;
 using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Controllers;

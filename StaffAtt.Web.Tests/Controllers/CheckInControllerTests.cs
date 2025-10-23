@@ -89,6 +89,63 @@ public class CheckInControllerTests
     }
 
     [Fact]
+    public async Task List_ShouldReturnErrorView_WhenCheckInsApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "API call failed";
+
+        // check-in API returns success
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s => s.StartsWith("checkin/all?startDate="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Failure(errorMessage));
+
+        // Staff call should never happen because the first one fails
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>(It.IsAny<string>()))
+            .Verifiable();
+
+        // Act
+        var result = await _sut.List();
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        // Staff API must not be called after the first one fails
+        _apiClientMock.Verify(api => api.GetAsync<List<StaffBasicDto>>(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task List_ShouldReturnErrorView_WhenStaffApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Failed to load staff list";
+
+        // check-in API returns success
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s => s.StartsWith("checkin/all?startDate="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Success(new List<CheckInFullDto>()));
+
+        // staff API returns failure
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>("staff/basic"))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.List();
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+    }
+
+    [Fact]
     public async Task ListPost_ShouldReturnListViewWithCheckInDisplayAdminViewModel()
     {
         // Arrange
@@ -248,6 +305,34 @@ public class CheckInControllerTests
     }
 
     [Fact]
+    public async Task ListPost_ShouldReturnErrorView_WhenCheckInsApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Failed to load check-ins";
+
+        var vm = new CheckInDisplayAdminViewModel
+        {
+            SelectedStaffId = "0",
+            StartDate = DateTime.Today.AddDays(-1),
+            EndDate = DateTime.Today
+        };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s => s.StartsWith("checkin/all?startDate="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.List(vm);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+    }
+
+    [Fact]
     public async Task Display_ShouldReturnDisplayViewWithCheckInDisplayStaffViewModel()
     {
         // Arrange
@@ -282,6 +367,34 @@ public class CheckInControllerTests
         viewResult.ViewName.Should().Be(expectedViewName);
         var model = viewResult.Model.Should().BeOfType<CheckInDisplayStaffViewModel>().Subject;
         model.CheckIns.Should().BeEquivalentTo(mappedViewModels);
+    }
+
+    [Fact]
+    public async Task Display_ShouldReturnErrorView_WhenApiCallFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Failed to load check-ins";
+
+        string userEmail = "john.doe@johndoe.com";
+        _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s =>
+                s.StartsWith("checkin/byEmail?emailAddress="))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.Display();
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        // Mapper should never be called
+        _mapperMock.Verify(m => m.Map<List<CheckInFullViewModel>>(It.IsAny<List<CheckInFullDto>>()), Times.Never);
     }
 
     [Fact]
@@ -326,4 +439,40 @@ public class CheckInControllerTests
         var model = viewResult.Model.Should().BeOfType<CheckInDisplayStaffViewModel>().Subject;
         model.CheckIns.Should().BeEquivalentTo(mappedViewModels);
     }
+
+    [Fact]
+    public async Task DisplayPost_ShouldReturnErrorView_WhenApiCallFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "API request failed";
+
+        string userEmail = "john.doe@johndoe.com";
+        _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
+
+        var inputModel = new CheckInDisplayStaffViewModel
+        {
+            StartDate = DateTime.Today.AddDays(-7),
+            EndDate = DateTime.Today
+        };
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<CheckInFullDto>>(It.Is<string>(s =>
+                s.Contains("checkin/byEmail") && s.Contains(Uri.EscapeDataString(userEmail)))))
+            .ReturnsAsync(Result<List<CheckInFullDto>>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.Display(inputModel);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        // Mapper should never be called
+        _mapperMock.Verify(m => m.Map<List<CheckInFullViewModel>>(It.IsAny<List<CheckInFullDto>>()), Times.Never);
+    }
+
 }

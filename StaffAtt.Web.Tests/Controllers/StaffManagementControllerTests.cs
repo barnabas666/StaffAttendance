@@ -73,6 +73,29 @@ public class StaffManagementControllerTests
     }
 
     [Fact]
+    public async Task List_ShouldReturnErrorView_WhenApiCallFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Failed to load staff list";
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>("staff/basic"))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.List();
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        _mapperMock.Verify(m => m.Map<List<StaffBasicViewModel>>(It.IsAny<List<StaffBasicDto>>()), Times.Never);
+    }
+
+    [Fact]
     public async Task ListPost_ShouldReturnListViewWithStaffManagementListViewModel()
     {
         // Arrange
@@ -116,6 +139,38 @@ public class StaffManagementControllerTests
     }
 
     [Fact]
+    public async Task ListPost_ShouldReturnErrorView_WhenApiCallFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Filtering failed";
+
+        var staffModel = new StaffManagementListViewModel
+        {
+            DepartmentId = "2",
+            ApprovedRadio = ApprovedType.All
+        };
+
+        string expectedUrl =
+            $"staff/basic/filter?departmentId={staffModel.DepartmentId}&approvedType={(int)staffModel.ApprovedRadio}";
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<List<StaffBasicDto>>(expectedUrl))
+            .ReturnsAsync(Result<List<StaffBasicDto>>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.List(staffModel);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        _mapperMock.Verify(m => m.Map<List<StaffBasicViewModel>>(It.IsAny<List<StaffBasicDto>>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Details_ShouldReturnDetailsViewWithStaffDetailsViewModel()
     {
         // Arrange
@@ -143,6 +198,30 @@ public class StaffManagementControllerTests
         viewResult.ViewName.Should().Be(expectedViewName);
         var model = viewResult.Model.Should().BeOfType<StaffDetailsViewModel>().Subject;
         model.BasicInfo.Id.Should().Be(staffId);
+    }
+
+    [Fact]
+    public async Task Details_ShouldReturnErrorView_WhenApiCallFails()
+    {
+        // Arrange
+        int staffId = 5;
+        const string expectedViewName = "Error";
+        const string errorMessage = "Failed to load staff details";
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<StaffFullDto>($"staff/{staffId}"))
+            .ReturnsAsync(Result<StaffFullDto>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.Details(staffId);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        _mapperMock.Verify(m => m.Map<StaffDetailsViewModel>(It.IsAny<StaffFullDto>()), Times.Never);
     }
 
     [Fact]
@@ -188,6 +267,30 @@ public class StaffManagementControllerTests
     }
 
     [Fact]
+    public async Task Update_ShouldReturnErrorView_WhenApiCallFails()
+    {
+        // Arrange
+        int staffId = 1;
+        const string expectedViewName = "Error";
+        const string errorMessage = "Failed to load staff for update";
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<StaffBasicDto>($"staff/basic/{staffId}"))
+            .ReturnsAsync(Result<StaffBasicDto>.Failure(errorMessage));
+
+        // Act
+        IActionResult result = await _sut.Update(staffId);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        _mapperMock.Verify(m => m.Map<StaffManagementUpdateViewModel>(It.IsAny<StaffBasicDto>()), Times.Never);
+    }
+
+    [Fact]
     public async Task UpdatePost_ShouldRedirectToListAction()
     {
         // Arrange
@@ -229,6 +332,40 @@ public class StaffManagementControllerTests
     }
 
     [Fact]
+    public async Task UpdatePost_ShouldReturnErrorView_WhenApiPutFails()
+    {
+        // Arrange
+        int staffId = 1;
+        const string expectedViewName = "Error";
+        const string errorMessage = "Update failed";
+
+        var updateModel = new StaffManagementUpdateViewModel
+        {
+            BasicInfo = new StaffBasicViewModel
+            {
+                Id = staffId,
+                DepartmentId = 1,
+                IsApproved = true
+            }
+        };
+
+        _apiClientMock
+            .Setup(api => api.PutAsync("staff/admin", It.IsAny<UpdateStaffByAdminRequest>()))
+            .ReturnsAsync(Result<UpdateStaffByAdminRequest>.Failure(errorMessage));
+
+        // Act
+        IActionResult result = await _sut.Update(updateModel);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        _apiClientMock.Verify(api => api.PutAsync("staff/admin", It.IsAny<UpdateStaffByAdminRequest>()), Times.Once);
+    }
+
+    [Fact]
     public async Task Delete_ShouldReturnDeleteViewWithStaffManagementDeleteViewModel()
     {
         // Arrange
@@ -258,6 +395,30 @@ public class StaffManagementControllerTests
         viewResult.ViewName.Should().Be(expectedViewName);
         var model = viewResult.Model.Should().BeOfType<StaffManagementDeleteViewModel>().Subject;
         model.BasicInfo.Id.Should().Be(staffId);
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturnErrorView_WhenApiCallFails()
+    {
+        // Arrange
+        int staffId = 2;
+        const string expectedViewName = "Error";
+        const string errorMessage = "Failed to load staff for deletion";
+
+        _apiClientMock
+            .Setup(api => api.GetAsync<StaffBasicDto>($"staff/basic/{staffId}"))
+            .ReturnsAsync(Result<StaffBasicDto>.Failure(errorMessage));
+
+        // Act
+        IActionResult result = await _sut.Delete(staffId);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        _mapperMock.Verify(m => m.Map<StaffManagementDeleteViewModel>(It.IsAny<StaffBasicDto>()), Times.Never);
     }
 
     [Fact]
@@ -302,5 +463,59 @@ public class StaffManagementControllerTests
         var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirectResult.ActionName.Should().Be(expectedActionName);
         redirectResult.RouteValues[expectedRouteName].Should().Be(expectedMessage);
+    }
+
+    [Fact]
+    public async Task DeletePost_ShouldReturnErrorView_WhenIdIsInvalid()
+    {
+        // Arrange
+        var deleteModel = new StaffManagementDeleteViewModel
+        {
+            BasicInfo = new StaffBasicViewModel { Id = 0 }
+        };
+
+        // Act
+        IActionResult result = await _sut.Delete(deleteModel);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be("Error");
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be("Invalid staff ID.");
+
+        _apiClientMock.Verify(api => api.DeleteAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeletePost_ShouldReturnErrorView_WhenApiDeleteFails()
+    {
+        // Arrange
+        int staffId = 10;
+        const string expectedViewName = "Error";
+        const string errorMessage = "Delete failed";
+
+        var deleteModel = new StaffManagementDeleteViewModel
+        {
+            BasicInfo = new StaffBasicViewModel
+            {
+                Id = staffId,
+                EmailAddress = "someone@example.com"
+            }
+        };
+
+        _apiClientMock
+            .Setup(api => api.DeleteAsync($"staff/{staffId}"))
+            .ReturnsAsync(Result<bool>.Failure(errorMessage));
+
+        // Act
+        IActionResult result = await _sut.Delete(deleteModel);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+
+        _userServiceMock.Verify(x => x.FindByEmailAsync(It.IsAny<string>()), Times.Never);
     }
 }

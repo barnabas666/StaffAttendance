@@ -63,12 +63,12 @@ public class StaffControllerTests
     }
 
     [Fact]
-    public async Task CreatePost_ShouldRedirectToDetailsActionWithoutRouteValues_WhenUserHasNoAccountYet()
+    public async Task CreatePost_ShouldRedirectToDetailsActionWithSuccessMessage_WhenUserHasNoAccountYet()
     {
         // Arrange
         const string expectedActionName = "Details";
         const string expectedRouteName = "successMessage";
-        const string expectedMessage = "Your staff profile was successfully created.";
+        const string expectedSuccessMessage = "Your staff profile was successfully created.";
         var staffCreateModel = new StaffCreateViewModel
         {
             FirstName = "John",
@@ -114,16 +114,16 @@ public class StaffControllerTests
         // Assert
         var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirect.ActionName.Should().Be(expectedActionName);
-        redirect.RouteValues[expectedRouteName].Should().Be(expectedMessage);
+        redirect.RouteValues[expectedRouteName].Should().Be(expectedSuccessMessage);
     }
 
     [Fact]
-    public async Task CreatePost_ShouldRedirectToDetailsActionWithRouteValues_WhenUserHasAlreadyAccount()
+    public async Task CreatePost_ShouldRedirectToDetailsActionWithErrorMessage_WhenUserHasAlreadyAccount()
     {
         // Arrange
         const string expectedActionName = "Details";
         const string expectedRouteName = "errorMessage";
-        const string expectedMessage = "You have already created account!";
+        const string expectedErrorMessage = "You have already created account!";
 
         var staffCreateModel = new StaffCreateViewModel();
         var userEmail = "john.doe@johndoe.com";
@@ -141,7 +141,81 @@ public class StaffControllerTests
         // Assert
         var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirect.ActionName.Should().Be(expectedActionName);
-        redirect.RouteValues[expectedRouteName].Should().Be(expectedMessage);
+        redirect.RouteValues[expectedRouteName].Should().Be(expectedErrorMessage);
+    }
+
+    [Fact]
+    public async Task CreatePost_ShouldReturnErrorView_WhenCheckEmailApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Check email API failed";
+        var staffCreateModel = new StaffCreateViewModel();
+        var userEmail = "john.doe@johndoe.com";
+
+        _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
+
+        // API call: check-email fails
+        _apiClientMock
+            .Setup(x => x.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<bool>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.Create(staffCreateModel);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+    }
+
+    [Fact]
+    public async Task CreatePost_ShouldReturnErrorView_WhenCreateStaffApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Create staff API failed";
+        var staffCreateModel = new StaffCreateViewModel
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            PIN = 1234,
+            DepartmentId = "1",
+            Address = new AddressViewModel(),
+            PhoneNumbersText = "111222333,444555666",
+        };
+        var userEmail = "john.doe@johndoe.com";
+
+        _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
+
+        // API call: user does NOT have an account
+        _apiClientMock
+            .Setup(x => x.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<bool>.Success(false));
+
+        // API call: create staff fails
+        _apiClientMock
+            .Setup(x => x.PostAsync<CreateStaffRequest>("staff", It.IsAny<CreateStaffRequest>()))
+            .ReturnsAsync(Result<CreateStaffRequest>.Failure(errorMessage));
+
+        // Mapping and parsing
+        _phoneNumberParserMock
+            .Setup(x => x.ParseStringToPhoneNumbers(It.IsAny<string>()))
+            .Returns(new List<PhoneNumberDto>());
+
+        _mapperMock
+            .Setup(x => x.Map<AddressDto>(It.IsAny<AddressViewModel>()))
+            .Returns(new AddressDto());
+
+        // Act
+        var result = await _sut.Create(staffCreateModel);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
     }
 
     [Fact]
@@ -212,6 +286,58 @@ public class StaffControllerTests
     }
 
     [Fact]
+    public async Task Details_ShouldReturnErrorView_WhenCheckEmailApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Check email API failed";
+        var userEmail = "john.doe@johndoe.com";
+        _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
+
+        _apiClientMock
+            .Setup(x => x.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<bool>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.Details();
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+    }
+
+    [Fact]
+    public async Task Details_ShouldReturnErrorView_WhenGetStaffDetailsApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Get staff details API failed";
+        var userEmail = "john.doe@johndoe.com";
+        _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
+
+        // Check-email succeeds, staff exists
+        _apiClientMock
+            .Setup(x => x.GetAsync<bool>($"staff/check-email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<bool>.Success(true));
+
+        // Get staff details fails
+        _apiClientMock
+            .Setup(x => x.GetAsync<StaffFullDto>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<StaffFullDto>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.Details();
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
+    }
+
+    [Fact]
     public async Task Update_ShouldReturnUpdateViewWithStaffUpdateViewModel()
     {
         // Arrange
@@ -252,6 +378,29 @@ public class StaffControllerTests
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
         viewResult.Model.Should().BeAssignableTo<StaffUpdateViewModel>();
+    }
+
+    [Fact]
+    public async Task UpdateGet_ShouldReturnErrorView_WhenGetStaffApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Get staff API failed";
+        var userEmail = "john.doe@johndoe.com";
+        _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
+
+        _apiClientMock
+            .Setup(x => x.GetAsync<StaffFullDto>($"staff/email?emailAddress={Uri.EscapeDataString(userEmail)}"))
+            .ReturnsAsync(Result<StaffFullDto>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.Update();
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
     }
 
     [Fact]
@@ -296,5 +445,45 @@ public class StaffControllerTests
         var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
         redirect.ActionName.Should().Be(expectedActionName);
         redirect.RouteValues[expectedRouteName].Should().Be(expectedMessage);
+    }
+
+    [Fact]
+    public async Task UpdatePost_ShouldReturnErrorView_WhenUpdateStaffApiFails()
+    {
+        // Arrange
+        const string expectedViewName = "Error";
+        const string errorMessage = "Update staff API failed";
+        var userEmail = "john.doe@johndoe.com";
+        var updateModel = new StaffUpdateViewModel
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            PIN = 1234,
+            Address = new AddressViewModel(),
+            EmailAddress = userEmail,
+            PhoneNumbersText = "111222333,444555666"
+        };
+        _userContextMock.Setup(x => x.GetUserEmail()).Returns(userEmail);
+
+        _phoneNumberParserMock
+            .Setup(x => x.ParseStringToPhoneNumbers(updateModel.PhoneNumbersText))
+            .Returns(new List<PhoneNumberDto>());
+
+        _mapperMock
+            .Setup(x => x.Map<AddressDto>(updateModel.Address))
+            .Returns(new AddressDto());
+
+        _apiClientMock
+            .Setup(x => x.PutAsync<UpdateStaffRequest>("staff", It.IsAny<UpdateStaffRequest>()))
+            .ReturnsAsync(Result<UpdateStaffRequest>.Failure(errorMessage));
+
+        // Act
+        var result = await _sut.Update(updateModel);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.ViewName.Should().Be(expectedViewName);
+        var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
+        model.Message.Should().Be(errorMessage);
     }
 }
