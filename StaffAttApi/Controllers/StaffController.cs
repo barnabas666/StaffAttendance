@@ -34,7 +34,10 @@ public class StaffController : ControllerBase
     private void ApplyResponseCache(string level)
     {
         int duration = _config.GetValue<int>($"Caching:{level}");
-        Response.Headers["Cache-Control"] = $"public,max-age={duration}";
+        if (Response?.Headers != null)
+        {
+            Response.Headers["Cache-Control"] = $"public,max-age={duration}";
+        }
     }
 
     // GET: api/staff/departments
@@ -46,8 +49,8 @@ public class StaffController : ControllerBase
 
         try
         {
-            var departments = await _staffService.GetAllDepartmentsAsync();
-            var departmentDtos = _mapper.Map<List<DepartmentDto>>(departments);
+            List<DepartmentModel> departments = await _staffService.GetAllDepartmentsAsync();
+            List<DepartmentDto> departmentDtos = _mapper.Map<List<DepartmentDto>>(departments);
             return Ok(departmentDtos);
         }
         catch (Exception ex)
@@ -65,8 +68,8 @@ public class StaffController : ControllerBase
 
         try
         {
-            var address = _mapper.Map<AddressModel>(request.Address);
-            var phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
+            AddressModel address = _mapper.Map<AddressModel>(request.Address);
+            List<PhoneNumberModel> phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
 
             int staffId = await _staffService.CreateStaffAsync(
                 request.DepartmentId,
@@ -94,8 +97,8 @@ public class StaffController : ControllerBase
 
         try
         {
-            var address = _mapper.Map<AddressModel>(request.Address);
-            var phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
+            AddressModel address = _mapper.Map<AddressModel>(request.Address);
+            List<PhoneNumberModel> phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
 
             await _staffService.UpdateStaffAsync(
                 address,
@@ -127,7 +130,7 @@ public class StaffController : ControllerBase
 
         try
         {
-            var staffList = await _staffService.GetAllBasicStaffFilteredAsync(departmentId, approvedType);
+            List<StaffBasicModel> staffList = await _staffService.GetAllBasicStaffFilteredAsync(departmentId, approvedType);
 
             if (staffList == null)
             {
@@ -135,7 +138,7 @@ public class StaffController : ControllerBase
                     departmentId, approvedType);
                 return NotFound();
             }
-            var staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
+            List<StaffBasicDto> staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
             return Ok(staffDto);
         }
         catch (Exception ex)
@@ -155,14 +158,14 @@ public class StaffController : ControllerBase
 
         try
         {
-            var staffList = await _staffService.GetAllBasicStaffAsync();
+            List<StaffBasicModel> staffList = await _staffService.GetAllBasicStaffAsync();
 
             if (staffList == null)
             {
                 _logger.LogWarning("No staff found.");
                 return NotFound();
             }
-            var staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
+            List<StaffBasicDto> staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
             return Ok(staffDto);
         }
         catch (Exception ex)
@@ -183,13 +186,13 @@ public class StaffController : ControllerBase
 
         try
         {
-            var staffFull = await _staffService.GetStaffByEmailAsync(emailAddress);
+            StaffFullModel staffFull = await _staffService.GetStaffByEmailAsync(emailAddress);
             if (staffFull == null)
             {
                 _logger.LogWarning("Staff not found for Email: {Email}", emailAddress);
                 return NotFound();
             }
-            var staffDto = _mapper.Map<StaffFullDto>(staffFull);
+            StaffFullDto staffDto = _mapper.Map<StaffFullDto>(staffFull);
             return Ok(staffDto);
         }
         catch (Exception ex)
@@ -209,13 +212,13 @@ public class StaffController : ControllerBase
 
         try
         {
-            var staffFull = await _staffService.GetStaffByIdAsync(id);
+            StaffFullModel staffFull = await _staffService.GetStaffByIdAsync(id);
             if (staffFull == null)
             {
                 _logger.LogWarning("Staff not found for Id: {Id}", id);
                 return NotFound();
             }
-            var staffDto = _mapper.Map<StaffFullDto>(staffFull);
+            StaffFullDto staffDto = _mapper.Map<StaffFullDto>(staffFull);
             return Ok(staffDto);
         }
         catch (Exception ex)
@@ -235,13 +238,13 @@ public class StaffController : ControllerBase
 
         try
         {
-            var staff = await _staffService.GetBasicStaffByIdAsync(id);
+            StaffBasicModel staff = await _staffService.GetBasicStaffByIdAsync(id);
             if (staff == null)
             {
                 _logger.LogWarning("Basic staff not found for Id: {Id}", id);
                 return NotFound();
             }
-            var staffDto = _mapper.Map<StaffBasicDto>(staff);
+            StaffBasicDto staffDto = _mapper.Map<StaffBasicDto>(staff);
             return Ok(staffDto);
         }
         catch (Exception ex)
@@ -261,13 +264,13 @@ public class StaffController : ControllerBase
 
         try
         {
-            var staff = await _staffService.GetBasicStaffByAliasIdAsync(aliasId);
+            StaffBasicModel staff = await _staffService.GetBasicStaffByAliasIdAsync(aliasId);
             if (staff == null)
             {
                 _logger.LogWarning("Staff not found for AliasId: {AliasId}", aliasId);
                 return NotFound();
             }
-            var staffDto = _mapper.Map<StaffBasicDto>(staff);
+            StaffBasicDto staffDto = _mapper.Map<StaffBasicDto>(staff);
             return Ok(staffDto);
         }
         catch (Exception ex)
@@ -287,7 +290,7 @@ public class StaffController : ControllerBase
 
         try
         {
-            var email = await _staffService.GetStaffEmailByIdAsync(id);
+            string email = await _staffService.GetStaffEmailByIdAsync(id);
             if (string.IsNullOrEmpty(email))
             {
                 _logger.LogWarning("Email not found for staff Id: {Id}", id);
@@ -313,7 +316,7 @@ public class StaffController : ControllerBase
 
         try
         {
-            var exists = await _staffService.CheckStaffByEmailAsync(emailAddress);
+            bool exists = await _staffService.CheckStaffByEmailAsync(emailAddress);
             return Ok(exists);
         }
         catch (Exception ex)
