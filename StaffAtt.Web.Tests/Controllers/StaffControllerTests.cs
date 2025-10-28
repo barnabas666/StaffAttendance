@@ -7,7 +7,6 @@ using Moq;
 using StaffAtt.Web.Controllers;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Models;
 using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Controllers;
@@ -39,13 +38,13 @@ public class StaffControllerTests
         // Arrange
         const string expectedViewName = "Create";
 
-        var departments = new List<DepartmentModel>
+        var departments = new List<DepartmentDto>
             {
-                new DepartmentModel { Id = 1, Title = "IT" },
-                new DepartmentModel { Id = 2, Title = "HR" }
+                new DepartmentDto { Id = 1, Title = "IT" },
+                new DepartmentDto { Id = 2, Title = "HR" }
             };
 
-        var selectListItems = new SelectList(departments, nameof(DepartmentModel.Id), nameof(DepartmentModel.Title));
+        var selectListItems = new SelectList(departments, nameof(DepartmentDto.Id), nameof(DepartmentDto.Title));
 
         _departmentSelectListServiceMock
             .Setup(x => x.GetDepartmentSelectListAsync(It.IsAny<string>()))

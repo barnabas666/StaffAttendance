@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Data;
-using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Helpers;
 
@@ -10,34 +10,41 @@ namespace StaffAtt.Web.Helpers;
 /// </summary>
 public class StaffSelectListService : IStaffSelectListService
 {
-    private readonly IStaffService _staffService;
+    private readonly IApiClient _apiClient;
+    private readonly IMapper _mapper;
 
-    public StaffSelectListService(IStaffService staffService)
+    public StaffSelectListService(IApiClient apiClient, IMapper mapper)
     {
-        _staffService = staffService;
+        _apiClient = apiClient;
+        _mapper = mapper;
     }
 
     /// <summary>
-    /// Get all Staff from database and create SelectList for DropDown in View.
-    /// If defaultValue is not empty, we create default item = All Staff for DropDown.
+    /// Get all Staff from API and create SelectList for dropdown in view.
+    /// If defaultValue is provided, add a default item (e.g. "All Staff").
     /// </summary>
-    /// <param name="dateDisplayModel"></param>
-    /// <param name="defaultValue"></param>
-    /// <returns></returns>
     public async Task<SelectList> GetStaffSelectListAsync(CheckInDisplayAdminViewModel dateDisplayModel,
                                                           string defaultValue = "")
     {
-        if (string.IsNullOrEmpty(defaultValue) == false)
+        // --- Load staff from API ---
+        var staffResult = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
+
+        if (!staffResult.IsSuccess || staffResult.Value is null)
         {
-            // Creating default item = All Staff for DropDown.
-            dateDisplayModel.StaffList.Insert(0, new StaffBasicViewModel()
-            {
-                Id = 0,
-                FirstName = defaultValue
-            });
+            // Instead of crashing UI, return empty dropdown
+            return new SelectList(Enumerable.Empty<StaffBasicDto>(), nameof(StaffBasicDto.Id), nameof(StaffBasicDto.FullName));
         }
 
+        List<StaffBasicDto> staffList = staffResult.Value;
+
+        // Insert default value at the top (e.g. "All Staff")
+        if (!string.IsNullOrEmpty(defaultValue))
+        {
+            staffList.Insert(0, new StaffBasicDto { Id = 0, FirstName = defaultValue });
+        }
+        dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(staffList);
+
         // Source is staff, value (Id here) gonna be saved to database, Text (FullName) gets displayed to user.
-        return new SelectList(dateDisplayModel.StaffList, nameof(StaffBasicModel.Id), nameof(StaffBasicModel.FullName));
+        return new SelectList(dateDisplayModel.StaffList, nameof(StaffBasicViewModel.Id), nameof(StaffBasicViewModel.FullName));
     }
 }

@@ -4,13 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using StaffAtt.Identity;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttLibrary.Data;
-using StaffAttLibrary.Data.PostgreSQL;
-using StaffAttLibrary.Data.SQL;
-using StaffAttLibrary.Data.SQLite;
-using StaffAttLibrary.Db.PostgreSQL;
-using StaffAttLibrary.Db.SQL;
-using StaffAttLibrary.Db.SQLite;
 
 namespace StaffAtt.Web.StartupConfig;
 
@@ -24,37 +17,6 @@ public static class ServicesConfigExtensions
             opts.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ApiUrl"));
         });
 
-        // Register services for dependency injection according to the DbType specified in appsettings.json
-        string dbType = builder.Configuration.GetValue<string>("DbType") ?? "SQLite";
-        if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
-        {
-            builder.Services.AddTransient<ISqliteDataAccess, SqliteDataAccess>();
-            builder.Services.AddTransient<IStaffService, StaffSqliteService>();
-            builder.Services.AddTransient<ICheckInService, CheckInSqliteService>();
-            builder.Services.AddTransient<IStaffData, StaffSqliteData>();
-            builder.Services.AddTransient<ICheckInData, CheckInSqliteData>();
-            builder.Services.AddTransient<IStaffDataProcessor, StaffSqliteDataProcessor>();
-        }
-        else if (dbType.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
-        {
-            builder.Services.AddTransient<IPostgresDataAccess, PostgresDataAccess>();
-            builder.Services.AddTransient<IStaffService, StaffPostgresService>();
-            builder.Services.AddTransient<ICheckInService, CheckInPostgresService>();
-            builder.Services.AddTransient<IStaffData, StaffPostgresData>();
-            builder.Services.AddTransient<ICheckInData, CheckInPostgresData>();
-            builder.Services.AddTransient<IStaffDataProcessor, StaffPostgresDataProcessor>();
-        }
-        else
-        {
-            builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-            builder.Services.AddTransient<IStaffService, StaffService>();
-            builder.Services.AddTransient<ICheckInService, CheckInService>();
-            builder.Services.AddTransient<IStaffData, StaffData>();
-            builder.Services.AddTransient<ICheckInData, CheckInData>();
-            builder.Services.AddTransient<IStaffDataProcessor, StaffDataProcessor>();
-        }
-
-        builder.Services.AddTransient<IConnectionStringData, ConnectionStringData>();
         builder.Services.AddTransient<IPhoneNumberDtoParser, PhoneNumberDtoParser>();
         builder.Services.AddTransient<IUserContext, UserContext>();
         builder.Services.AddTransient<IUserService, UserService>();
@@ -63,10 +25,6 @@ public static class ServicesConfigExtensions
         builder.Services.AddTransient<IEmailSender, EmailSender>();
 
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-        // old Services, to be removed later after refactoring Controllers to consume API with DTOs
-        builder.Services.AddTransient<IPhoneNumberParser, PhoneNumberParser>();
-
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<IApiClient, ApiClient>();
     }

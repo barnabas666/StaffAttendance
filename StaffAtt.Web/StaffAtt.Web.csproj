@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StaffAtt.Identity\StaffAtt.Identity.csproj" />
-    <ProjectReference Include="..\StaffAttLibrary\StaffAttLibrary.csproj" />
     <ProjectReference Include="..\StaffAttShared\StaffAttShared.csproj" />
   </ItemGroup>
 
