@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http; // Add this using directive
 using StaffAtt.Desktop.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.PostgreSQL;
@@ -10,7 +9,6 @@ using StaffAttLibrary.Db.PostgreSQL;
 using StaffAttLibrary.Db.SQL;
 using StaffAttLibrary.Db.SQLite;
 using System.IO;
-using System.Net.Http; // Optionally add this if not present
 using System.Windows;
 
 namespace StaffAtt.Desktop;

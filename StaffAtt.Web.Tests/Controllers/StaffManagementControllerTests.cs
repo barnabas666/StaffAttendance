@@ -7,9 +7,8 @@ using Moq;
 using StaffAtt.Web.Controllers;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
-using StaffAttShared.Enums;
-
 using StaffAttShared.DTOs;
+using StaffAttShared.Enums;
 
 namespace StaffAtt.Web.Tests.Controllers;
 
@@ -24,7 +23,7 @@ public class StaffManagementControllerTests
     public StaffManagementControllerTests()
     {
         _sut = new StaffManagementController(
-            _apiClientMock.Object,           
+            _apiClientMock.Object,
             _userServiceMock.Object,
             _mapperMock.Object,
             _departmentSelectListServiceMock.Object

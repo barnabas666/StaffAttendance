@@ -1,13 +1,7 @@
 ﻿using StaffAttLibrary.Db.PostgreSQL;
-using StaffAttLibrary.Db.SQL;
-using StaffAttShared.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using StaffAttShared.Enums;
 
 namespace StaffAttLibrary.Data.PostgreSQL;
 public class StaffPostgresData : IStaffData

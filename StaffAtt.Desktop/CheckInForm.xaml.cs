@@ -2,7 +2,6 @@
 using StaffAttShared.DTOs;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using System.Windows;
 
@@ -57,11 +56,11 @@ public partial class CheckInForm : Window
         departmentTitleText.Text = _basicStaffModel.Title;
 
         try
-        {            
+        {
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenModel.Token);
 
             var lastCheckInResponse = await httpClient.GetAsync($"checkin/last/{_basicStaffModel.Id}");
-            if(!lastCheckInResponse.IsSuccessStatusCode)
+            if (!lastCheckInResponse.IsSuccessStatusCode)
             {
                 var errorContent = await lastCheckInResponse.Content.ReadAsStringAsync();
                 string message = $"Getting last CheckIn failed ({(int)lastCheckInResponse.StatusCode} {lastCheckInResponse.ReasonPhrase})";
@@ -73,7 +72,7 @@ public partial class CheckInForm : Window
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            
+
             var content = await lastCheckInResponse.Content.ReadAsStringAsync();
             if (string.IsNullOrWhiteSpace(content) || content == "null")
                 _checkInModel = null;
@@ -129,7 +128,7 @@ public partial class CheckInForm : Window
                 }
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
-            }            
+            }
         }
         catch (HttpRequestException ex)
         {

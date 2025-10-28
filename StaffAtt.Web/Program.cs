@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using StaffAtt.Web.StartupConfig;
 
 var builder = WebApplication.CreateBuilder(args);

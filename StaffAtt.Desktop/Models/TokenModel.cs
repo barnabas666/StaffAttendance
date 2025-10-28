@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace StaffAtt.Desktop.Models;
+﻿namespace StaffAtt.Desktop.Models;
 
 /// <summary>
 /// Holds JWT token after successful authentication. 

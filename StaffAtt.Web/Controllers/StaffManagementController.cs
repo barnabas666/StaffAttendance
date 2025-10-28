@@ -19,7 +19,7 @@ public class StaffManagementController : Controller
     private readonly IMapper _mapper;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffManagementController(IApiClient apiClient,                                     
+    public StaffManagementController(IApiClient apiClient,
                                      IUserService userService,
                                      IMapper mapper,
                                      IDepartmentSelectListService departmentService)
@@ -71,7 +71,7 @@ public class StaffManagementController : Controller
         // Call API endpoint with query parameters
         var result = await _apiClient.GetAsync<List<StaffBasicDto>>(
             $"staff/basic/filter?departmentId={staffModel.DepartmentId}&approvedType={(int)staffModel.ApprovedRadio}"
-        );       
+        );
         if (!result.IsSuccess || result.Value is null)
             return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
@@ -93,12 +93,12 @@ public class StaffManagementController : Controller
     public async Task<IActionResult> Details(int id)
     {
         // Call API to get staff by ID
-        var result = await _apiClient.GetAsync<StaffFullDto>($"staff/{id}");        
+        var result = await _apiClient.GetAsync<StaffFullDto>($"staff/{id}");
         if (!result.IsSuccess || result.Value is null)
             return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         var detailsModel = _mapper.Map<StaffDetailsViewModel>(result.Value);
-        
+
         return View("Details", detailsModel);
     }
 
@@ -152,7 +152,7 @@ public class StaffManagementController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _apiClient.GetAsync<StaffBasicDto>($"staff/basic/{id}");        
+        var result = await _apiClient.GetAsync<StaffBasicDto>($"staff/basic/{id}");
         if (!result.IsSuccess || result.Value is null)
             return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
@@ -180,7 +180,7 @@ public class StaffManagementController : Controller
         string userEmail = deleteModel.BasicInfo.EmailAddress;
 
         if (id <= 0)
-            return View("Error", new ErrorViewModel { Message = "Invalid staff ID." });     
+            return View("Error", new ErrorViewModel { Message = "Invalid staff ID." });
 
         // Delete staff record
         var deleteStaffResult = await _apiClient.DeleteAsync($"staff/{id}");

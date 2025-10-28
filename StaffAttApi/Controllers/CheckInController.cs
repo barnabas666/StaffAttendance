@@ -148,7 +148,7 @@ public class CheckInController : ControllerBase
     public async Task<ActionResult<List<CheckInFullDto>>> GetCheckInsByDateAndId(int id, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         ApplyResponseCache("MediumDuration");
-        _logger.LogInformation("GET: api/CheckIn/byId/{id} (Id: {Id}, StartDate: {StartDate}, EndDate: {EndDate})", 
+        _logger.LogInformation("GET: api/CheckIn/byId/{id} (Id: {Id}, StartDate: {StartDate}, EndDate: {EndDate})",
                                id, id, startDate, endDate);
 
         try
@@ -164,7 +164,7 @@ public class CheckInController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "The GET call to api/CheckIn/byId/{id} failed. Id: {Id}, StartDate: {StartDate}, EndDate: {EndDate}", 
+            _logger.LogError(ex, "The GET call to api/CheckIn/byId/{id} failed. Id: {Id}, StartDate: {StartDate}, EndDate: {EndDate}",
                              id, id, startDate, endDate);
             return BadRequest();
         }

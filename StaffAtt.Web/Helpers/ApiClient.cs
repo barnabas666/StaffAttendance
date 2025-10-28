@@ -30,7 +30,7 @@ public class ApiClient : IApiClient
 
         return client;
     }
-    
+
     // Common helper for reading response    
     private static async Task<Result<T>> ReadResponseAsync<T>(HttpResponseMessage response, string verb, string endpoint)
     {
@@ -79,7 +79,7 @@ public class ApiClient : IApiClient
             return Result<T>.Failure($"{verb} {endpoint} returned non-JSON response: {raw}");
         }
     }
-        
+
     // CRUD methods    
     public async Task<Result<T>> GetAsync<T>(string endpoint)
     {

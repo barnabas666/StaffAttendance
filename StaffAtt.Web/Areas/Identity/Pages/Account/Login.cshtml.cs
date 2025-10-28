@@ -19,7 +19,7 @@ namespace StaffAtt.Web.Areas.Identity.Pages.Account
 
         public LoginModel(IHttpClientFactory httpClientFactory, SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
         {
-            httpClient = httpClientFactory.CreateClient("api");           
+            httpClient = httpClientFactory.CreateClient("api");
             _signInManager = signInManager;
             _logger = logger;
         }

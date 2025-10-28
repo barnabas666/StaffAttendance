@@ -6,7 +6,7 @@ namespace StaffAtt.Web.Models;
 /// Model for user authentication.
 /// </summary>
 public record AuthenticationModel
-{    
+{
     [JsonPropertyName("email")]
     public string Email { get; set; }
     [JsonPropertyName("password")]

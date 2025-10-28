@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using StaffAttShared.DTOs;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAttApi.Profiles;
 
 public class AddressModelToAddressDtoProfile : Profile
 {
     public AddressModelToAddressDtoProfile()
-    {        
+    {
         CreateMap<AddressModel, AddressDto>()
             .ForPath(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForPath(dest => dest.Street, opt => opt.MapFrom(src => src.Street))

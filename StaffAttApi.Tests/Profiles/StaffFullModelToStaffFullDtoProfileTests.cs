@@ -3,9 +3,6 @@ using FluentAssertions;
 using StaffAttApi.Profiles;
 using StaffAttLibrary.Models;
 using StaffAttShared.DTOs;
-using System.Linq;
-using System.Collections.Generic;
-using Xunit;
 
 namespace StaffAttApi.Tests.Profiles;
 public class StaffFullModelToStaffFullDtoProfileTests

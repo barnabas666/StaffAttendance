@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using StaffAtt.Identity;
 using StaffAtt.Web.Helpers;
-using StaffAtt.Web.Models;
 
 namespace StaffAtt.Web.StartupConfig;
 

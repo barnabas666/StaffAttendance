@@ -1,7 +1,7 @@
 ﻿using StaffAttLibrary.Db.SQLite;
-using StaffAttShared.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
+using StaffAttShared.Enums;
 
 namespace StaffAttLibrary.Data.SQLite;
 public class StaffSqliteData : IStaffData

@@ -1,7 +1,7 @@
 ﻿using StaffAttLibrary.Db.PostgreSQL;
-using StaffAttShared.Enums;
 using StaffAttLibrary.Helpers;
 using StaffAttLibrary.Models;
+using StaffAttShared.Enums;
 
 namespace StaffAttLibrary.Data.PostgreSQL;
 public class StaffPostgresService : IStaffService

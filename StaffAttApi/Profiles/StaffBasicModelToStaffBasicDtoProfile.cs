@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using StaffAttShared.DTOs;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAttApi.Profiles;
 
 public class StaffBasicModelToStaffBasicDtoProfile : Profile
 {
     public StaffBasicModelToStaffBasicDtoProfile()
-    {        
+    {
         CreateMap<StaffBasicModel, StaffBasicDto>()
             .ForPath(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForPath(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))

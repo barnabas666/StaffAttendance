@@ -30,7 +30,7 @@ public partial class MainWindow : Window
     /// <param name="tokenModel"></param>
     public MainWindow(IHttpClientFactory httpClientFactory, TokenModel tokenModel)
     {
-        InitializeComponent();        
+        InitializeComponent();
         _tokenModel = tokenModel;
         httpClient = httpClientFactory.CreateClient("api");
     }
@@ -43,9 +43,9 @@ public partial class MainWindow : Window
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
-    {        
+    {
         AuthenticationModel login = new();
-        StaffBasicDto staff = new();        
+        StaffBasicDto staff = new();
 
         if (string.IsNullOrWhiteSpace(aliasText.Text) || string.IsNullOrWhiteSpace(pINText.Text))
         {
@@ -97,7 +97,7 @@ public partial class MainWindow : Window
                 return;
             }
             staff = await staffResponse.Content.ReadFromJsonAsync<StaffBasicDto>();
-                        
+
             if (staff.IsApproved)
             {
                 CheckInForm checkInForm = App.serviceProvider.GetRequiredService<CheckInForm>();

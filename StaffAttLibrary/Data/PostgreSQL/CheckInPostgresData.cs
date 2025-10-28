@@ -1,11 +1,5 @@
 ﻿using StaffAttLibrary.Db.PostgreSQL;
-using StaffAttLibrary.Db.SQLite;
 using StaffAttLibrary.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StaffAttLibrary.Data.PostgreSQL;
 public class CheckInPostgresData : ICheckInData

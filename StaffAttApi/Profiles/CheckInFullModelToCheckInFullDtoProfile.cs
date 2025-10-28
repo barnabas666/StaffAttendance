@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using StaffAttShared.DTOs;
 using StaffAttLibrary.Models;
+using StaffAttShared.DTOs;
 
 namespace StaffAttApi.Profiles;
 

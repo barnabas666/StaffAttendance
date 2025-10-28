@@ -69,11 +69,11 @@ public class CheckInController : Controller
         // Determine which API endpoint to use
         string endpoint;
 
-        if (viewModel.SelectedStaffId == "0")        
-            endpoint = $"checkin/all?startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}";        
-        else        
+        if (viewModel.SelectedStaffId == "0")
+            endpoint = $"checkin/all?startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}";
+        else
             endpoint = $"checkin/byId/{viewModel.SelectedStaffId}?startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}";
-        
+
         var checkInResult = await _apiClient.GetAsync<List<CheckInFullDto>>(endpoint);
         if (!checkInResult.IsSuccess)
             return View("Error", new ErrorViewModel { Message = checkInResult.ErrorMessage });

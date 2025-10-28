@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using StaffAtt.Web.Helpers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using System.Text.Encodings.Web;
 
 namespace StaffAtt.Web.Areas.Identity.Pages.Account
 {

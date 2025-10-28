@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
 using StaffAtt.Web.Helpers;
-using StaffAttShared.DTOs;  
+using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Helpers
 {

@@ -3,8 +3,8 @@ using Moq;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.SQL;
 using StaffAttLibrary.Db.SQL;
-using StaffAttShared.Enums;
 using StaffAttLibrary.Models;
+using StaffAttShared.Enums;
 
 namespace StaffAttLibrary.Tests.Data.SQL;
 public class StaffServiceTests

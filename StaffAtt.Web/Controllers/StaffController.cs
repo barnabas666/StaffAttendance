@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
 using StaffAttShared.DTOs;
-using System.Diagnostics;
 
 namespace StaffAtt.Web.Controllers;
 
@@ -23,18 +22,18 @@ public class StaffController : Controller
     private readonly IPhoneNumberDtoParser _phoneNumberDtoParser;
     private readonly IDepartmentSelectListService _departmentService;
 
-    public StaffController(IApiClient apiClient,                           
+    public StaffController(IApiClient apiClient,
                            IUserService userService,
                            IUserContext userContext,
                            IMapper mapper,
-                           IPhoneNumberDtoParser phoneNumberDtoParser,                           
+                           IPhoneNumberDtoParser phoneNumberDtoParser,
                            IDepartmentSelectListService departmentService)
-    {        
-        _apiClient = apiClient;        
+    {
+        _apiClient = apiClient;
         _userService = userService;
         _userContext = userContext;
         _mapper = mapper;
-        _phoneNumberDtoParser = phoneNumberDtoParser;        
+        _phoneNumberDtoParser = phoneNumberDtoParser;
         _departmentService = departmentService;
     }
 

@@ -75,7 +75,7 @@ public class AuthenticationDesktopController : ControllerBase
         AliasModel? aliasModel = null;
 
         aliasModel = await _staffService.AliasVerificationAsync(data.Alias, data.PIN);
-        
+
         if (aliasModel != null)
         {
             return new AliasData(aliasModel.Id, aliasModel.Alias);

@@ -1,5 +1,5 @@
-﻿using StaffAttShared.Enums;
-using StaffAttLibrary.Models;
+﻿using StaffAttLibrary.Models;
+using StaffAttShared.Enums;
 
 namespace StaffAttLibrary.Data;
 public interface IStaffService
