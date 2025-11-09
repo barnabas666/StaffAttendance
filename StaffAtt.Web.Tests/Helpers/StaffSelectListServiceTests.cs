@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
@@ -12,10 +13,12 @@ namespace StaffAtt.Web.Tests.Helpers
         private readonly StaffSelectListService _sut;
         private readonly Mock<IApiClient> _apiClientMock = new();
         private readonly Mock<IMapper> _mapperMock = new();
+        private readonly IMemoryCache _realCache; // real cache instance
 
         public StaffSelectListServiceTests()
         {
-            _sut = new StaffSelectListService(_apiClientMock.Object, _mapperMock.Object);
+            _realCache = new MemoryCache(new MemoryCacheOptions());
+            _sut = new StaffSelectListService(_apiClientMock.Object, _mapperMock.Object, _realCache);
         }
 
         [Fact]
@@ -23,7 +26,7 @@ namespace StaffAtt.Web.Tests.Helpers
         {
             // Arrange
             string defaultValue = "All Staff";
-            var checkInDisplayAdminViewModel = new CheckInDisplayAdminViewModel();
+            var viewModel = new CheckInDisplayAdminViewModel();
 
             var staffDtos = new List<StaffBasicDto>
             {
@@ -47,7 +50,7 @@ namespace StaffAtt.Web.Tests.Helpers
                 .Returns(mappedViewModels);
 
             // Act
-            var result = await _sut.GetStaffSelectListAsync(checkInDisplayAdminViewModel, defaultValue);
+            var result = await _sut.GetStaffSelectListAsync(viewModel, defaultValue);
 
             // Assert
             result.Should().NotBeNull();
@@ -60,7 +63,7 @@ namespace StaffAtt.Web.Tests.Helpers
         public async Task GetStaffSelectListAsync_ShouldReturnSelectListWithoutDefaultValue_WhenDefaultValueIsNotProvided()
         {
             // Arrange
-            var checkInDisplayAdminViewModel = new CheckInDisplayAdminViewModel();
+            var viewModel = new CheckInDisplayAdminViewModel();
 
             var staffDtos = new List<StaffBasicDto>
             {
@@ -79,11 +82,11 @@ namespace StaffAtt.Web.Tests.Helpers
             };
 
             _mapperMock
-                .Setup(x => x.Map<List<StaffBasicViewModel>>(staffDtos))
+                .Setup(x => x.Map<List<StaffBasicViewModel>>(It.IsAny<List<StaffBasicDto>>()))
                 .Returns(mappedViewModels);
 
             // Act
-            var result = await _sut.GetStaffSelectListAsync(checkInDisplayAdminViewModel);
+            var result = await _sut.GetStaffSelectListAsync(viewModel);
 
             // Assert
             result.Should().NotBeNull();

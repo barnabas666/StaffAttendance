@@ -153,7 +153,7 @@ public class CheckInControllerTests
 
         var vm = new CheckInDisplayAdminViewModel
         {
-            SelectedStaffId = "0", // "All Staff" selected
+            SelectedStaffId = 0, // "All Staff" selected
             StartDate = DateTime.Today.AddDays(-1),
             EndDate = DateTime.Today
         };
@@ -216,7 +216,7 @@ public class CheckInControllerTests
         // Arrange
         var vm = new CheckInDisplayAdminViewModel
         {
-            SelectedStaffId = "0", // All Staff selected
+            SelectedStaffId = 0, // All Staff selected
             StartDate = DateTime.Today.AddDays(-1),
             EndDate = DateTime.Today
         };
@@ -262,7 +262,7 @@ public class CheckInControllerTests
         // Arrange
         var vm = new CheckInDisplayAdminViewModel
         {
-            SelectedStaffId = "5", // Single staff selected
+            SelectedStaffId = 5, // Single staff selected
             StartDate = DateTime.Today.AddDays(-1),
             EndDate = DateTime.Today
         };
@@ -313,7 +313,7 @@ public class CheckInControllerTests
 
         var vm = new CheckInDisplayAdminViewModel
         {
-            SelectedStaffId = "0",
+            SelectedStaffId = 0,
             StartDate = DateTime.Today.AddDays(-1),
             EndDate = DateTime.Today
         };
