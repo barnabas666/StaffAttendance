@@ -39,16 +39,16 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Update"> 
-            <input asp-for="@Model.BasicInfo.Id" type="hidden" />
-            <input asp-for="@Model.BasicInfo.FirstName" type="hidden" />
-            <input asp-for="@Model.BasicInfo.LastName" type="hidden" />
+            <input asp-for="BasicInfo.Id" type="hidden" />
+            <input asp-for="BasicInfo.FirstName" type="hidden" />
+            <input asp-for="BasicInfo.LastName" type="hidden" />
             <div class="form-group">
-                <label asp-for="@Model.DepartmentItems" class="control-label"></label>
-                <select asp-items="@Model.DepartmentItems" asp-for="@Model.BasicInfo.DepartmentId"></select>
+                <label asp-for="DepartmentItems" class="control-label"></label>
+                <select asp-items="@Model.DepartmentItems" asp-for="BasicInfo.DepartmentId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="@Model.BasicInfo.IsApproved" class="control-label"></label>
-                <input asp-for="@Model.BasicInfo.IsApproved" type="checkbox" class="form-check-input" />
+                <label asp-for="BasicInfo.IsApproved" class="control-label"></label>
+                <input asp-for="BasicInfo.IsApproved" type="checkbox" class="form-check-input" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" /> |

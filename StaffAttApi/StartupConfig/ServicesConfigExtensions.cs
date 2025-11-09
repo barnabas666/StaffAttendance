@@ -128,8 +128,8 @@ public static class ServicesConfigExtensions
         builder.Services.AddHealthChecksUI(opts =>
         {
             opts.AddHealthCheckEndpoint("API", "/health");
-            opts.SetEvaluationTimeInSeconds(10);
-            opts.SetMinimumSecondsBetweenFailureNotifications(30);
+            opts.SetEvaluationTimeInSeconds(60);
+            opts.SetMinimumSecondsBetweenFailureNotifications(300);
         }).AddInMemoryStorage();
     }
 

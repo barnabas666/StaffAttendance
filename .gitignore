@@ -8,6 +8,7 @@ StaffAtt.Web/appsettings.Development.json
 StaffAtt.Desktop/appsettings.Development.json
 StaffAttSQLiteDB/StaffAttSQLite.db
 StaffAtt.Web/app.db
+StaffAtt.Identity/app.db
 StaffAttApi/appsettings.Development.json
 SolutionStructure.txt
 

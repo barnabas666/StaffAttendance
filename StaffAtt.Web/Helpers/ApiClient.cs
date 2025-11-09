@@ -3,6 +3,12 @@ using System.Text.Json;
 
 namespace StaffAtt.Web.Helpers;
 
+/// <summary>
+/// Provides methods for performing HTTP operations against a specified API endpoint.
+/// </summary>
+/// <remarks>This class utilizes an <see cref="IHttpClientFactory"/> to create HTTP clients and an <see
+/// cref="IHttpContextAccessor"/> to access the current HTTP context for retrieving authentication tokens. It supports
+/// CRUD operations and handles JSON serialization and deserialization of request and response bodies.</remarks>
 public class ApiClient : IApiClient
 {
     private readonly IHttpClientFactory _httpClientFactory;

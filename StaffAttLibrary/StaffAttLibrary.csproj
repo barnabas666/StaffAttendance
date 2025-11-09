@@ -30,6 +30,7 @@
     <None Remove="Queries\PostgreSQL\PhoneNumbers_GetByStaffId.sql" />
     <None Remove="Queries\PostgreSQL\PhoneNumbers_GetIdByPhoneNumber.sql" />
     <None Remove="Queries\PostgreSQL\PhoneNumbers_Insert.sql" />
+    <None Remove="Queries\PostgreSQL\StaffPhoneNumbers_Check.sql" />
     <None Remove="Queries\PostgreSQL\StaffPhoneNumbers_Delete.sql" />
     <None Remove="Queries\PostgreSQL\StaffPhoneNumbers_GetByPhoneNumber.sql" />
     <None Remove="Queries\PostgreSQL\StaffPhoneNumbers_Insert.sql" />
@@ -70,6 +71,7 @@
     <None Remove="Queries\SQLite\PhoneNumbers_GetIdByPhoneNumber.sql" />
     <None Remove="Queries\SQLite\PhoneNumbers_GetPhoneNumber.sql" />
     <None Remove="Queries\SQLite\PhoneNumbers_Insert.sql" />
+    <None Remove="Queries\SQLite\StaffPhoneNumbers_Check.sql" />
     <None Remove="Queries\SQLite\StaffPhoneNumbers_Delete.sql" />
     <None Remove="Queries\SQLite\StaffPhoneNumbers_GetByPhoneNumber.sql" />
     <None Remove="Queries\SQLite\StaffPhoneNumbers_Insert.sql" />
@@ -153,6 +155,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Queries\PostgreSQL\PhoneNumbers_Insert.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\PostgreSQL\StaffPhoneNumbers_Check.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Queries\PostgreSQL\StaffPhoneNumbers_Delete.sql">
@@ -270,6 +275,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Queries\SQLite\PhoneNumbers_Insert.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Queries\SQLite\StaffPhoneNumbers_Check.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Queries\SQLite\StaffPhoneNumbers_Delete.sql">

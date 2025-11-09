@@ -69,7 +69,7 @@ public class CheckInController : Controller
         // Determine which API endpoint to use
         string endpoint;
 
-        if (viewModel.SelectedStaffId == "0")
+        if (viewModel.SelectedStaffId == 0)
             endpoint = $"checkin/all?startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}";
         else
             endpoint = $"checkin/byId/{viewModel.SelectedStaffId}?startDate={viewModel.StartDate:yyyy-MM-dd}&endDate={viewModel.EndDate:yyyy-MM-dd}";

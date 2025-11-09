@@ -19,7 +19,7 @@ else
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <!-- Selection from DropDown List populated by SelectList StaffDropDownData.
             Value is Id of Staff and we bind it to SelectedStaffId property.-->
-            <select asp-items="@Model.StaffDropDownData" asp-for="@Model.SelectedStaffId" new { onchange="this.form.submit();" }></select>
+            <select asp-items="@Model.StaffDropDownData" asp-for="SelectedStaffId" class="form-select" onchange="this.form.submit();"></select>
             <div class="form-group">
                 <label asp-for="StartDate" class="control-label"></label>
                 <input asp-for="StartDate" class="form-control" />

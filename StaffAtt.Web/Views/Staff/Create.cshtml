@@ -11,8 +11,10 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>  
             <div class="form-group">
-                <label asp-for="@Model.DepartmentItems" class="control-label"></label>
-                <select asp-items="@Model.DepartmentItems" asp-for="@Model.DepartmentId"></select>
+                <label 
+                    
+                    ="@Model.DepartmentItems" class="control-label"></label>
+                <select asp-items="@Model.DepartmentItems" asp-for="DepartmentId"></select>
                 <span asp-validation-for="@Model.DepartmentId" class="text-danger"></span>
             </div>
             <div class="form-group">
