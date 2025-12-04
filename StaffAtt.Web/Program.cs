@@ -2,20 +2,14 @@ using StaffAtt.Web.StartupConfig;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddIdentityAndMvcServices();
+builder.AddAuthAndMvcServices();
 builder.AddCustomServices();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -23,15 +17,18 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseSession();
 
+app.UseCookiePolicy();   // <--- REQUIRED FOR SESSION TO WORK
+app.UseSession();        // must be after cookie policy
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Staff}/{action=Details}/{id?}");
-app.MapRazorPages();
 
-await IdentitySeedExtensions.SeedRolesAndAdminAsync(app.Services);
+app.MapRazorPages(); // keep, because you still have Razor views (Identity UI)
 
 app.Run();

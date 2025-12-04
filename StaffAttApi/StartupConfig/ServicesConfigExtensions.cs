@@ -1,11 +1,13 @@
 ﻿using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using StaffAtt.Identity; // Use the same ApplicationDbContext as your web app
 using StaffAttApi.Helpers;
+using StaffAttApi.Services;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.PostgreSQL;
 using StaffAttLibrary.Data.SQL;
@@ -88,6 +90,10 @@ public static class ServicesConfigExtensions
                         builder.Configuration.GetValue<string>("Authentication:SecretKey")))
                 };
             });
+
+        builder.Services.AddSingleton<IJwtService, JwtService>();
+        builder.Services.AddTransient<IEmailSender, EmailSender>();
+
     }
 
     public static void AddIdentityServices(this WebApplicationBuilder builder)

@@ -23,11 +23,4 @@ public class StaffDetailsViewModel
     /// </summary>
     [DisplayName("Phone Numbers")]
     public List<PhoneNumberDto> PhoneNumbers { get; set; } = new List<PhoneNumberDto>();
-
-    /// <summary>
-    /// Details Action optional parameter. Some info message from different Action.
-    /// </summary>
-    public string? Message { get; set; }
-    public string? SuccessMessage { get; set; }
-    public string? ErrorMessage { get; set; }
 }

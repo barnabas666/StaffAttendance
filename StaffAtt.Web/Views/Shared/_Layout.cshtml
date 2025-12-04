@@ -41,11 +41,28 @@
                             </li>
                         }
                     </ul>
-                    <partial name="_LoginPartial" />
+                    <partial name="_UserMenuPartial" />
                 </div>
             </div>
         </nav>
     </header>
+    @{
+        var success = TempData["Success"] as string;
+        var error = TempData["Error"] as string;
+        var info = TempData["Message"] as string;
+    }
+    @if (!string.IsNullOrEmpty(success))
+    {
+        <div class="alert alert-success fade-alert">@success</div>
+    }
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger fade-alert">@error</div>
+    }
+    @if (!string.IsNullOrEmpty(info))
+    {
+        <div class="alert alert-warning fade-alert">@info</div>
+    }
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -60,6 +77,13 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Global fade script -->
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.fade-alert').forEach(a => a.style.display = 'none');
+        }, 5000);
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

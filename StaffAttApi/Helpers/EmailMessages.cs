@@ -1,12 +1,12 @@
 ﻿using System.Text.Encodings.Web;
 
-namespace StaffAtt.Web.Helpers;
+namespace StaffAttApi.Helpers;
 
 public static class EmailMessages
 {
     public static string GetConfirmLinkMessage(string callbackUrl)
     {
-        string encodedUrl = HtmlEncoder.Default.Encode(callbackUrl);
+        var encodedUrl = Uri.EscapeDataString(callbackUrl);
 
         return $"""
         <html>
@@ -27,4 +27,15 @@ public static class EmailMessages
         """;
     }
 
+    public static string GetPasswordResetMessage(string resetUrl)
+    {
+        string encodedUrl = HtmlEncoder.Default.Encode(resetUrl);
+
+        return $"""
+        <p>You requested to reset your password for <strong>Polaris Staff Attendance</strong> system!</p> <br/>
+
+        <p>Please reset your password by 
+        <a href='{encodedUrl}'>clicking here</a>.</p> <br/>        
+        """;
+    }
 }

@@ -29,6 +29,7 @@ public class AuthenticationDesktopController : ControllerBase
     public record AuthenticationData(string? Alias, string? PIN);
     public record AliasData(int Id, string Alias);
 
+    // POST: api/AuthenticationDesktop/token
     [HttpPost("token")]
     [AllowAnonymous]
     public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticationData data)

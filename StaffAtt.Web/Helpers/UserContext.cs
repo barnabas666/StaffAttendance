@@ -3,24 +3,27 @@
 namespace StaffAtt.Web.Helpers;
 
 /// <summary>
-/// Service to handle user claims.
-/// This class is used to get the current user's email from the ClaimsPrincipal.
+/// Service to access information about the currently logged-in user.
 /// </summary>
 public class UserContext : IUserContext
 {
-    private readonly ClaimsPrincipal _user;
+    private readonly IHttpContextAccessor _ctx;
 
-    public UserContext(IHttpContextAccessor httpContextAccessor)
+    public UserContext(IHttpContextAccessor ctx)
     {
-        _user = httpContextAccessor.HttpContext.User;
+        _ctx = ctx;
     }
 
-    /// <summary>
-    /// Gets the email of the current user from the claims.
-    /// </summary>
-    /// <returns></returns>
-    public string GetUserEmail()
+    public string? GetUserEmail()
     {
-        return _user.FindFirst(ClaimTypes.Email)?.Value;
+        return _ctx.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
+    }
+
+    public IEnumerable<string> GetRoles()
+    {
+        return _ctx.HttpContext?.User?
+            .FindAll(ClaimTypes.Role)
+            .Select(r => r.Value)
+            ?? Enumerable.Empty<string>();
     }
 }

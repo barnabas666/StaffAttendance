@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
-using StaffAtt.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using StaffAtt.Web.Helpers;
 
 namespace StaffAtt.Web.StartupConfig;
@@ -21,37 +23,60 @@ public static class ServicesConfigExtensions
         builder.Services.AddTransient<IUserService, UserService>();
         builder.Services.AddTransient<IDepartmentSelectListService, DepartmentSelectListService>();
         builder.Services.AddTransient<IStaffSelectListService, StaffSelectListService>();
-        builder.Services.AddTransient<IEmailSender, EmailSender>();
 
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<IApiClient, ApiClient>();
+        builder.Services.AddScoped<IAuthClient, AuthClient>();
     }
 
-    public static void AddIdentityAndMvcServices(this WebApplicationBuilder builder)
+    public static void AddAuthAndMvcServices(this WebApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration.GetConnectionString("IdentityDb") ??
-            throw new InvalidOperationException("Connection string 'IdentityDb' not found.");
-
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite(connectionString));
-        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-        builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
-
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddControllersWithViews();
-        builder.Services.AddSession();
+        builder.Services.AddRazorPages();
 
-        builder.Services.Configure<IdentityOptions>(options =>
+        // Distributed cache required by session middleware
+        builder.Services.AddDistributedMemoryCache();
+
+        // Configure session (make cookie essential so it's created even without consent)
+        builder.Services.AddSession(options =>
         {
-            // Lockout settings
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // Block for 15 minutes
-            options.Lockout.MaxFailedAccessAttempts = 3; // Lock after 3 failed attempts
-            options.Lockout.AllowedForNewUsers = true;   // Enable lockout for new users
-            // Disable 2FA at framework level    
-            options.SignIn.RequireConfirmedPhoneNumber = false;
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;          // important for cookies to be created
+            options.Cookie.SameSite = SameSiteMode.Lax;
+            // you can tweak SecurePolicy depending on local dev vs prod:
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
+
+        builder.Services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.MinimumSameSitePolicy = SameSiteMode.Lax;
+            options.HttpOnly = HttpOnlyPolicy.Always;
+            options.Secure = CookieSecurePolicy.SameAsRequest;
+        });
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = "SessionJwtScheme";
+            options.DefaultChallengeScheme = "SessionJwtScheme";
+        })
+        .AddScheme<AuthenticationSchemeOptions, SessionJwtAuthenticationHandler>("SessionJwtScheme", null)
+        .AddJwtBearer("Bearer", opts =>
+        {
+            opts.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Authentication:Issuer"],
+                ValidAudience = builder.Configuration["Authentication:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.ASCII.GetBytes(builder.Configuration["Authentication:SecretKey"]!))
+            };
+        });
+
+        builder.Services.AddAuthorization(); // optional but recommended
     }
 }

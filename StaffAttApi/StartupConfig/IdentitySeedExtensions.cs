@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace StaffAtt.Web.StartupConfig;
+namespace StaffAttApi.StartupConfig;
 
 public static class IdentitySeedExtensions
 {

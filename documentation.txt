@@ -1,10 +1,10 @@
 This solution is a staff management and attendance system built with .NET 8.0, designed for flexibility, security, and multi-database support. It consists of:
 
-• StaffAtt.Web: An ASP.NET Core MVC web application for staff registration, profile management, and administration. It no longer accesses the business logic or data layer directly, but communicates exclusively with the StaffAttApi via HTTP and uses JWT tokens for authentication/authorization. It uses DTOs from the StaffAttShared library for data exchange and maps them to its own ViewModels. The web app also provides a downloadable desktop application in StaffAtt.Web/wwwroot/downloads/DesktopApp.zip.
+• StaffAtt.Web: An ASP.NET Core Razor Pages web application for staff registration, profile management, and administration. It no longer accesses the business logic or data layer directly, but communicates exclusively with the StaffAttApi via HTTP and uses JWT tokens for authentication/authorization. All authentication and user management logic (including registration, login, password changes, and email confirmation) is now handled by the API; the web app contains only the UI pages for these actions. It uses DTOs from the StaffAttShared library for data exchange and maps them to its own ViewModels. The web app also provides a downloadable desktop application in StaffAtt.Web/wwwroot/downloads/DesktopApp.zip.
 
 • StaffAtt.Desktop: A WPF desktop application for recording staff check-ins and check-outs. Like the web app, it communicates only with the StaffAttApi via HTTP and uses JWT tokens for authentication/authorization. It also uses DTOs from the StaffAttShared library for data exchange and maps them to its own UI models. The desktop app is distributed as a portable application for end users.
 
-• StaffAttApi: An ASP.NET Core Web API application that acts as the single backend entry point for both the web and desktop apps. It handles all business logic and data access by calling into StaffAttLibrary, and exposes endpoints that work with DTOs from StaffAttShared. The API is responsible for authentication and authorization, issuing JWT tokens, and mapping between DTOs and domain models.
+• StaffAttApi: An ASP.NET Core Web API application that acts as the single backend entry point for both the web and desktop apps. It handles all business logic and data access by calling into StaffAttLibrary, and exposes endpoints that work with DTOs from StaffAttShared. The API is responsible for authentication and authorization, issuing JWT tokens, and mapping between DTOs and domain models. All Identity logic (user registration, login, password management, etc.) is implemented here, using a single Identity database for the entire solution.
 
 • StaffAttLibrary: A shared .NET 8.0 class library containing all business logic and data access. It is only referenced by the API. The library supports three types of main StaffAtt databases:
   - PostgreSQL (now the main and recommended backend, using raw SQL queries stored in StaffAttLibrary/Queries/PostgreSQL/)
@@ -12,7 +12,7 @@ This solution is a staff management and attendance system built with .NET 8.0, d
   - SQLite (using raw SQL queries stored in StaffAttLibrary/Queries/SQLite/)
   The main StaffAtt database (regardless of backend) is accessed only by the API via the library, and is shared for all staff and attendance data.
 
-• StaffAtt.Identity: A class library containing the ASP.NET Core Identity system, now extracted from the web app and used by both StaffAtt.Web and StaffAttApi for authentication and user management. The Identity system uses a separate SQLite database.
+• StaffAtt.Identity: A class library containing the ASP.NET Core Identity system, now used exclusively by StaffAttApi for authentication and user management. The Identity system uses a separate SQLite database, accessed only by the API.
 
 • StaffAttShared: A class library containing only DTOs and Enums. Both StaffAtt.Web and StaffAtt.Desktop depend on this library for data contracts, and the API uses it to map between DTOs and domain models.
 
@@ -21,4 +21,4 @@ This solution is a staff management and attendance system built with .NET 8.0, d
 • Unit Tests: The solution includes automated tests to verify business logic and data operations.
 
 Summary:
-The system enables staff registration, profile updates, and attendance tracking, with administrative features for managing staff and access rights. Both the web and desktop apps interact with the backend exclusively through the API, ensuring security and separation of concerns. The API is the only component with access to the business logic and main StaffAtt database, supporting PostgreSQL, SQL Server, and SQLite backends. The solution is designed for easy deployment to Azure, with clear separation of responsibilities, secure authentication, and maintainable code structure.
+The system enables staff registration, profile updates, and attendance tracking, with administrative features for managing staff and access rights. Both the web and desktop apps interact with the backend exclusively through the API, ensuring security and separation of concerns. The API is the only component with access to the business logic and main StaffAtt database, supporting PostgreSQL, SQL Server, and SQLite backends. All authentication and user management is centralized in the API, using a single Identity database for the solution. The solution is designed for easy deployment to Azure, with clear separation of responsibilities, secure authentication, and maintainable code structure.

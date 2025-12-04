@@ -100,11 +100,8 @@ public class StaffController : Controller
         if (!createResult.IsSuccess)
             return View("Error", new ErrorViewModel { Message = createResult.ErrorMessage });
 
-        IdentityUser newUser = await _userService.FindByEmailAsync(userEmail);
-        await _userService.AddToRoleAsync(newUser, "Member");
-        await _userService.SignInAsync(newUser, false);
-
-        return RedirectToAction("Details", new { successMessage = "Your staff profile was successfully created." });
+        TempData["Success"] = "Your staff profile was successfully created.";
+        return RedirectToAction("Details");
     }
 
     /// <summary>
@@ -115,7 +112,7 @@ public class StaffController : Controller
     /// <param name="message">Optional parameter. Some warning message from different Action.</param>
     /// <returns>View with populated StaffDetailsModel inside.</returns>
     [HttpGet]
-    public async Task<IActionResult> Details(string? message = "", string? successMessage = "", string? errorMessage = "")
+    public async Task<IActionResult> Details()
     {
         string userEmail = _userContext.GetUserEmail();
 
@@ -134,9 +131,6 @@ public class StaffController : Controller
 
         // 3. Map to view model
         var detailsModel = _mapper.Map<StaffDetailsViewModel>(detailsResult.Value);
-        detailsModel.Message = message;
-        detailsModel.SuccessMessage = successMessage;
-        detailsModel.ErrorMessage = errorMessage;
 
         return View("Details", detailsModel);
     }
@@ -196,6 +190,7 @@ public class StaffController : Controller
         if (!result.IsSuccess)
             return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
-        return RedirectToAction("Details", new { successMessage = "Your profile was successfully updated." });
+        TempData["Success"] = "Your profile was successfully updated.";
+        return RedirectToAction("Details");
     }
 }

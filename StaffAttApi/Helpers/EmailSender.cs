@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using MimeKit;
 using MimeKit.Text;
 
-namespace StaffAtt.Web.Helpers;
+namespace StaffAttApi.Helpers;
 
 public class EmailSender : IEmailSender
 {
@@ -37,11 +37,17 @@ public class EmailSender : IEmailSender
 
         try
         {
+            Console.WriteLine($"EmailSender: sending to {email}, link={confirmLink}");
+
             await smtp.ConnectAsync("smtp.gmail.com", 465, true);
             await smtp.AuthenticateAsync(senderEmail, password);
             await smtp.SendAsync(message);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"EmailSender ERROR: {ex.Message}");
+        }
+
         finally
         {
             await smtp.DisconnectAsync(true);

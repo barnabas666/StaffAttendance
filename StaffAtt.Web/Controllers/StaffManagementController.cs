@@ -15,16 +15,19 @@ namespace StaffAtt.Web.Controllers;
 public class StaffManagementController : Controller
 {
     private readonly IApiClient _apiClient;
+    private readonly IAuthClient _authClient;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly IDepartmentSelectListService _departmentService;
 
     public StaffManagementController(IApiClient apiClient,
+                                     IAuthClient authClient,
                                      IUserService userService,
                                      IMapper mapper,
                                      IDepartmentSelectListService departmentService)
     {
         _apiClient = apiClient;
+        _authClient = authClient;
         _userService = userService;
         _mapper = mapper;
         _departmentService = departmentService;
@@ -38,7 +41,7 @@ public class StaffManagementController : Controller
     /// rendering. Display Check-In Approval status for all staff.</remarks>
     /// <returns>An <see cref="IActionResult"/> that renders the staff management list view with the populated data.</returns>
     [HttpGet]
-    public async Task<IActionResult> List(string? message = "", string? successMessage = "", string? errorMessage = "")
+    public async Task<IActionResult> List()
     {
         StaffManagementListViewModel staffModel = new StaffManagementListViewModel();
 
@@ -47,11 +50,7 @@ public class StaffManagementController : Controller
             return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(result.Value);
-        staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
-
-        staffModel.Message = message;
-        staffModel.SuccessMessage = successMessage;
-        staffModel.ErrorMessage = errorMessage;
+        staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All Departments");
 
         return View("List", staffModel);
     }
@@ -76,7 +75,7 @@ public class StaffManagementController : Controller
             return View("Error", new ErrorViewModel { Message = result.ErrorMessage });
 
         staffModel.BasicInfos = _mapper.Map<List<StaffBasicViewModel>>(result.Value);
-        staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All");
+        staffModel.DepartmentItems = await _departmentService.GetDepartmentSelectListAsync("All Departments");
 
         return View("List", staffModel);
     }
@@ -138,8 +137,8 @@ public class StaffManagementController : Controller
         if (!createResult.IsSuccess)
             return View("Error", new ErrorViewModel { Message = createResult.ErrorMessage });
 
-        return RedirectToAction("List",
-                                new { successMessage = $"{updateModel.BasicInfo.FirstName} {updateModel.BasicInfo.LastName} profile was successfully updated." });
+        TempData["Success"] = $"{updateModel.BasicInfo.FirstName} {updateModel.BasicInfo.LastName} profile was successfully updated.";
+        return RedirectToAction("List");
     }
 
     /// <summary>
@@ -188,11 +187,11 @@ public class StaffManagementController : Controller
             return View("Error", new ErrorViewModel { Message = deleteStaffResult.ErrorMessage });
 
         // Delete IdentityUser
-        IdentityUser userToDelete = await _userService.FindByEmailAsync(userEmail);
-        if (userToDelete is not null)
-            await _userService.DeleteIdentityUserAsync(userToDelete);
+        var deleteIdentityUserResult = await _authClient.DeleteUserAsync(userEmail);
+        if (!deleteIdentityUserResult.IsSuccess)
+            return View("Error", new ErrorViewModel { Message = deleteIdentityUserResult.ErrorMessage });
 
-        return RedirectToAction("List",
-                                new { successMessage = $"{deleteModel.BasicInfo.FirstName} {deleteModel.BasicInfo.LastName} profile was successfully deleted." });
+        TempData["Success"] = $"{deleteModel.BasicInfo.FirstName} {deleteModel.BasicInfo.LastName} profile was successfully deleted.";
+        return RedirectToAction("List");
     }
 }

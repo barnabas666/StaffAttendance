@@ -1,62 +1,46 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace StaffAtt.Web.Helpers;
 
 /// <summary>
-/// Service to handle user operations. Contains instances of UserManager and SignInManager.
-/// Contains methods to find user by email, add user to role, and sign in user.
+/// Service for managing user authentication and session data.
 /// </summary>
 public class UserService : IUserService
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IHttpContextAccessor _ctx;
 
-    public UserService(UserManager<IdentityUser> userManager,
-                       SignInManager<IdentityUser> signInManager)
+    public UserService(IHttpContextAccessor ctx)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
+        _ctx = ctx;
     }
 
-    /// <summary>
-    /// Finds a user by email address.
-    /// </summary>
-    /// <param name="email"></param>
-    /// <returns></returns>
-    public Task<IdentityUser?> FindByEmailAsync(string email)
+    public Task SignInAsync(string token, string email, IEnumerable<string> roles)
     {
-        return _userManager.FindByEmailAsync(email);
+        var session = _ctx.HttpContext!.Session;
+        session.SetString("jwt", token);
+        session.SetString("email", email);
+        session.SetString("roles", string.Join(",", roles));
+
+        return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Adds a user to a role.
-    /// </summary>
-    /// <param name="user"></param>
-    /// <param name="role"></param>
-    /// <returns></returns>
-    public Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
+    public void SignOut()
     {
-        return _userManager.AddToRoleAsync(user, role);
+        var session = _ctx.HttpContext!.Session;
+        session.Remove("jwt");
+        session.Remove("email");
+        session.Remove("roles");
     }
 
-    /// <summary>
-    /// Signs in a user with the specified persistence option.
-    /// </summary>
-    /// <param name="user"></param>
-    /// <param name="isPersistent"></param>
-    /// <returns></returns>
-    public Task SignInAsync(IdentityUser user, bool isPersistent)
-    {
-        return _signInManager.SignInAsync(user, isPersistent);
-    }
+    public string? GetToken() => _ctx.HttpContext!.Session.GetString("jwt");
 
-    /// <summary>
-    /// Deletes the specified user asynchronously.
-    /// </summary>
-    /// <param name="user">The user to delete. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task DeleteIdentityUserAsync(IdentityUser user)
+    public string? GetEmail() => _ctx.HttpContext!.Session.GetString("email");
+
+    public IEnumerable<string> GetRoles()
     {
-        await _userManager.DeleteAsync(user);
+        var r = _ctx.HttpContext!.Session.GetString("roles");
+        return string.IsNullOrEmpty(r)
+            ? Enumerable.Empty<string>()
+            : r.Split(',', StringSplitOptions.RemoveEmptyEntries);
     }
 }

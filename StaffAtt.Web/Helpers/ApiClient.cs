@@ -30,7 +30,7 @@ public class ApiClient : IApiClient
     {
         var client = _httpClientFactory.CreateClient("api");
 
-        var token = _httpContextAccessor.HttpContext?.Session.GetString("JwtToken");
+        var token = _httpContextAccessor.HttpContext?.Session.GetString("jwt");
         if (!string.IsNullOrEmpty(token))
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

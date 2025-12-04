@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿namespace StaffAtt.Web.Helpers;
 
-namespace StaffAtt.Web.Helpers;
 public interface IUserService
 {
-    Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role);
-    Task<IdentityUser?> FindByEmailAsync(string email);
-    Task SignInAsync(IdentityUser user, bool isPersistent);
-    Task DeleteIdentityUserAsync(IdentityUser user);
+    Task SignInAsync(string token, string email, IEnumerable<string> roles);
+
+    void SignOut();
+
+    string? GetToken();
+    string? GetEmail();
+    IEnumerable<string> GetRoles();
 }

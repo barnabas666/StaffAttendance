@@ -14,7 +14,7 @@ public class StaffSelectListService : IStaffSelectListService
     private readonly IApiClient _apiClient;
     private readonly IMapper _mapper;
     private readonly IMemoryCache _cache;
-    private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(1); // adjust as needed
+    private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(1);
 
     public StaffSelectListService(IApiClient apiClient, IMapper mapper, IMemoryCache cache)
     {
@@ -34,19 +34,20 @@ public class StaffSelectListService : IStaffSelectListService
         // Try get cached staff list
         if (!_cache.TryGetValue("staff_basic_list", out List<StaffBasicDto>? staffList))
         {
+            // Not cached => call API
             var staffResult = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
 
-            if (!staffResult.IsSuccess || staffResult.Value is null)
-            {
-                // Instead of crashing UI, return empty dropdown
+            // Instead of crashing UI, return empty dropdown
+            if (!staffResult.IsSuccess || staffResult.Value is null)            
                 return new SelectList(Enumerable.Empty<StaffBasicDto>(), nameof(StaffBasicDto.Id), nameof(StaffBasicDto.FullName));
-            }
+            
             staffList = staffResult.Value;
 
             // Cache result
             _cache.Set("staff_basic_list", staffList, _cacheDuration);
         }
 
+        // Copy list so we don’t mutate the cached version (we insert default value below which we don’t want cached)
         var listToDisplay = new List<StaffBasicDto>(staffList);
 
         // Insert default value at the top (e.g. "All Staff")
@@ -54,7 +55,7 @@ public class StaffSelectListService : IStaffSelectListService
             listToDisplay.Insert(0, new StaffBasicDto { Id = 0, FirstName = defaultValue });
 
         // Map and return dropdown
-        dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(staffList);
+        dateDisplayModel.StaffList = _mapper.Map<List<StaffBasicViewModel>>(listToDisplay);
         // Source is staff, value (Id here) gonna be saved to database, Text (FullName) gets displayed to user.
         return new SelectList(dateDisplayModel.StaffList, nameof(StaffBasicViewModel.Id), nameof(StaffBasicViewModel.FullName));
     }

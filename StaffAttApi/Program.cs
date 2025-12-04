@@ -44,4 +44,5 @@ else
 }
 
 app.MapControllers();
+await IdentitySeedExtensions.SeedRolesAndAdminAsync(app.Services);
 app.Run();

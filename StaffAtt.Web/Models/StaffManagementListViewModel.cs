@@ -29,11 +29,4 @@ public class StaffManagementListViewModel
     /// Enum - Staff's Approved status.
     /// </summary>
     public ApprovedType ApprovedRadio { get; set; }
-
-    /// <summary>
-    /// Details Action optional parameter. Some info message from different Action.
-    /// </summary>
-    public string? Message { get; set; }
-    public string? SuccessMessage { get; set; }
-    public string? ErrorMessage { get; set; }
 }

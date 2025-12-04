@@ -4,28 +4,6 @@
     ViewData["Title"] = "Details";
 }
 
-@* Notification for success messages *@
-@if (!string.IsNullOrEmpty(Model.SuccessMessage))
-{
-    <div class="alert alert-success" role="alert">
-        @Model.SuccessMessage
-    </div>
-}
-@* Notification for error messages *@
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <div class="alert alert-danger" role="alert">
-        @Model.ErrorMessage
-    </div>
-}
-@* Notification for info messages *@
-@if (!string.IsNullOrEmpty(Model.Message))
-{
-    <div class="alert alert-warning" role="alert">
-        @Model.Message
-    </div>
-}
-
 @if (Model.BasicInfo.IsApproved == false)
 {
     <h4 class="text-danger">You are not approved to Check-in.</h4>
@@ -113,13 +91,3 @@ else
         </dl>
     </div>
 }
-
-@section Scripts {
-    <script>
-        setTimeout(() => {
-            const alert = document.querySelector(".alert-success");
-            if (alert) alert.style.display = "none";
-        }, 5000);
-    </script>
-}
-

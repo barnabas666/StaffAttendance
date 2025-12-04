@@ -1,0 +1,29 @@
+﻿@inject StaffAtt.Web.Helpers.IUserService UserService
+
+@{
+    var email = UserService.GetEmail();
+    var roles = UserService.GetRoles();
+    var isLogged = !string.IsNullOrEmpty(email);
+}
+
+@if (isLogged)
+{
+    <div class="d-flex align-items-center">
+        <span class="text-light me-3">Logged in as: <strong>@email</strong></span>
+
+        <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-light btn-sm me-2">
+            Account
+        </a>
+
+        <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+            <button class="btn btn-danger btn-sm">Logout</button>
+        </form>
+    </div>
+}
+else
+{
+    <div>
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-light btn-sm me-2">Login</a>
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-light btn-sm">Register</a>
+    </div>
+}
