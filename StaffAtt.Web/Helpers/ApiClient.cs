@@ -1,14 +1,14 @@
-﻿using System.Net.Http.Headers;
+﻿using StaffAtt.Web.Models;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace StaffAtt.Web.Helpers;
 
 /// <summary>
-/// Provides methods for performing HTTP operations against a specified API endpoint.
+/// Implementation of <see cref="IApiClient"/> for making HTTP requests to a RESTful API.
+/// Provides methods for sending GET, POST, PUT, and DELETE requests with JSON serialization/deserialization.
+/// Handles authorization by including a JWT token from the session if available.
 /// </summary>
-/// <remarks>This class utilizes an <see cref="IHttpClientFactory"/> to create HTTP clients and an <see
-/// cref="IHttpContextAccessor"/> to access the current HTTP context for retrieving authentication tokens. It supports
-/// CRUD operations and handles JSON serialization and deserialization of request and response bodies.</remarks>
 public class ApiClient : IApiClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -26,6 +26,11 @@ public class ApiClient : IApiClient
         _httpContextAccessor = httpContextAccessor;
     }
 
+    /// <summary>
+    /// Creates and configures an <see cref="HttpClient"/> instance with the necessary headers, including
+    /// authorization if a JWT token is present in the session.
+    /// </summary>
+    /// <returns></returns>
     private HttpClient CreateClient()
     {
         var client = _httpClientFactory.CreateClient("api");
@@ -37,7 +42,13 @@ public class ApiClient : IApiClient
         return client;
     }
 
-    // Common helper for reading response    
+    /// <summary>   
+    /// Reads the response from an HTTP request and deserializes the JSON content.
+    /// </summary>
+    /// <param name="response">The HTTP response message to read from.</param>
+    /// <param name="verb">The HTTP verb used in the request (e.g., GET, POST).</param>
+    /// <param name="endpoint">The URI of the resource being accessed.</param>
+    /// <returns>A <see cref="Result{T}"/> object containing the deserialized JSON content, or an error message if the operation failed.</returns>
     private static async Task<Result<T>> ReadResponseAsync<T>(HttpResponseMessage response, string verb, string endpoint)
     {
         var status = (int)response.StatusCode;
@@ -86,7 +97,11 @@ public class ApiClient : IApiClient
         }
     }
 
-    // CRUD methods    
+    /// <summary>
+    /// Sends a GET request to the specified endpoint and reads the response.
+    /// </summary>
+    /// <param name="endpoint">The URI of the resource to retrieve. This must be a valid, non-null, and non-empty string.</param>
+    /// <returns>A <see cref="Result{T}"/> object containing the retrieved resource, or an error message if the operation failed.</returns>
     public async Task<Result<T>> GetAsync<T>(string endpoint)
     {
         var client = CreateClient();
@@ -94,6 +109,12 @@ public class ApiClient : IApiClient
         return await ReadResponseAsync<T>(response, "GET", endpoint);
     }
 
+    /// <summary>
+    /// Sends a POST request with JSON data to the specified endpoint and reads the response.
+    /// </summary>
+    /// <param name="endpoint">The URI of the resource to create. This must be a valid, non-null, and non-empty string.</param>
+    /// <param name="data">The data to create the resource with. This must be a valid, non-null object.</param>
+    /// <returns>A <see cref="Result{T}"/> object containing the created resource, or an error message if the operation failed.</returns>
     public async Task<Result<T>> PostAsync<T>(string endpoint, T data)
     {
         var client = CreateClient();
@@ -101,6 +122,12 @@ public class ApiClient : IApiClient
         return await ReadResponseAsync<T>(response, "POST", endpoint);
     }
 
+    /// <summary>
+    /// Sends a PUT request with JSON data to the specified endpoint and reads the response.
+    /// </summary>
+    /// <param name="endpoint">The URI of the resource to update. This must be a valid, non-null, and non-empty string.</param>
+    /// <param name="data">The data to update the resource with. This must be a valid, non-null object.</param>
+    /// <returns>A <see cref="Result{T}"/> object containing the updated resource, or an error message if the operation failed.</returns>
     public async Task<Result<T>> PutAsync<T>(string endpoint, T data)
     {
         var client = CreateClient();
@@ -108,6 +135,15 @@ public class ApiClient : IApiClient
         return await ReadResponseAsync<T>(response, "PUT", endpoint);
     }
 
+    /// <summary>
+    /// Sends an asynchronous DELETE request to the specified endpoint and returns the result.
+    /// </summary>
+    /// <remarks>The method uses an HTTP client to send the DELETE request and processes the response to
+    /// determine the outcome. If the operation fails, the returned <see cref="Result{T}"/> will contain an error
+    /// message describing the failure.</remarks>
+    /// <param name="endpoint">The URI of the resource to delete. This must be a valid, non-null, and non-empty string.</param>
+    /// <returns>A <see cref="Result{T}"/> object containing a boolean value indicating whether the operation was successful.
+    /// Returns <see langword="true"/> if the DELETE request was successful; otherwise, <see langword="false"/>.</returns>
     public async Task<Result<bool>> DeleteAsync(string endpoint)
     {
         var client = CreateClient();

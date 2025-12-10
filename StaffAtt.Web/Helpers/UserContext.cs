@@ -3,7 +3,8 @@
 namespace StaffAtt.Web.Helpers;
 
 /// <summary>
-/// Service to access information about the currently logged-in user.
+/// Implementation of <see cref="IUserContext"/> for accessing user information from the HTTP context.
+/// Provides methods to retrieve the user's email and roles based on claims.
 /// </summary>
 public class UserContext : IUserContext
 {

@@ -1,5 +1,10 @@
-﻿namespace StaffAtt.Web.Helpers;
+﻿namespace StaffAtt.Web.Models;
 
+/// <summary>
+/// Generic result class to encapsulate success or failure of an operation.
+/// Provides information about the operation's outcome, including any resulting value or error message.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class Result<T>
 {
     public bool IsSuccess { get; }

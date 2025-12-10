@@ -17,6 +17,10 @@ using System.Threading.Tasks;
 
 namespace StaffAttApi.Controllers
 {
+    /// <summary>
+    /// API controller for handling user authentication and authorization.
+    /// Provides endpoints for user registration, login, email confirmation, password reset, and user management.
+    /// </summary>
     [Route("api/auth")]
     [ApiController]
     public class AuthenticationWebController : ControllerBase

@@ -1,4 +1,6 @@
-﻿namespace StaffAtt.Web.Helpers;
+﻿using StaffAtt.Web.Models;
+
+namespace StaffAtt.Web.Helpers;
 
 public interface IApiClient
 {

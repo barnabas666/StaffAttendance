@@ -1,8 +1,6 @@
 ﻿using StaffAtt.Desktop.Models;
+using StaffAtt.Desktop.Helpers;
 using StaffAttShared.DTOs;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
 using System.Windows;
 
 namespace StaffAtt.Desktop;
@@ -12,88 +10,45 @@ namespace StaffAtt.Desktop;
 /// </summary>
 public partial class CheckInForm : Window
 {
-    /// <summary>
-    /// Instance of class which holds JWT token.
-    /// </summary>
-    private readonly TokenModel _tokenModel;
-    /// <summary>
-    /// Instance of HttpClient to call our API.
-    /// </summary>
-    private HttpClient httpClient;
+    private readonly IDesktopApiClient _api;
+    private StaffBasicDto _staff = null!;
+    private CheckInDto? _lastCheckIn = null;
 
-    /// <summary>
-    /// Instance of class which holds Basic Staff data.
-    /// </summary>
-    private StaffBasicDto _basicStaffModel = null;
-    /// <summary>
-    /// Instance of class which holds CheckIn data.
-    /// </summary>
-    private CheckInDto _checkInModel = null;
-
-    /// <summary>
-    /// Constructor, initialize instance of this class.
-    /// </summary>
-    /// <param name="httpClientFactory"></param>
-    /// <param name="tokenModel"></param>
-    public CheckInForm(IHttpClientFactory httpClientFactory, TokenModel tokenModel)
+    public CheckInForm(IDesktopApiClient api)
     {
         InitializeComponent();
-        _tokenModel = tokenModel;
-        httpClient = httpClientFactory.CreateClient("api");
+        _api = api;
     }
 
     /// <summary>
-    /// Populate our form with data we get from Db - StaffBasicModel.
-    /// Just info for Staff to be sure its really his/her own CheckIn/Out.
+    /// Called when the user successfully logs in from MainWindow.
     /// </summary>
-    /// <param name="basicStaffModel">Holds Basic Staff data.</param>
-    public async void PopulateStaff(StaffBasicDto basicStaffModel)
+    public async void PopulateStaff(StaffBasicDto staff)
     {
-        _basicStaffModel = basicStaffModel;
-        firstNameText.Text = _basicStaffModel.FirstName;
-        lastNameText.Text = _basicStaffModel.LastName;
-        emailAddressText.Text = _basicStaffModel.EmailAddress;
-        departmentTitleText.Text = _basicStaffModel.Title;
+        _staff = staff;
 
-        try
-        {
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenModel.Token);
+        firstNameText.Text = staff.FirstName;
+        lastNameText.Text = staff.LastName;
+        emailAddressText.Text = staff.EmailAddress;
+        departmentTitleText.Text = staff.Title;
 
-            var lastCheckInResponse = await httpClient.GetAsync($"checkin/last/{_basicStaffModel.Id}");
-            if (!lastCheckInResponse.IsSuccessStatusCode)
-            {
-                var errorContent = await lastCheckInResponse.Content.ReadAsStringAsync();
-                string message = $"Getting last CheckIn failed ({(int)lastCheckInResponse.StatusCode} {lastCheckInResponse.ReasonPhrase})";
-                // Try to extract more info if the error is JSON
-                if (lastCheckInResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
-                {
-                    message += $"\nDetails: {errorContent}";
-                }
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var content = await lastCheckInResponse.Content.ReadAsStringAsync();
-            if (string.IsNullOrWhiteSpace(content) || content == "null")
-                _checkInModel = null;
-            else
-            {
-                _checkInModel = JsonSerializer.Deserialize<CheckInDto>(content, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-            }
-        }
-        catch (HttpRequestException ex)
-        {
-            MessageBox.Show("Network error: " + ex.Message);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Unexpected error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        await LoadLastCheckInAsync();
 
         checkInButton.Content = IsNextCheckIn() ? "Check-In" : "Check-Out";
+    }
+
+    private async Task LoadLastCheckInAsync()
+    {
+        var result = await _api.GetLastCheckInAsync(_staff.Id);
+
+        if (!result.IsSuccess)
+        {
+            // Silent fail: we don't bother the user with last check-in errors
+            _lastCheckIn = null;
+            return;
+        }
+
+        _lastCheckIn = result.Value;
     }
 
     /// <summary>
@@ -101,10 +56,11 @@ public partial class CheckInForm : Window
     /// For first CheckIn ever or if last record is CheckOut we return true.
     /// If last CheckIn has no CheckOut value than we return false.
     /// </summary>
-    /// <returns>True for CheckIn, false for CheckOut.</returns>
+    /// <returns></returns>
     private bool IsNextCheckIn()
     {
-        return _checkInModel == null || _checkInModel.CheckOutDate != null;
+        // If null => first check in; If CheckOutDate != null => next is check in
+        return _lastCheckIn == null || _lastCheckIn.CheckOutDate != null;
     }
 
     /// <summary>
@@ -114,39 +70,29 @@ public partial class CheckInForm : Window
     /// <param name="e"></param>
     private async void CheckInButton_Click(object sender, RoutedEventArgs e)
     {
-        try
+        var result = await _api.DoCheckInAsync(_staff.Id);
+
+        if (!result.IsSuccess)
         {
-            var doCheckInResponse = await httpClient.PostAsync($"checkin/do/{_basicStaffModel.Id}", null);
-            if (!doCheckInResponse.IsSuccessStatusCode)
-            {
-                var errorContent = await doCheckInResponse.Content.ReadAsStringAsync();
-                string message = $"CheckIn/Out failed ({(int)doCheckInResponse.StatusCode} {doCheckInResponse.ReasonPhrase})";
-                // Try to extract more info if the error is JSON
-                if (doCheckInResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
-                {
-                    message += $"\nDetails: {errorContent}";
-                }
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            MessageBox.Show(
+                result.ErrorMessage ?? "Unable to perform Check-In/Out.",
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
         }
-        catch (HttpRequestException ex)
-        {
-            MessageBox.Show("Network error: " + ex.Message);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Unexpected error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+
+        string action = IsNextCheckIn() ? "Check-In" : "Check-Out";
+
+        MessageBox.Show(
+            $"{action} successful.",
+            "Success",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
 
         this.Close();
     }
 
-    /// <summary>
-    /// Close this CheckInForm Window.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
     private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
         this.Close();

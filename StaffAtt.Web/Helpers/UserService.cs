@@ -4,6 +4,8 @@ namespace StaffAtt.Web.Helpers;
 
 /// <summary>
 /// Service for managing user authentication and session data.
+/// Provides methods for signing in, signing out, and retrieving user information such as JWT token, email, and roles
+/// from the HTTP context session.
 /// </summary>
 public class UserService : IUserService
 {

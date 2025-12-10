@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StaffAtt.Desktop.Helpers;
 using StaffAtt.Desktop.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.PostgreSQL;
@@ -45,8 +46,6 @@ public static class ServiceCollectionExtensions
             .Build();
 
         services.AddSingleton<IConfiguration>(configuration);
-        // Register TokenModel as scoped, so we have one instance per user session (circuit). 
-        services.AddScoped<TokenModel>();
 
         // Register HttpClient with base address from config        
         services.AddHttpClient("api", opts =>
@@ -84,10 +83,10 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<IStaffDataProcessor, StaffPostgresDataProcessor>();
         }
 
+        services.AddSingleton<IDesktopApiClient, DesktopApiClient>();
         services.AddSingleton<IConnectionStringData, ConnectionStringData>();
         services.AddTransient<MainWindow>();
         services.AddTransient<CheckInForm>();
-
     }
 }
 
