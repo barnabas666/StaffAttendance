@@ -45,6 +45,7 @@ A database diagram is available at the solution root: `StaffAttDbDiagram.png`.
 ## How It Works
 
 - Both the web and desktop apps communicate **only with the API** (never directly with the database or business logic).
+- Clients authenticate via JWT; the web app stores the token in session, the desktop app keeps it in memory.
 - The API handles all authentication, authorization, and business rules. All Identity logic is centralized in the API.
 - All data exchanged between clients and API uses DTOs from `StaffAttShared`.
 
@@ -79,4 +80,10 @@ Contributions are welcome! Please open issues or submit pull requests.
 
 ---
 
-**For more details, see the full documentation in `documentation.txt` or the database diagram.**
+**For more details, see 
+/docs/documentation.txt
+/docs/architecture.txt
+/docs/web-auth-flow.txt
+/docs/desktop-checkin-flow.txt
+/docs/StaffAttDbDiagram.png.
+**

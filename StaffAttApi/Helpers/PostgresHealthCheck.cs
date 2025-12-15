@@ -3,6 +3,9 @@ using Npgsql;
 
 namespace StaffAttApi.Helpers;
 
+/// <summary>
+/// Health check for PostgreSQL database connectivity.
+/// </summary>
 public class PostgresHealthCheck : IHealthCheck
 {
     private readonly string _connectionString;

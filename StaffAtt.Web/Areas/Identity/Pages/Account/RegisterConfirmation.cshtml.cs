@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StaffAtt.Web.Helpers;
+using StaffAtt.Web.Services;
 
 namespace StaffAtt.Web.Areas.Identity.Pages.Account
 {

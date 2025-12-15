@@ -12,13 +12,41 @@ This solution is a staff management and attendance system built with .NET 8.0, d
   - SQLite (using raw SQL queries stored in StaffAttLibrary/Queries/SQLite/)
   The main StaffAtt database (regardless of backend) is accessed only by the API via the library, and is shared for all staff and attendance data.
 
-• StaffAtt.Identity: A class library containing the ASP.NET Core Identity system, now used exclusively by StaffAttApi for authentication and user management. The Identity system uses a separate SQLite database, accessed only by the API.
+• StaffAtt.Identity: A class library containing the ASP.NET Core Identity configuration, entities, and database context. It is referenced exclusively by StaffAttApi, which hosts and executes all Identity-related logic (authentication and user management). Neither the Web nor Desktop applications reference or execute Identity code directly.
 
 • StaffAttShared: A class library containing only DTOs and Enums. Both StaffAtt.Web and StaffAtt.Desktop depend on this library for data contracts, and the API uses it to map between DTOs and domain models.
 
+• Unit Tests: The solution includes automated tests to verify business logic and data operations.
+
 • Database Diagram: The structure of the main StaffAtt database is documented in StaffAttDbDiagram.png at the solution root.
 
-• Unit Tests: The solution includes automated tests to verify business logic and data operations.
+• Authentication overview:
+
+  - Web application:
+    Uses JWT tokens issued by the API.
+    Tokens are stored in server-side session and injected into outgoing API requests via a custom authentication handler.
+
+  - Desktop application:
+    Uses JWT tokens issued by the API.
+    Tokens are stored only in memory and discarded when the application exits.
+
+• API infrastructure features:
+
+  - Health checks:
+    The API exposes health check endpoints to monitor application and database status.
+    Endpoints:
+      • /health        – returns JSON health status
+      • /health-ui     – provides a visual health check dashboard
+    Health checks currently verify database connectivity (PostgreSQL / SQL Server / SQLite).
+
+  - Response caching:
+    Selected API endpoints apply HTTP response caching headers.
+    Cache duration is configurable via application settings and is used to reduce database load
+    for frequently requested read-only data (e.g., reference lists).
+
+  - Rate limiting:
+    The API applies rate limiting middleware to protect against abuse and accidental overload.
+    Limits are configurable and enforced per client.
 
 Summary:
 The system enables staff registration, profile updates, and attendance tracking, with administrative features for managing staff and access rights. Both the web and desktop apps interact with the backend exclusively through the API, ensuring security and separation of concerns. The API is the only component with access to the business logic and main StaffAtt database, supporting PostgreSQL, SQL Server, and SQLite backends. All authentication and user management is centralized in the API, using a single Identity database for the solution. The solution is designed for easy deployment to Azure, with clear separation of responsibilities, secure authentication, and maintainable code structure.

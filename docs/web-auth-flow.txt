@@ -1,0 +1,72 @@
+WEB APPLICATION – AUTHENTICATION FLOW (JWT)
+
+--------------------------------------------------
+LOGIN FLOW
+--------------------------------------------------
+
+User
+ |
+ | 1) Enters email + password
+ v
+StaffAtt.Web (Login Page)
+ |
+ | 2) POST /api/auth/login
+ v
+StaffAttApi
+ |
+ | 3) Validate credentials via ASP.NET Core Identity
+ | 4) Generate JWT token with user id, email, roles
+ v
+StaffAttApi
+ |
+ | 5) Return AuthLoginResponse { token, email, roles }
+ v
+StaffAtt.Web
+ |
+ | 6) Store JWT in server-side session
+ | 7) Create ClaimsPrincipal for UI authorization
+ v
+Authenticated Web Session
+
+--------------------------------------------------
+AUTHENTICATED REQUEST FLOW
+--------------------------------------------------
+
+StaffAtt.Web
+ |
+ | 1) User navigates to secured page
+ | 2) ApiClient prepares HTTP request
+ | 3) SessionJwtAuthenticationHandler:
+ |    - reads JWT from session
+ |    - adds Authorization: Bearer <token>
+ v
+StaffAttApi
+ |
+ | 4) JWT middleware validates token
+ | 5) Controller executes authorized action
+ v
+StaffAtt.Web
+
+--------------------------------------------------
+LOGOUT FLOW
+--------------------------------------------------
+
+User
+ |
+ | 1) Click Logout
+ v
+StaffAtt.Web
+ |
+ | 2) Clear session
+ | 3) Remove JWT and user context
+ v
+Unauthenticated Web Session
+
+--------------------------------------------------
+NOTES
+--------------------------------------------------
+
+- Web app never handles Identity directly
+- JWT is never stored in browser storage
+- Session lifetime controls authentication lifetime
+- API is the single authority for authentication

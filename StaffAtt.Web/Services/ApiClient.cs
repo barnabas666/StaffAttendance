@@ -2,7 +2,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace StaffAtt.Web.Helpers;
+namespace StaffAtt.Web.Services;
 
 /// <summary>
 /// Implementation of <see cref="IApiClient"/> for making HTTP requests to a RESTful API.

@@ -83,7 +83,7 @@ public partial class MainWindow : Window
             // 3) Open CheckIn window
             var checkInForm = App.serviceProvider.GetRequiredService<CheckInForm>();
             // we populate instance of CheckInForm window with data from our StaffBasicDto
-            checkInForm.PopulateStaff(staff);
+            await checkInForm.PopulateStaff(staff);
             checkInForm.ShowDialog();
         }
         catch (Exception ex)

@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace StaffAtt.Web.Helpers;
+namespace StaffAtt.Web.Services;
 
 /// <summary>
 /// Implementation of <see cref="IUserContext"/> for accessing user information from the HTTP context.

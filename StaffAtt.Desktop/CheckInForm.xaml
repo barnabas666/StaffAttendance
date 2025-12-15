@@ -37,9 +37,9 @@
         </StackPanel>
 
         <Button Margin="10" Padding="20 10" Grid.Row="3" Grid.ColumnSpan="2"
-                x:Name="checkInButton" Click="CheckInButton_Click"></Button>
+                x:Name="checkInButton" Click="CheckInButton_Click" Background="#FF158CBA" Foreground="White"></Button>
 
         <Button Margin="10 30" Padding="20 10" Grid.Row="4" Grid.ColumnSpan="2"
-                x:Name="cancelButton" Click="CancelButton_Click" >Cancel</Button>
+                x:Name="cancelButton" Click="CancelButton_Click" Background="#FFF0F0F0" >Cancel</Button>
     </Grid>
 </Window>

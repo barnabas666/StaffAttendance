@@ -2,7 +2,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace StaffAtt.Web.Helpers;
+namespace StaffAtt.Web.Services;
 
 /// <summary>
 /// Implementation of <see cref="IAuthClient"/> for handling authentication-related HTTP requests.

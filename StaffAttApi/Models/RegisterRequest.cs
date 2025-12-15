@@ -1,6 +1,6 @@
-﻿namespace StaffAttApi.Controllers.DTOs;
+﻿namespace StaffAttApi.Models;
 
-public class LoginRequest
+public class RegisterRequest
 {
     public string Email { get; set; } = "";
     public string Password { get; set; } = "";

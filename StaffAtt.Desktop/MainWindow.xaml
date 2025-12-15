@@ -26,6 +26,6 @@
         <TextBox x:Name="pINText" Grid.Row="1" Grid.Column="1"
          FontSize="24" Margin="5"/>
 
-        <Button x:Name="loginButton" Grid.Row="2" Grid.ColumnSpan="2" Click="LoginButton_Click" >LOGIN</Button>
+        <Button x:Name="loginButton" Grid.Row="2" Grid.ColumnSpan="2" Click="LoginButton_Click" Background="#FF158CBA" Foreground="White" >LOGIN</Button>
     </Grid>
 </Window>

@@ -1,6 +1,6 @@
 ﻿using StaffAtt.Web.Models;
 
-namespace StaffAtt.Web.Helpers;
+namespace StaffAtt.Web.Services;
 
 public interface IApiClient
 {

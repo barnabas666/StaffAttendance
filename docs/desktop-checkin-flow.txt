@@ -1,0 +1,78 @@
+DESKTOP APPLICATION – CHECK-IN / CHECK-OUT FLOW
+
+--------------------------------------------------
+LOGIN FLOW
+--------------------------------------------------
+
+User
+ |
+ | 1) Enters Alias + PIN
+ v
+StaffAtt.Desktop (MainWindow)
+ |
+ | 2) POST /api/AuthenticationDesktop/token
+ v
+StaffAttApi
+ |
+ | 3) Validate alias and PIN
+ | 4) Generate JWT token (alias-based)
+ v
+StaffAttApi
+ |
+ | 5) Return JWT token
+ v
+StaffAtt.Desktop
+ |
+ | 6) Store JWT in memory only
+ | 7) Set Authorization header on HttpClient
+
+--------------------------------------------------
+STAFF LOAD FLOW
+--------------------------------------------------
+
+StaffAtt.Desktop
+ |
+ | 1) GET /api/staff/basic/alias/{aliasId}
+ v
+StaffAttApi
+ |
+ | 2) Validate JWT
+ | 3) Return StaffBasicDto
+ v
+StaffAtt.Desktop
+
+--------------------------------------------------
+CHECK-IN / CHECK-OUT FLOW
+--------------------------------------------------
+
+User
+ |
+ | 1) Click Check-In / Check-Out
+ v
+StaffAtt.Desktop (CheckInForm)
+ |
+ | 2) POST /api/checkin/do/{staffId}
+ v
+StaffAttApi
+ |
+ | 3) Validate JWT
+ | 4) Perform check-in or check-out
+ v
+StaffAttApi
+ |
+ | 5) Return success
+ v
+StaffAtt.Desktop
+ |
+ | 6) Show confirmation
+ | 7) Close application
+
+--------------------------------------------------
+SECURITY CHARACTERISTICS
+--------------------------------------------------
+
+- JWT stored only in memory
+- No persistent login
+- No refresh tokens
+- Application exit = logout
+- Designed for single-purpose terminal usage

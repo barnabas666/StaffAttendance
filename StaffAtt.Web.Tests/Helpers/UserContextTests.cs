@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using StaffAtt.Web.Helpers;
+using StaffAtt.Web.Services;
 using System.Security.Claims;
 
 namespace StaffAtt.Web.Tests.Helpers;

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using StaffAttShared.DTOs;
 
-namespace StaffAtt.Web.Helpers;
+namespace StaffAtt.Web.Services;
 
 /// <summary>
 /// Service for getting Departments SelectList info.

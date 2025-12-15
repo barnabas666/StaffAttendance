@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using StaffAtt.Web.Helpers;
+using StaffAtt.Web.Services;
 
 namespace StaffAtt.Web.StartupConfig;
 

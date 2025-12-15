@@ -1,0 +1,73 @@
+ARCHITECTURE OVERVIEW
+
+StaffAttendance is built as a strict client–server system with a single backend
+(API) and multiple clients (Web and Desktop).
+
+--------------------------------------------------
+COMPONENTS AND RESPONSIBILITIES
+--------------------------------------------------
+
+1) StaffAttApi (Backend / Core)
+
+- Single entry point for all business logic
+- Hosts authentication, authorization, and Identity
+- Issues JWT tokens
+- Validates JWT tokens for protected endpoints
+- Maps DTOs to domain models
+- Calls StaffAttLibrary for data access
+- The only component with access to databases
+
+2) StaffAtt.Identity (Identity Library)
+
+- Class library containing ASP.NET Core Identity setup
+- Referenced exclusively by StaffAttApi
+- Uses a separate SQLite database for identity data
+- Not referenced by Web or Desktop applications
+
+3) StaffAttLibrary (Business Logic & Data Access)
+
+- Contains all domain logic and database access code
+- Supports PostgreSQL, SQL Server, and SQLite
+- Referenced only by StaffAttApi
+
+4) StaffAttShared (Contracts)
+
+- Contains DTOs and enums
+- Shared by Web, Desktop, and API
+- No business logic
+
+5) StaffAtt.Web (Web Client)
+
+- ASP.NET Core Razor Pages application
+- Provides UI only
+- No direct database or business logic access
+- Communicates exclusively with StaffAttApi via HTTP
+- Uses JWT tokens stored in server-side session
+- Injects JWT into API requests via a custom authentication handler
+
+6) StaffAtt.Desktop (Desktop Client)
+
+- WPF application for check-in / check-out
+- Communicates exclusively with StaffAttApi via HTTP
+- Uses JWT tokens stored only in memory
+- Short-lived authentication (single user flow)
+
+--------------------------------------------------
+HIGH-LEVEL COMMUNICATION FLOW
+--------------------------------------------------
+
+Web App  ----\
+               \
+                --> StaffAttApi --> StaffAttLibrary --> Database
+               /
+Desktop App --/
+
+--------------------------------------------------
+KEY PRINCIPLES
+--------------------------------------------------
+
+- API-first architecture
+- Clear separation of concerns
+- No shared state between clients
+- Identity logic centralized in the API
+- DTO-based communication only

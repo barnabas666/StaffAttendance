@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using StaffAtt.Web.Models;
 using StaffAttShared.DTOs;
 
-namespace StaffAtt.Web.Helpers;
+namespace StaffAtt.Web.Services;
 
 /// <summary>
 /// Service for getting Staff SelectList info.

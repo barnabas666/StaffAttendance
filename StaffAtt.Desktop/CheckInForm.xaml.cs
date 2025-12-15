@@ -23,7 +23,7 @@ public partial class CheckInForm : Window
     /// <summary>
     /// Called when the user successfully logs in from MainWindow.
     /// </summary>
-    public async void PopulateStaff(StaffBasicDto staff)
+    public async Task PopulateStaff(StaffBasicDto staff)
     {
         _staff = staff;
 

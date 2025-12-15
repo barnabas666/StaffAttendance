@@ -5,10 +5,19 @@ using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace StaffAtt.Desktop.Helpers;
+
+/// <summary>
+/// Implementation of <see cref="IDesktopApiClient"/> for making HTTP requests to the Staff Attendance API.
+/// Provides methods for user authentication, retrieving staff information, and performing check-ins.
+/// Handles JWT token management and error handling.
+/// </summary>
 public class DesktopApiClient : IDesktopApiClient
 {
     private readonly HttpClient _client;
-    
+
+    // JWT token for the current session, just for future reference
+    public string? Token { get; private set; }
+
     public DesktopApiClient(IHttpClientFactory factory)
     {
         _client = factory.CreateClient("api");
@@ -31,7 +40,8 @@ public class DesktopApiClient : IDesktopApiClient
             }
 
             // Read token
-            string tokenStr = await resp.Content.ReadAsStringAsync();            
+            string tokenStr = await resp.Content.ReadAsStringAsync(); 
+            Token = tokenStr;
 
             _client.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenStr);

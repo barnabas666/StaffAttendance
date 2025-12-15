@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
 using StaffAtt.Web.Controllers;
-using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Models;
+using StaffAtt.Web.Services;
 using StaffAttShared.DTOs;
 
 namespace StaffAtt.Web.Tests.Controllers;

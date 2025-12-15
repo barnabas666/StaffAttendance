@@ -1,4 +1,5 @@
-﻿@inject StaffAtt.Web.Helpers.IUserService UserService
+﻿@using StaffAtt.Web.Services
+@inject IUserService UserService
 
 @{
     var email = UserService.GetEmail();

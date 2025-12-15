@@ -1,4 +1,4 @@
-﻿namespace StaffAtt.Web.Helpers;
+﻿namespace StaffAtt.Web.Services;
 
 public interface IUserService
 {

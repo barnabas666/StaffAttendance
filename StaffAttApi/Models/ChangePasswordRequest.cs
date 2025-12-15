@@ -1,4 +1,4 @@
-﻿namespace StaffAttApi.Controllers.DTOs;
+﻿namespace StaffAttApi.Models;
 
 public class ChangePasswordRequest
 {
