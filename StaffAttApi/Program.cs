@@ -1,6 +1,7 @@
 using AspNetCoreRateLimit;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using StaffAttApi.Middleware;
 using StaffAttApi.StartupConfig;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ApiExceptionMiddleware>();
 app.UseIpRateLimiting();
 app.UseResponseCaching();
 app.UseAuthentication();

@@ -47,17 +47,9 @@ public class StaffController : ControllerBase
         ApplyResponseCache("LongDuration");
         _logger.LogInformation("GET: api/Staff/departments");
 
-        try
-        {
-            List<DepartmentModel> departments = await _staffService.GetAllDepartmentsAsync();
-            List<DepartmentDto> departmentDtos = _mapper.Map<List<DepartmentDto>>(departments);
-            return Ok(departmentDtos);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The GET call to api/Staff/departments failed.");
-            return BadRequest();
-        }
+        List<DepartmentModel> departments = await _staffService.GetAllDepartmentsAsync();
+        List<DepartmentDto> departmentDtos = _mapper.Map<List<DepartmentDto>>(departments);
+        return Ok(departmentDtos); 
     }
 
     // POST: api/staff
@@ -66,27 +58,19 @@ public class StaffController : ControllerBase
     {
         _logger.LogInformation("POST: api/Staff (Email: {Email})", request.EmailAddress);
 
-        try
-        {
-            AddressModel address = _mapper.Map<AddressModel>(request.Address);
-            List<PhoneNumberModel> phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
+        AddressModel address = _mapper.Map<AddressModel>(request.Address);
+        List<PhoneNumberModel> phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
 
-            int staffId = await _staffService.CreateStaffAsync(
-                request.DepartmentId,
-                address,
-                request.PIN,
-                request.FirstName,
-                request.LastName,
-                request.EmailAddress,
-                phoneNumbers);
+        int staffId = await _staffService.CreateStaffAsync(
+            request.DepartmentId,
+            address,
+            request.PIN,
+            request.FirstName,
+            request.LastName,
+            request.EmailAddress,
+            phoneNumbers);
 
-            return Ok(new { StaffId = staffId });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The POST call to api/Staff failed. Email: {Email}", request.EmailAddress);
-            return BadRequest();
-        }
+        return Ok(new { StaffId = staffId });
     }
 
     // PUT: api/staff
@@ -95,26 +79,18 @@ public class StaffController : ControllerBase
     {
         _logger.LogInformation("PUT: api/Staff (Email: {Email})", request.EmailAddress);
 
-        try
-        {
-            AddressModel address = _mapper.Map<AddressModel>(request.Address);
-            List<PhoneNumberModel> phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
+        AddressModel address = _mapper.Map<AddressModel>(request.Address);
+        List<PhoneNumberModel> phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
 
-            await _staffService.UpdateStaffAsync(
-                address,
-                request.PIN,
-                request.FirstName,
-                request.LastName,
-                request.EmailAddress,
-                phoneNumbers);
+        await _staffService.UpdateStaffAsync(
+            address,
+            request.PIN,
+            request.FirstName,
+            request.LastName,
+            request.EmailAddress,
+            phoneNumbers);
 
-            return Ok(new { request.EmailAddress });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The PUT call to api/Staff failed. Email: {Email}", request.EmailAddress);
-            return BadRequest();
-        }
+        return Ok(new { request.EmailAddress });
     }
 
     // Example request: GET /api/staff/basic/filter?departmentId=5&approvedType=Approved    
@@ -128,25 +104,16 @@ public class StaffController : ControllerBase
         _logger.LogInformation("GET: api/Staff/basic/filter (DepartmentId: {departmentId}, ApprovedType: {approvedType})",
             departmentId, approvedType);
 
-        try
-        {
-            List<StaffBasicModel> staffList = await _staffService.GetAllBasicStaffFilteredAsync(departmentId, approvedType);
+        List<StaffBasicModel> staffList = await _staffService.GetAllBasicStaffFilteredAsync(departmentId, approvedType);
 
-            if (staffList == null)
-            {
-                _logger.LogWarning("No staff found for DepartmentId: {departmentId}, ApprovedType: {approvedType}",
-                    departmentId, approvedType);
-                return NotFound();
-            }
-            List<StaffBasicDto> staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
-            return Ok(staffDto);
-        }
-        catch (Exception ex)
+        if (staffList == null)
         {
-            _logger.LogError(ex, "The GET call to api/Staff/basic/filter failed. DepartmentId: {departmentId}, ApprovedType: {approvedType}",
+            _logger.LogWarning("No staff found for DepartmentId: {departmentId}, ApprovedType: {approvedType}",
                 departmentId, approvedType);
-            return BadRequest();
+            return NotFound();
         }
+        List<StaffBasicDto> staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
+        return Ok(staffDto);
     }
 
     // GET: api/staff/basic
@@ -156,23 +123,15 @@ public class StaffController : ControllerBase
         ApplyResponseCache("MediumDuration");
         _logger.LogInformation("GET: api/Staff/basic");
 
-        try
-        {
-            List<StaffBasicModel> staffList = await _staffService.GetAllBasicStaffAsync();
+        List<StaffBasicModel> staffList = await _staffService.GetAllBasicStaffAsync();
 
-            if (staffList == null)
-            {
-                _logger.LogWarning("No staff found.");
-                return NotFound();
-            }
-            List<StaffBasicDto> staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
-            return Ok(staffDto);
-        }
-        catch (Exception ex)
+        if (staffList == null)
         {
-            _logger.LogError(ex, "The GET call to api/Staff/basic failed.");
-            return BadRequest();
+            _logger.LogWarning("No staff found.");
+            return NotFound();
         }
+        List<StaffBasicDto> staffDto = _mapper.Map<List<StaffBasicDto>>(staffList);
+        return Ok(staffDto);
     }
 
     // Example request: GET /api/staff/email?emailAddress=someone%40example.com
@@ -184,22 +143,16 @@ public class StaffController : ControllerBase
         ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/email (Email: {Email})", emailAddress);
 
-        try
+        var staffFull = await _staffService.GetStaffByEmailAsync(emailAddress);
+
+        if (staffFull == null)
         {
-            StaffFullModel staffFull = await _staffService.GetStaffByEmailAsync(emailAddress);
-            if (staffFull == null)
-            {
-                _logger.LogWarning("Staff not found for Email: {Email}", emailAddress);
-                return NotFound();
-            }
-            StaffFullDto staffDto = _mapper.Map<StaffFullDto>(staffFull);
-            return Ok(staffDto);
+            _logger.LogWarning("Staff not found for Email: {Email}", emailAddress);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The GET call to api/Staff/email failed. Email: {Email}", emailAddress);
-            return BadRequest();
-        }
+
+        var staffDto = _mapper.Map<StaffFullDto>(staffFull);
+        return Ok(staffDto);
     }
 
     // Example request: GET /api/staff/123
@@ -210,22 +163,14 @@ public class StaffController : ControllerBase
         ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/{id} (Staff's Id: {Id})", id, id);
 
-        try
+        StaffFullModel staffFull = await _staffService.GetStaffByIdAsync(id);
+        if (staffFull == null)
         {
-            StaffFullModel staffFull = await _staffService.GetStaffByIdAsync(id);
-            if (staffFull == null)
-            {
-                _logger.LogWarning("Staff not found for Id: {Id}", id);
-                return NotFound();
-            }
-            StaffFullDto staffDto = _mapper.Map<StaffFullDto>(staffFull);
-            return Ok(staffDto);
+            _logger.LogWarning("Staff not found for Id: {Id}", id);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The GET call to api/Staff/{id} failed. Staff's Id: {Id}", id, id);
-            return BadRequest();
-        }
+        StaffFullDto staffDto = _mapper.Map<StaffFullDto>(staffFull);
+        return Ok(staffDto);
     }
 
     // Example request: GET /api/staff/basic/123
@@ -236,22 +181,14 @@ public class StaffController : ControllerBase
         ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/basic/{id} (Staff's Id: {Id})", id, id);
 
-        try
+        StaffBasicModel staff = await _staffService.GetBasicStaffByIdAsync(id);
+        if (staff == null)
         {
-            StaffBasicModel staff = await _staffService.GetBasicStaffByIdAsync(id);
-            if (staff == null)
-            {
-                _logger.LogWarning("Basic staff not found for Id: {Id}", id);
-                return NotFound();
-            }
-            StaffBasicDto staffDto = _mapper.Map<StaffBasicDto>(staff);
-            return Ok(staffDto);
+            _logger.LogWarning("Basic staff not found for Id: {Id}", id);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The GET call to api/Staff/basic/{id} failed. Staff's Id: {Id}", id, id);
-            return BadRequest();
-        }
+        StaffBasicDto staffDto = _mapper.Map<StaffBasicDto>(staff);
+        return Ok(staffDto);
     }
 
     // Example request: GET /api/staff/basic/alias/456
@@ -262,22 +199,14 @@ public class StaffController : ControllerBase
         ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/basic/alias/{aliasId} (AliasId: {AliasId})", aliasId, aliasId);
 
-        try
+        StaffBasicModel staff = await _staffService.GetBasicStaffByAliasIdAsync(aliasId);
+        if (staff == null)
         {
-            StaffBasicModel staff = await _staffService.GetBasicStaffByAliasIdAsync(aliasId);
-            if (staff == null)
-            {
-                _logger.LogWarning("Staff not found for AliasId: {AliasId}", aliasId);
-                return NotFound();
-            }
-            StaffBasicDto staffDto = _mapper.Map<StaffBasicDto>(staff);
-            return Ok(staffDto);
+            _logger.LogWarning("Staff not found for AliasId: {AliasId}", aliasId);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The GET call to api/Staff/basic/alias/{AliasId} failed.", aliasId);
-            return BadRequest();
-        }
+        StaffBasicDto staffDto = _mapper.Map<StaffBasicDto>(staff);
+        return Ok(staffDto);
     }
 
     // Example request: GET /api/staff/email/123
@@ -288,21 +217,13 @@ public class StaffController : ControllerBase
         ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/email/{id} (Staff's Id: {Id})", id, id);
 
-        try
+        string email = await _staffService.GetStaffEmailByIdAsync(id);
+        if (string.IsNullOrEmpty(email))
         {
-            string email = await _staffService.GetStaffEmailByIdAsync(id);
-            if (string.IsNullOrEmpty(email))
-            {
-                _logger.LogWarning("Email not found for staff Id: {Id}", id);
-                return NotFound();
-            }
-            return Ok(new { EmailAddress = email });
+            _logger.LogWarning("Email not found for staff Id: {Id}", id);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The GET call to api/Staff/email/{id} failed. Staff's Id: {Id}", id, id);
-            return BadRequest();
-        }
+        return Ok(new { EmailAddress = email });
     }
 
     // Example request: GET /api/staff/check-email?emailAddress=someone%40example.com
@@ -314,16 +235,8 @@ public class StaffController : ControllerBase
         ApplyResponseCache("ShortDuration");
         _logger.LogInformation("GET: api/Staff/check-email (Email: {Email})", emailAddress);
 
-        try
-        {
-            bool exists = await _staffService.CheckStaffByEmailAsync(emailAddress);
-            return Ok(exists);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The GET call to api/Staff/check-email failed. Email: {Email}", emailAddress);
-            return BadRequest();
-        }
+        bool exists = await _staffService.CheckStaffByEmailAsync(emailAddress);
+        return Ok(exists);
     }
 
     // PUT: api/staff/admin
@@ -333,16 +246,8 @@ public class StaffController : ControllerBase
         _logger.LogInformation("PUT: api/Staff/admin (Staff's Id: {Id}, DepartmentId: {DepartmentId}, IsApproved: {IsApproved})",
             request.Id, request.DepartmentId, request.IsApproved);
 
-        try
-        {
-            await _staffService.UpdateStaffByAdminAsync(request.Id, request.DepartmentId, request.IsApproved);
-            return Ok(new { request.Id });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The PUT call to api/Staff/admin failed. Staff's Id: {Id}", request.Id);
-            return BadRequest();
-        }
+        await _staffService.UpdateStaffByAdminAsync(request.Id, request.DepartmentId, request.IsApproved);
+        return Ok(new { request.Id });
     }
 
     // Example request: DELETE /api/staff/123
@@ -352,15 +257,7 @@ public class StaffController : ControllerBase
     {
         _logger.LogInformation("DELETE: api/Staff/{staffId} (StaffId: {StaffId})", staffId, staffId);
 
-        try
-        {
-            await _staffService.DeleteStaffAsync(staffId);
-            return Ok(new { StaffId = staffId });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The DELETE call to api/Staff/{staffId} failed. StaffId: {StaffId}", staffId, staffId);
-            return BadRequest();
-        }
+        await _staffService.DeleteStaffAsync(staffId);
+        return Ok(new { StaffId = staffId });
     }
 }
