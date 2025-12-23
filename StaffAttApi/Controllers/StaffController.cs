@@ -49,6 +49,8 @@ public class StaffController : ControllerBase
 
         List<DepartmentModel> departments = await _staffService.GetAllDepartmentsAsync();
         List<DepartmentDto> departmentDtos = _mapper.Map<List<DepartmentDto>>(departments);
+
+        _logger.LogInformation("Returned {Count} departments", departmentDtos.Count);
         return Ok(departmentDtos); 
     }
 
@@ -56,7 +58,9 @@ public class StaffController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateStaff([FromBody] CreateStaffRequest request)
     {
-        _logger.LogInformation("POST: api/Staff (Email: {Email})", request.EmailAddress);
+        _logger.LogInformation("POST api/staff - Creating staff (Email={Email}, DepartmentId={DepartmentId})",
+                               request.EmailAddress,
+                               request.DepartmentId);
 
         AddressModel address = _mapper.Map<AddressModel>(request.Address);
         List<PhoneNumberModel> phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
@@ -70,6 +74,9 @@ public class StaffController : ControllerBase
             request.EmailAddress,
             phoneNumbers);
 
+        _logger.LogInformation("Staff created successfully (StaffId={StaffId}, Email={Email})",
+                               staffId,
+                               request.EmailAddress);
         return Ok(new { StaffId = staffId });
     }
 
@@ -77,7 +84,7 @@ public class StaffController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateStaff([FromBody] UpdateStaffRequest request)
     {
-        _logger.LogInformation("PUT: api/Staff (Email: {Email})", request.EmailAddress);
+        _logger.LogInformation("PUT api/staff - Updating staff (Email={Email})", request.EmailAddress);
 
         AddressModel address = _mapper.Map<AddressModel>(request.Address);
         List<PhoneNumberModel> phoneNumbers = _mapper.Map<List<PhoneNumberModel>>(request.PhoneNumbers);
@@ -90,6 +97,7 @@ public class StaffController : ControllerBase
             request.EmailAddress,
             phoneNumbers);
 
+        _logger.LogInformation("Staff updated successfully (Email={Email})", request.EmailAddress);
         return Ok(new { request.EmailAddress });
     }
 

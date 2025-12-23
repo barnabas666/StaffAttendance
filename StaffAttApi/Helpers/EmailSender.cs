@@ -5,6 +5,9 @@ using MimeKit.Text;
 
 namespace StaffAttApi.Helpers;
 
+/// <summary>
+/// Implements email sending functionality using SMTP.
+/// </summary>
 public class EmailSender : IEmailSender
 {
     private readonly IConfiguration _configuration;

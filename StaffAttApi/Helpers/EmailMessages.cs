@@ -2,10 +2,14 @@
 
 namespace StaffAttApi.Helpers;
 
+/// <summary>
+/// Provides email message templates for account confirmation and password reset.
+/// </summary>
 public static class EmailMessages
 {
     public static string GetConfirmLinkMessage(string callbackUrl)
     {
+        // Encode the URL to ensure it is safe for use in HTML
         var encodedUrl = Uri.EscapeDataString(callbackUrl);
 
         return $"""
@@ -29,6 +33,7 @@ public static class EmailMessages
 
     public static string GetPasswordResetMessage(string resetUrl)
     {
+        // Encode the URL to ensure it is safe for use in HTML
         string encodedUrl = HtmlEncoder.Default.Encode(resetUrl);
 
         return $"""

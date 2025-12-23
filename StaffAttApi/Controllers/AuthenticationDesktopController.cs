@@ -34,17 +34,21 @@ public class AuthenticationDesktopController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticationData data)
     {
-        _logger.LogInformation("POST: api/AuthenticationDesktop/token (Alias: {data.Alias})", data.Alias);
+        _logger.LogInformation("Desktop authentication attempt (Alias={Alias})", data.Alias);
 
         var aliasData = await ValidateCredentials(data);
 
         if (aliasData is null)
         {
+            _logger.LogWarning("Desktop authentication failed - invalid credentials (Alias={Alias})", data.Alias);
             return Unauthorized();
         }
 
         string token = GenerateToken(aliasData);
 
+        _logger.LogInformation("Desktop authentication successful (Alias={Alias}, StaffId={StaffId})",
+                               aliasData.Alias,
+                               aliasData.Id);
         return Ok(token);
     }
 
@@ -72,16 +76,12 @@ public class AuthenticationDesktopController : ControllerBase
     }
 
     private async Task<AliasData?> ValidateCredentials(AuthenticationData data)
-    {
-        AliasModel? aliasModel = null;
+    {      
+        var aliasModel = await _staffService.AliasVerificationAsync(data.Alias, data.PIN);
 
-        aliasModel = await _staffService.AliasVerificationAsync(data.Alias, data.PIN);
+        if (aliasModel == null)
+            return null;
 
-        if (aliasModel != null)
-        {
-            return new AliasData(aliasModel.Id, aliasModel.Alias);
-        }
-
-        return null;
+        return new AliasData(aliasModel.Id, aliasModel.Alias);
     }
 }
