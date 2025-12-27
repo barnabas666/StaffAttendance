@@ -38,9 +38,9 @@ public class StaffSelectListService : IStaffSelectListService
             var staffResult = await _apiClient.GetAsync<List<StaffBasicDto>>("staff/basic");
 
             // Instead of crashing UI, return empty dropdown
-            if (!staffResult.IsSuccess || staffResult.Value is null)            
+            if (!staffResult.IsSuccess || staffResult.Value is null)
                 return new SelectList(Enumerable.Empty<StaffBasicDto>(), nameof(StaffBasicDto.Id), nameof(StaffBasicDto.FullName));
-            
+
             staffList = staffResult.Value;
 
             // Cache result

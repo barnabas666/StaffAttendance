@@ -1,5 +1,4 @@
-﻿using StaffAtt.Desktop.Models;
-using StaffAtt.Desktop.Helpers;
+﻿using StaffAtt.Desktop.Helpers;
 using StaffAttShared.DTOs;
 using System.Windows;
 

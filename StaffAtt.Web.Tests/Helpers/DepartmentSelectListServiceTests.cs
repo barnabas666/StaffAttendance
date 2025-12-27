@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using StaffAtt.Web.Models;
 using StaffAtt.Web.Services;
@@ -11,10 +12,11 @@ namespace StaffAtt.Web.Tests.Helpers
     {
         private readonly DepartmentSelectListService _sut;
         private readonly Mock<IApiClient> _apiClientMock = new();
+        private readonly Mock<IMemoryCache> _memoryCacheMock = new();
 
         public DepartmentSelectListServiceTests()
         {
-            _sut = new DepartmentSelectListService(_apiClientMock.Object);
+            _sut = new DepartmentSelectListService(_apiClientMock.Object, _memoryCacheMock.Object);
         }
 
         [Fact]

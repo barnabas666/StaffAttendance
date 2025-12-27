@@ -1,19 +1,13 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Ocsp;
 using StaffAttApi.Helpers;
 using StaffAttApi.Models;
 using StaffAttApi.Services;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StaffAttApi.Controllers
 {
@@ -91,7 +85,7 @@ namespace StaffAttApi.Controllers
             // Send email
             await _emailSender.SendEmailAsync(req.Email,
                                               "Confirm your email",
-                                              EmailMessages.GetConfirmLinkMessage(confirmUrl));            
+                                              EmailMessages.GetConfirmLinkMessage(confirmUrl));
             return Ok();
         }
 
@@ -233,7 +227,7 @@ namespace StaffAttApi.Controllers
         [HttpPost("change-password")]
         [Authorize]
         public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
-        {            
+        {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             _logger.LogInformation("POST api/auth/change-password (UserId={UserId})", userId);
 

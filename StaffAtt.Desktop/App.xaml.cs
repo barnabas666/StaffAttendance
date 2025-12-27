@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StaffAtt.Desktop.Helpers;
-using StaffAtt.Desktop.Models;
 using StaffAttLibrary.Data;
 using StaffAttLibrary.Data.PostgreSQL;
 using StaffAttLibrary.Data.SQL;

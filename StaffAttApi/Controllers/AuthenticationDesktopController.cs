@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using StaffAttLibrary.Data;
-using StaffAttLibrary.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -76,7 +75,7 @@ public class AuthenticationDesktopController : ControllerBase
     }
 
     private async Task<AliasData?> ValidateCredentials(AuthenticationData data)
-    {      
+    {
         var aliasModel = await _staffService.AliasVerificationAsync(data.Alias, data.PIN);
 
         if (aliasModel == null)

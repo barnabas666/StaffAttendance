@@ -34,9 +34,9 @@ public class DepartmentSelectListService : IDepartmentSelectListService
             var result = await _apiClient.GetAsync<List<DepartmentDto>>("staff/departments");
 
             // Instead of crashing UI, return empty dropdown
-            if (!result.IsSuccess || result.Value is null)           
+            if (!result.IsSuccess || result.Value is null)
                 return new SelectList(Enumerable.Empty<DepartmentDto>(), nameof(DepartmentDto.Id), nameof(DepartmentDto.Title));
-            
+
             departments = result.Value;
 
             // Cache result
@@ -47,8 +47,8 @@ public class DepartmentSelectListService : IDepartmentSelectListService
         var listToDisplay = new List<DepartmentDto>(departments);
 
         // Insert default value at the top (e.g. "All Departments")
-        if (!string.IsNullOrEmpty(defaultValue))  
-            listToDisplay.Insert(0, new DepartmentDto { Id = 0, Title = defaultValue });        
+        if (!string.IsNullOrEmpty(defaultValue))
+            listToDisplay.Insert(0, new DepartmentDto { Id = 0, Title = defaultValue });
 
         // Source is departments, value (Id here) gonna be saved to database, Text (Title) gets displayed to user, both expect string.
         return new SelectList(listToDisplay, nameof(DepartmentDto.Id), nameof(DepartmentDto.Title));

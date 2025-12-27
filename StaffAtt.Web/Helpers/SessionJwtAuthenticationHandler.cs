@@ -49,7 +49,7 @@ public class SessionJwtAuthenticationHandler : AuthenticationHandler<Authenticat
 
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
-    
+
     /// <summary>
     /// Handles authentication challenges by redirecting unauthenticated users to the login page.
     /// </summary>

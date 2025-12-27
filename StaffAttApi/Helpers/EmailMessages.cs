@@ -10,7 +10,7 @@ public static class EmailMessages
     public static string GetConfirmLinkMessage(string callbackUrl)
     {
         // Encode the URL to ensure it is safe for use in HTML
-        var encodedUrl = Uri.EscapeDataString(callbackUrl);
+        string encodedUrl = HtmlEncoder.Default.Encode(callbackUrl);
 
         return $"""
         <html>

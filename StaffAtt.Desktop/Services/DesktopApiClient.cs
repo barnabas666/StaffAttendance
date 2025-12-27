@@ -40,7 +40,7 @@ public class DesktopApiClient : IDesktopApiClient
             }
 
             // Read token
-            string tokenStr = await resp.Content.ReadAsStringAsync(); 
+            string tokenStr = await resp.Content.ReadAsStringAsync();
             Token = tokenStr;
 
             _client.DefaultRequestHeaders.Authorization =

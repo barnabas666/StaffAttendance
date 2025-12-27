@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <!-- REQUIRED for source-generated configuration binding -->
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <InterceptorsPreview>true</InterceptorsPreview>
+    <InterceptorsNamespaces>Microsoft.Extensions.Configuration.Binder</InterceptorsNamespaces>
   </PropertyGroup>
 
   <ItemGroup>

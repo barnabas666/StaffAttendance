@@ -15,7 +15,6 @@ public class StaffControllerTests
 {
     private readonly StaffController _sut;
     private readonly Mock<IApiClient> _apiClientMock = new();
-    private readonly Mock<IUserService> _userServiceMock = new();
     private readonly Mock<IUserContext> _userContextMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
     private readonly Mock<IPhoneNumberDtoParser> _phoneNumberParserMock = new();
@@ -24,8 +23,7 @@ public class StaffControllerTests
     public StaffControllerTests()
     {
         _sut = new StaffController(
-            _apiClientMock.Object,
-            _userServiceMock.Object,
+            _apiClientMock.Object,            
             _userContextMock.Object,
             _mapperMock.Object,
             _phoneNumberParserMock.Object,
@@ -104,9 +102,6 @@ public class StaffControllerTests
 
         // Identity setup
         var identityUser = new IdentityUser { Email = userEmail };
-        _userServiceMock.Setup(x => x.FindByEmailAsync(userEmail)).ReturnsAsync(identityUser);
-        _userServiceMock.Setup(x => x.AddToRoleAsync(identityUser, "Member")).ReturnsAsync(IdentityResult.Success);
-        _userServiceMock.Setup(x => x.SignInAsync(identityUser, false)).Returns(Task.CompletedTask);
 
         // Act
         var result = await _sut.Create(staffCreateModel);
@@ -252,15 +247,14 @@ public class StaffControllerTests
             .Returns(expectedDetailsModel);
 
         // Act
-        var result = await _sut.Details(expectedMessage);
+        var result = await _sut.Details();
 
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().Be(expectedViewName);
 
         var model = viewResult.Model.Should().BeAssignableTo<StaffDetailsViewModel>().Subject;
-        model.Should().BeEquivalentTo(expectedDetailsModel);
-        model.Message.Should().Be(expectedMessage);
+        model.Should().BeEquivalentTo(expectedDetailsModel);        
     }
 
     [Fact]
@@ -278,7 +272,7 @@ public class StaffControllerTests
             .ReturnsAsync(Result<bool>.Success(false));
 
         // Act
-        var result = await _sut.Details(It.IsAny<string>());
+        var result = await _sut.Details();
 
         // Assert
         var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;

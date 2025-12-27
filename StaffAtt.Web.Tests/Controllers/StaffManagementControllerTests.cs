@@ -16,15 +16,15 @@ public class StaffManagementControllerTests
 {
     private readonly StaffManagementController _sut;
     private readonly Mock<IApiClient> _apiClientMock = new();
-    private readonly Mock<IUserService> _userServiceMock = new();
+    private readonly Mock<IAuthClient> _authClientMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
     private readonly Mock<IDepartmentSelectListService> _departmentSelectListServiceMock = new();
 
     public StaffManagementControllerTests()
     {
         _sut = new StaffManagementController(
-            _apiClientMock.Object,
-            _userServiceMock.Object,
+            _apiClientMock.Object,            
+            _authClientMock.Object,
             _mapperMock.Object,
             _departmentSelectListServiceMock.Object
         );
@@ -447,14 +447,6 @@ public class StaffManagementControllerTests
 
         IdentityUser identityUser = new() { Email = userEmail };
 
-        _userServiceMock
-            .Setup(x => x.FindByEmailAsync(userEmail))
-            .ReturnsAsync(identityUser);
-
-        _userServiceMock
-            .Setup(x => x.DeleteIdentityUserAsync(identityUser))
-            .Returns(Task.CompletedTask);
-
         // Act
         IActionResult result = await _sut.Delete(deleteViewModel);
 
@@ -514,7 +506,5 @@ public class StaffManagementControllerTests
         viewResult.ViewName.Should().Be(expectedViewName);
         var model = viewResult.Model.Should().BeOfType<ErrorViewModel>().Subject;
         model.Message.Should().Be(errorMessage);
-
-        _userServiceMock.Verify(x => x.FindByEmailAsync(It.IsAny<string>()), Times.Never);
     }
 }

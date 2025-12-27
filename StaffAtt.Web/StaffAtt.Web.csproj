@@ -5,11 +5,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-StaffAtt.Web-a0b95186-d673-4572-ab42-d22f1e90256e</UserSecretsId>
+    <!-- REQUIRED for source-generated configuration binding -->
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <InterceptorsPreview>true</InterceptorsPreview>
+    <InterceptorsNamespaces>Microsoft.Extensions.Configuration.Binder</InterceptorsNamespaces>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="app.db" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />

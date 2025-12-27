@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.CookiePolicy;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using StaffAtt.Web.Helpers;
 using StaffAtt.Web.Services;
+using System.Text;
 
 namespace StaffAtt.Web.StartupConfig;
 

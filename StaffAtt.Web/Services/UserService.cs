@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace StaffAtt.Web.Services;
+﻿namespace StaffAtt.Web.Services;
 
 /// <summary>
 /// Service for managing user authentication and session data.

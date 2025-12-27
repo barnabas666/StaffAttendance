@@ -12,6 +12,11 @@ StaffAtt.Identity/app.db
 StaffAttApi/appsettings.Development.json
 SolutionStructure.txt
 
+# Identity db
+*.db
+*.db-shm
+*.db-wal
+
 # User-specific files
 *.rsuser
 *.suo

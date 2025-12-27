@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using StaffAtt.Desktop.Helpers;
-using StaffAtt.Desktop.Models;
-using StaffAttShared.DTOs;
 using System.Windows;
 
 namespace StaffAtt.Desktop;

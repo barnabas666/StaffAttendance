@@ -51,7 +51,7 @@ public class StaffController : ControllerBase
         List<DepartmentDto> departmentDtos = _mapper.Map<List<DepartmentDto>>(departments);
 
         _logger.LogInformation("Returned {Count} departments", departmentDtos.Count);
-        return Ok(departmentDtos); 
+        return Ok(departmentDtos);
     }
 
     // POST: api/staff

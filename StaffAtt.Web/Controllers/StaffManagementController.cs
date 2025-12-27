@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using StaffAtt.Web.Models;
 using StaffAtt.Web.Services;
@@ -16,19 +15,16 @@ public class StaffManagementController : Controller
 {
     private readonly IApiClient _apiClient;
     private readonly IAuthClient _authClient;
-    private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly IDepartmentSelectListService _departmentService;
 
     public StaffManagementController(IApiClient apiClient,
-                                     IAuthClient authClient,
-                                     IUserService userService,
+                                     IAuthClient authClient,                                     
                                      IMapper mapper,
                                      IDepartmentSelectListService departmentService)
     {
         _apiClient = apiClient;
-        _authClient = authClient;
-        _userService = userService;
+        _authClient = authClient;        
         _mapper = mapper;
         _departmentService = departmentService;
     }
