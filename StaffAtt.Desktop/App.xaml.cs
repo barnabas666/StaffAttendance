@@ -1,13 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StaffAtt.Desktop.Helpers;
-using StaffAttLibrary.Data;
-using StaffAttLibrary.Data.PostgreSQL;
-using StaffAttLibrary.Data.SQL;
-using StaffAttLibrary.Data.SQLite;
-using StaffAttLibrary.Db.PostgreSQL;
-using StaffAttLibrary.Db.SQL;
-using StaffAttLibrary.Db.SQLite;
 using System.IO;
 using System.Windows;
 
@@ -52,38 +45,7 @@ public static class ServiceCollectionExtensions
             opts.BaseAddress = new Uri(configuration.GetValue<string>("ApiUrl"));
         });
 
-        // Register services for dependency injection according to the DbType specified in config
-        string dbType = configuration["DbType"] ?? "Postgres";
-        if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
-        {
-            services.AddSingleton<ISqliteDataAccess, SqliteDataAccess>();
-            services.AddSingleton<IStaffService, StaffSqliteService>();
-            services.AddSingleton<ICheckInService, CheckInSqliteService>();
-            services.AddSingleton<IStaffData, StaffSqliteData>();
-            services.AddSingleton<ICheckInData, CheckInSqliteData>();
-            services.AddSingleton<IStaffDataProcessor, StaffSqliteDataProcessor>();
-        }
-        else if (dbType.Equals("Sql", StringComparison.OrdinalIgnoreCase))
-        {
-            services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
-            services.AddSingleton<IStaffService, StaffService>();
-            services.AddSingleton<ICheckInService, CheckInService>();
-            services.AddSingleton<IStaffData, StaffData>();
-            services.AddSingleton<ICheckInData, CheckInData>();
-            services.AddSingleton<IStaffDataProcessor, StaffDataProcessor>();
-        }
-        else
-        {
-            services.AddSingleton<IPostgresDataAccess, PostgresDataAccess>();
-            services.AddSingleton<IStaffService, StaffPostgresService>();
-            services.AddSingleton<ICheckInService, CheckInPostgresService>();
-            services.AddSingleton<IStaffData, StaffPostgresData>();
-            services.AddSingleton<ICheckInData, CheckInPostgresData>();
-            services.AddSingleton<IStaffDataProcessor, StaffPostgresDataProcessor>();
-        }
-
         services.AddSingleton<IDesktopApiClient, DesktopApiClient>();
-        services.AddSingleton<IConnectionStringData, ConnectionStringData>();
         services.AddTransient<MainWindow>();
         services.AddTransient<CheckInForm>();
     }

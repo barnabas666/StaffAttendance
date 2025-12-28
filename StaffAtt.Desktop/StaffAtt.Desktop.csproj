@@ -27,18 +27,11 @@
       <TreatAsUsed>true</TreatAsUsed>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
     <PackageReference Include="System.Net.Http.Json" Version="9.0.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StaffAttLibrary\StaffAttLibrary.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\StaffAttSQLiteDB\StaffAttSQLite.db">
-      <Link>StaffAttSQLiteDB\StaffAttSQLite.db</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -46,6 +39,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StaffAttShared\StaffAttShared.csproj" />
   </ItemGroup>
 
 </Project>
