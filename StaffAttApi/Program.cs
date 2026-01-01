@@ -10,6 +10,7 @@ builder.AddStandardServices();
 builder.AddCustomServices();
 builder.AddIdentityServices();
 builder.AddAuthServices();
+builder.AddCorsPolicy();
 builder.AddHealthCheckServices();
 builder.AddRateLimitServices();
 
@@ -25,6 +26,7 @@ app.UseHttpsRedirection();
 app.UseMiddleware<ApiExceptionMiddleware>();
 app.UseIpRateLimiting();
 app.UseResponseCaching();
+app.UseCors("WebClientPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -21,7 +21,7 @@ COMPONENTS AND RESPONSIBILITIES
 
 - Class library containing ASP.NET Core Identity setup
 - Referenced exclusively by StaffAttApi
-- Uses a separate SQLite database for identity data
+- Uses a separate PostgreSQL database for identity data
 - Not referenced by Web or Desktop applications
 
 3) StaffAttLibrary (Business Logic & Data Access)

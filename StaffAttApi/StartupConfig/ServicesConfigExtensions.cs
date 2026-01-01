@@ -19,6 +19,9 @@ using System.Text;
 
 namespace StaffAttApi.StartupConfig;
 
+/// <summary>
+/// Extension methods for configuring services in the dependency injection container.
+/// </summary>
 public static class ServicesConfigExtensions
 {
     public static void AddStandardServices(this WebApplicationBuilder builder)
@@ -93,7 +96,6 @@ public static class ServicesConfigExtensions
 
         builder.Services.AddSingleton<IJwtService, JwtService>();
         builder.Services.AddTransient<IEmailSender, EmailSender>();
-
     }
 
     public static void AddIdentityServices(this WebApplicationBuilder builder)
@@ -102,7 +104,7 @@ public static class ServicesConfigExtensions
             ?? throw new InvalidOperationException("Connection string 'IdentityDb' not found.");
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite(connectionString)); // Or UseSqlServer, etc.
+            options.UseNpgsql(connectionString)); // Or UseSqlServer, etc.
 
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         {
@@ -115,6 +117,24 @@ public static class ServicesConfigExtensions
         })
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
+    }
+
+    public static void AddCorsPolicy(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("WebClientPolicy", policy =>
+            {
+                policy
+                    .WithOrigins(
+                        "https://bar666-app-dev-we-staffatt-mvc-cdenaugsf7cffbdv.westeurope-01.azurewebsites.net",
+                        "https://localhost:7099" // local web development
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
     }
 
     public static void AddHealthCheckServices(this WebApplicationBuilder builder)
